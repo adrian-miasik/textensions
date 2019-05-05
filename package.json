@@ -1,0 +1,29 @@
+{
+  "name": "com.adrianmiasik.textensions",
+  "author": "Adrian Miasik",
+  "displayName": "Textensions",
+  "version": "0.0.1",
+  "unity": "2019.1",
+  "bugs": "bugs@textensions.com",
+  "description": "Textensions is a tool used to quickly create and apply visual effects to any TextMeshPro text component. Allowing the developer to spend more time creating the visuals and less time creating their own animation solutions for text.",
+  "homepage": "textensions.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adrian-miasik/textensions.git"
+  },
+  "category" : "Text",
+  "keywords": [
+    "Text",
+    "Textensions",
+    "Text Extensions",
+    "TextMeshPro",
+    "TextMesh Pro",
+    "Adrian",
+    "Miasik",
+    "Adrian Miasik"
+  ],
+  "dependencies": {
+    "com.unity.textmeshpro": "2.0.0",
+    "com.unity.ugui": "1.0.0"
+  }           
+}
