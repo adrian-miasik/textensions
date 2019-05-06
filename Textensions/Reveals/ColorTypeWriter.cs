@@ -21,6 +21,10 @@ namespace Textensions.Reveals
 		protected override void RevealCharacter(int index)
 		{
 			base.RevealCharacter(index);
+
+			// Skip any characters that aren't visible
+			if (!AllCharacters[index].Info().isVisible)
+				return;
 			
 			// Color
 			ColorSingleCharacter(AllCharacters[index].Info(), CachedColor);
