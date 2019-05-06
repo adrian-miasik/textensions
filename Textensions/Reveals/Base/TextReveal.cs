@@ -12,34 +12,34 @@ namespace Textensions.Reveals.Base
 {
 	public abstract class TextReveal : MonoBehaviour
 	{
-		[SerializeField] [Tooltip("The text we want to reveal.")]
-		internal TextMeshProUGUI displayText;
-
-		//[SerializeField] [Tooltip("The text we will use to display statistics about this character reveal (Number of characters revealed, the delay in-between each character reveal, the current characters reveal time, and the total elapsed time).")]
-		//private TextMeshProUGUI statistics;
-
-		[SerializeField] [Tooltip("The amount of time (in seconds) between each character reveal.")]
-		protected float characterDelay = 0.05f;
-
+		// PUBLIC MEMBERS
+		[Tooltip("The text we want to reveal.")]
+		public TextMeshProUGUI displayText;
+		
+		[Tooltip("The amount of time (in seconds) between each character reveal.")]
+		public float characterDelay = 0.05f;
+		
+		public float characterScale;
+		
+		// Note: We are assuming this list will never contain a null element
+		public List<Effect> allEffects = new List<Effect>();
+		
+		
+		// PROTECTED MEMBERS
 		protected Color32 CachedColor;
+		protected Character[] AllCharacters;
+		
+		
+		// PRIVATE MEMBERS
 		private TMP_MeshInfo[] _originalMesh;
 		private Vector3[] _targetVertices = new Vector3[0];
-		
 		private bool _isRevealing;
 		private float _characterTime;
 		private float _totalRevealTime;
 		private int _numberOfCharacters;
 		private int _numberOfCharactersRevealed;
-
-		public float characterScale;
-
-		protected Character[] AllCharacters;
-
-		// Note: We are assuming this list will never contain a null element
-		public List<Effect> allEffects = new List<Effect>();
-
-		public bool vertexUpdate = false;
-		public bool colorUpdate = false;
+		private bool _vertexUpdate;
+		private bool _colorUpdate;
 		
 		protected virtual void RevealCharacter(int index)
 		{
@@ -58,7 +58,6 @@ namespace Textensions.Reveals.Base
 		{
 			// Quickly Fetch References.
 			displayText = GetComponent<TextMeshProUGUI>();
-			//statistics = GetComponent<TextMeshProUGUI>();
 		}
 
 
@@ -177,18 +176,7 @@ namespace Textensions.Reveals.Base
 
 			HideAllCharacters();
 		}
-
-		/// <summary>
-		/// Updates the statistics UI string.
-		/// </summary>
-		private void UpdateStatisticsText(TMP_Text text)
-		{
-			text.text = "Number of characters revealed: " + _numberOfCharactersRevealed + "/" + _numberOfCharacters + "\n" +
-			                  "Delay in-between character reveal: " + characterDelay + " seconds.\n" +
-			                  "Current character reveal time: " + _characterTime.ToString("F2") + " seconds.\n" +
-			                  "Elapsed time: " + _totalRevealTime.ToString("F2") + " seconds.\n";
-		}
-
+		
 		/// <summary>
 		/// Starts revealing the characters.
 		/// </summary>
@@ -208,12 +196,9 @@ namespace Textensions.Reveals.Base
 			// If we are text revealing...
 			if (_isRevealing)
 			{
-				
 				// If we don't have anything to reveal...
 				if (_numberOfCharacters == 0)
 				{
-					//UpdateStatisticsText();
-
 					// Early exit
 					return;
 				}
@@ -237,8 +222,6 @@ namespace Textensions.Reveals.Base
 						break;
 					}
 				}
-
-				//UpdateStatisticsText();
 			}
 
 			// Iterate through all the characters
@@ -250,7 +233,6 @@ namespace Textensions.Reveals.Base
 					// Iterate through all the effects to apply to this character
 					for (int j = 0; j < allEffects.Count; j++)
 					{
-						// TODO: If calculations are the same for this frame and last, don't scale / update mesh.
 						SetCharacterScale(AllCharacters[i], allEffects[j].Calculate(AllCharacters[i]));
 					}
 				}
@@ -261,9 +243,9 @@ namespace Textensions.Reveals.Base
 				}
 			}
 			
-			if (vertexUpdate)
+			if (_vertexUpdate)
 			{
-				vertexUpdate = false;
+				_vertexUpdate = false;
 				ApplyMeshChanges();
 			}
 		}
@@ -296,16 +278,11 @@ namespace Textensions.Reveals.Base
 		{
 			if (character.cachedScale == scale)
 			{
-//				Debug.Log("Skipping");
 				// Cache the scale 
 				character.cachedScale = scale;
 				return;
 			}
-
-			// Skip any characters that aren't visible
-			if (!character.Info().isVisible)
-				return;
-			
+						
 			// Get the characters material vertices from the texts mesh
 			Vector3[] originalVertices = _originalMesh[character.Info().materialReferenceIndex].vertices;
 			
@@ -336,10 +313,9 @@ namespace Textensions.Reveals.Base
 			_targetVertices[index + 1] += characterOrigin;
 			_targetVertices[index + 2] += characterOrigin;
 			_targetVertices[index + 3] += characterOrigin;
-
 			
 			// Set our vertex update to true so we can update all the vertex data at once instead of numerous times in a single frame.
-			vertexUpdate = true;
+			_vertexUpdate = true;
 		}
 	}
 }
