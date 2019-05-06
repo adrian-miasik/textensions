@@ -3,9 +3,8 @@
 // Github Account: https://github.com/AdrianMiasik
 
 using TMPro;
-using UnityEngine;
 
-namespace Textensions.Reveals
+namespace Textensions.Core
 {
 	public class Character
 	{

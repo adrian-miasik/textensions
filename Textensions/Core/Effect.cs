@@ -4,7 +4,7 @@
 
 using UnityEngine;
 
-namespace Textensions.Reveals.Base
+namespace Textensions.Core
 {
 	public abstract class Effect : ScriptableObject
 	{

@@ -5,10 +5,10 @@
 using Textensions.Reveals.Base;
 using UnityEngine;
 
-namespace Textensions.Examples
+namespace Textensions.Examples.Scripts
 {
 	/// <summary>
-	/// An example class that demonstrates how to use invoke Reveal functions.
+	/// An example script that demonstrates how to use invoke Reveal functions.
 	/// </summary>
 	public class TextRevealUsageExample : MonoBehaviour
 	{

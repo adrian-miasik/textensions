@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Textensions.Core;
 using TMPro;
 using UnityEngine;
 
