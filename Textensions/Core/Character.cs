@@ -9,7 +9,7 @@ namespace Textensions.Core
 	public class Character
 	{
 		public float timeSinceReveal;
-		public bool IsRevealed = false;
+		public bool isRevealed = false;
 		private TMP_CharacterInfo _info;
 		public float cachedScale;
 
