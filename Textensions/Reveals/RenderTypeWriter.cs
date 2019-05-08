@@ -22,13 +22,13 @@ namespace Textensions.Reveals
 		protected override void HideAllCharacters()
 		{
 			// Hide the text
-			displayText.maxVisibleCharacters = 0;
+			textension.GetText().maxVisibleCharacters = 0;
 		}
 
 		protected override void RevealCharacter(int index)
 		{
 			// Reveal a character
-			displayText.maxVisibleCharacters = index + 1;
+			textension.GetText().maxVisibleCharacters = index + 1;
 		}
 	}
 }

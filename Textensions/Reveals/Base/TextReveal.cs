@@ -2,8 +2,6 @@
 // Personal Portfolio: http://AdrianMiasik.com
 // Github Account: https://github.com/AdrianMiasik
 
-using System.Collections.Generic;
-using System.Linq;
 using Textensions.Core;
 using TMPro;
 using UnityEngine;
@@ -14,25 +12,12 @@ namespace Textensions.Reveals.Base
 	{
 		// PUBLIC MEMBERS
 		[Tooltip("The text we want to reveal.")]
-		public TextMeshProUGUI displayText;
+		public Textension textension;
 		
 		[Tooltip("The amount of time (in seconds) between each character reveal.")]
 		public float characterDelay = 0.05f;
-		
-		public float characterScale;
-		
-		// Note: We are assuming this list will never contain a null element
-		public List<Effect> allEffects = new List<Effect>();
-		
-		
-		// PROTECTED MEMBERS
-		protected Color32 CachedColor;
-		protected Character[] AllCharacters;
-		
-		
+
 		// PRIVATE MEMBERS
-		private TMP_MeshInfo[] _originalMesh;
-		private Vector3[] _targetVertices = new Vector3[0];
 		private bool _isRevealing;
 		private float _characterTime;
 		private float _totalRevealTime;
@@ -43,24 +28,23 @@ namespace Textensions.Reveals.Base
 		
 		protected virtual void RevealCharacter(int index)
 		{
-			AllCharacters[index].IsRevealed = true;
+			textension.GetCharacter(index).isRevealed = true;
 		}
-
+		
 		protected virtual void HideAllCharacters()
 		{
-			for (int i = 0; i < AllCharacters.Length; i++)
+			for (int i = 0; i < textension.GetCharacters().Count; i++)
 			{
-				AllCharacters[AllCharacters.Length - 1].IsRevealed = false;
+				textension.GetCharacter(i).isRevealed = false;
 			}
 		}
 				
 		private void Reset()
 		{
 			// Quickly Fetch References.
-			displayText = GetComponent<TextMeshProUGUI>();
+			textension = GetComponent<Textension>();
 		}
-
-
+		
 		private void Start()
 		{
 			Initialize();
@@ -114,7 +98,7 @@ namespace Textensions.Reveals.Base
 		/// <param name="source"></param>
 		public void ReplaceStringWithSources(TMP_InputField source)
 		{
-			displayText.text = source.text;
+			SetTextString(source.text);
 		}
 
 		/// <summary>
@@ -141,7 +125,7 @@ namespace Textensions.Reveals.Base
 		/// <param name="message"></param>
 		private void SetTextString(string message)
 		{
-			displayText.text = message;
+			textension.SetTextString(message);
 		}
 
 		/// <summary>
@@ -150,30 +134,9 @@ namespace Textensions.Reveals.Base
 		private void Initialize()
 		{
 			_numberOfCharactersRevealed = 0;
-			_numberOfCharacters = displayText.text.Length;
+			_numberOfCharacters = textension.GetTextLength();
 			_totalRevealTime = 0f;
-
-			// Force the mesh update so we don't have to wait a frame to get the data.
-			// Since we need to get information from the mesh we will have to update the mesh a bit earlier than normal.
-			// "TMP generates/processes the mesh once per frame (if needed) just before Unity renders the frame."
-			// Source: https://www.youtube.com/watch?v=ZHU3AcyDKik&feature=youtu.be&t=164
-			// In most cases it's fine for TMP to render at it's normal timings but as mentioned above if we are going
-			// to manipulate or fetch data from the mesh we should force the mesh to update so the data remains accurate.
-			displayText.ForceMeshUpdate();
-
-			CachedColor = displayText.color;
-			_originalMesh = displayText.textInfo.CopyMeshInfoVertexData();
 			
-			// Define the size of our array
-			AllCharacters = new Character[_numberOfCharacters];
-
-			// Create and cache a character class (This will be used for later to keep track of effects and each character state)
-			for (int i = 0; i < _numberOfCharacters; i++)
-			{
-				Character c = new Character(displayText.textInfo.characterInfo[i]);
-				AllCharacters[i] = c;
-			}
-
 			HideAllCharacters();
 		}
 		
@@ -223,99 +186,6 @@ namespace Textensions.Reveals.Base
 					}
 				}
 			}
-
-			// Iterate through all the characters
-			for (int i = 0; i < AllCharacters.Length; i++)
-			{
-				// If we have effects to apply to this character...
-				if (allEffects.Count > 0)
-				{
-					// Iterate through all the effects to apply to this character
-					for (int j = 0; j < allEffects.Count; j++)
-					{
-						SetCharacterScale(AllCharacters[i], allEffects[j].Calculate(AllCharacters[i]));
-					}
-				}
-				// We don't have any effects to apply, lets just do the regular scale.
-				else
-				{
-					SetCharacterScale(AllCharacters[i], characterScale);
-				}
-			}
-			
-			if (_vertexUpdate)
-			{
-				_vertexUpdate = false;
-				ApplyMeshChanges();
-			}
-		}
-
-		public void ApplyMeshChanges()
-		{
-			if (_targetVertices.Length <= 0) return;
-			
-			displayText.textInfo.meshInfo[0].mesh.SetVertices(_targetVertices.ToList());
-
-			// Vert changes
-			displayText.textInfo.meshInfo[0].mesh.vertices = _targetVertices;
-			
-			// Refresh data to render correctly
-			displayText.UpdateGeometry(displayText.textInfo.meshInfo[0].mesh, 0);
-
-			// Cache data for next time we need to apply changes.
-			_originalMesh = displayText.textInfo.CopyMeshInfoVertexData();
-		}
-		
-		/// <summary>
-		/// Scales the specified character to a specific size. (Uniform)
-		/// </summary>
-		/// <summary>
-		/// Note: Remember to update your mesh vertex position data. Update the mesh geometry or use UpdateVertexData() 
-		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="scale"></param>
-		public void SetCharacterScale(Character character, float scale)
-		{
-			if (character.cachedScale == scale)
-			{
-				// Cache the scale 
-				character.cachedScale = scale;
-				return;
-			}
-						
-			// Get the characters material vertices from the texts mesh
-			Vector3[] originalVertices = _originalMesh[character.Info().materialReferenceIndex].vertices;
-			
-			// Make a copy of those verts
-			_targetVertices = originalVertices;
-
-			int index = character.Info().vertexIndex;
-			
-			// Locate the center of the mesh (Bottom left + top right) / 2
-			Vector3 characterOrigin = (originalVertices[index + 0] + originalVertices[index + 3]) / 2;
-			characterOrigin.y = 0;
-			
-			// Subtract the center of the mesh from target verts
-			_targetVertices[index + 0] -= characterOrigin;
-			_targetVertices[index + 1] -= characterOrigin;
-			_targetVertices[index + 2] -= characterOrigin;
-			_targetVertices[index + 3] -= characterOrigin;
-			 
-			// Scale the mesh of this character by our factor
-			Matrix4x4 matrix = Matrix4x4.Scale((scale + characterScale) * Vector3.one);
-			_targetVertices[index + 0] = matrix.MultiplyPoint3x4(_targetVertices[index + 0]);
-			_targetVertices[index + 1] = matrix.MultiplyPoint3x4(_targetVertices[index + 1]);
-			_targetVertices[index + 2] = matrix.MultiplyPoint3x4(_targetVertices[index + 2]);
-			_targetVertices[index + 3] = matrix.MultiplyPoint3x4(_targetVertices[index + 3]);
-
-			// Re-add the center of the mesh 
-			_targetVertices[index + 0] += characterOrigin;
-			_targetVertices[index + 1] += characterOrigin;
-			_targetVertices[index + 2] += characterOrigin;
-			_targetVertices[index + 3] += characterOrigin;
-			
-			// Set our vertex update to true so we can update all the vertex data at once instead of numerous times in a single frame.
-			_vertexUpdate = true;
 		}
 	}
 }

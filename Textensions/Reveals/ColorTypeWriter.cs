@@ -20,21 +20,26 @@ namespace Textensions.Reveals
 	{
 		protected override void RevealCharacter(int index)
 		{
+			Debug.Log("Attempting to reveal character " + textension.GetCharacter(index).Info().character);
 			base.RevealCharacter(index);
 
 			// Skip any characters that aren't visible
-			if (!AllCharacters[index].Info().isVisible)
+			if (!textension.GetCharacter(index).Info().isVisible)
 				return;
 			
 			// Color
-			ColorSingleCharacter(AllCharacters[index].Info(), CachedColor);
-			displayText.textInfo.meshInfo[0].mesh.colors32 = displayText.textInfo.meshInfo[0].colors32;
+			ColorSingleCharacter(textension.GetCharacter(index).Info(), textension.GetCachedColor());
+
+			// Update the color on the mesh
+			textension.text.textInfo.meshInfo[0].mesh.colors32 = textension.text.textInfo.meshInfo[0].colors32;
+			textension.text.UpdateGeometry(textension.text.textInfo.meshInfo[0].mesh, 0);
 		}
 		
 		protected override void HideAllCharacters()
 		{
 			base.HideAllCharacters();
 			
+			Debug.Log("Hiding all characters!");
 			ColorAllCharacters(new Color32(0,0,0,0));
 		}
 		
@@ -44,23 +49,28 @@ namespace Textensions.Reveals
 		/// <summary>
 		/// Note: Remember to update your mesh vertex color data. Update the mesh colors & update geometry or use UpdateVertexData() 
 		/// </summary>
-		protected void ColorAllCharacters(Color32 color)
+		private void ColorAllCharacters(Color32 color)
 		{						
 			// Iterate through each character
-			for (int i = 0; i < displayText.textInfo.characterCount; i++)
+			for (int i = 0; i < textension.Info().characterCount; i++)
 			{
 				// Bottom Left, Top Left, Top Right, Bottom Right
-				displayText.textInfo.meshInfo[0].colors32[displayText.textInfo.characterInfo[i].vertexIndex + 0] = color;
-				displayText.textInfo.meshInfo[0].colors32[displayText.textInfo.characterInfo[i].vertexIndex + 1] = color;
-				displayText.textInfo.meshInfo[0].colors32[displayText.textInfo.characterInfo[i].vertexIndex + 2] = color;
-				displayText.textInfo.meshInfo[0].colors32[displayText.textInfo.characterInfo[i].vertexIndex + 3] = color;
+				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 0] = color;
+				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 1] = color;
+				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 2] = color;
+				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 3] = color;
 			}
 
-			for (int i = 0; i < displayText.textInfo.meshInfo.Length; i++)
+			// TODO: Pass this data back to the associated textension
+			// Update the color on the mesh
+			for (int i = 0; i < textension.Info().meshInfo.Length; i++)
 			{
-				displayText.textInfo.meshInfo[i].mesh.colors32 = displayText.textInfo.meshInfo[i].colors32;
-				displayText.UpdateGeometry(displayText.textInfo.meshInfo[i].mesh, i);
+				// TODO: Don't reach into an object twice? This is a programming principle I need to read more about
+				textension.text.textInfo.meshInfo[i].mesh.colors32 = textension.text.textInfo.meshInfo[i].colors32;
+				textension.text.UpdateGeometry(textension.text.textInfo.meshInfo[i].mesh, i);
 			}
+			
+			textension.DirtyVertex();
 		}
 
 		/// <summary>
@@ -72,13 +82,13 @@ namespace Textensions.Reveals
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="color"></param>
-		protected void ColorSingleCharacter(TMP_CharacterInfo character, Color32 color)
+		private void ColorSingleCharacter(TMP_CharacterInfo character, Color32 color)
 		{
 			// Bottom Left, Top Left, Top Right, Bottom Right
-			displayText.textInfo.meshInfo[0].colors32[character.vertexIndex + 0] = color;
-			displayText.textInfo.meshInfo[0].colors32[character.vertexIndex + 1] = color;
-			displayText.textInfo.meshInfo[0].colors32[character.vertexIndex + 2] = color;
-			displayText.textInfo.meshInfo[0].colors32[character.vertexIndex + 3] = color;
+			textension.Info().meshInfo[0].colors32[character.vertexIndex + 0] = color;
+			textension.Info().meshInfo[0].colors32[character.vertexIndex + 1] = color;
+			textension.Info().meshInfo[0].colors32[character.vertexIndex + 2] = color;
+			textension.Info().meshInfo[0].colors32[character.vertexIndex + 3] = color;
 		}
 	}
 }
