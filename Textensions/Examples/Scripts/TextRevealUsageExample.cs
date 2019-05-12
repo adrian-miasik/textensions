@@ -2,7 +2,7 @@
 // Personal Portfolio: http://AdrianMiasik.com
 // Github Account: https://github.com/AdrianMiasik
 
-using Textensions.Reveals.Base;
+using Textensions.Core;
 using UnityEngine;
 
 namespace Textensions.Examples.Scripts
@@ -14,21 +14,17 @@ namespace Textensions.Examples.Scripts
 	{
 		[SerializeField] [Tooltip("The keycode that starts the reveal. When pressing this key down, the reveal will start.")]
 		private KeyCode revealKey = KeyCode.F1;
+        
+        [SerializeField] private Textension textension;
 
-		[SerializeField] [Tooltip("The amount of time (in seconds) between each character reveal.")]
-		private float characterDelay = 0.05f;
+        private const string MESSAGE = "This is a test sentence that was passed in by TextRevealUsageExample.cs";
 
-		[SerializeField] private TextReveal reveal = null;
-
-		private string message = "This is a test sentence that was passed in by TextRevealUsageExample.cs";
-		
-		// Update is called once per frame
-		void Update()
+        private void Update()
 		{
 			if (Input.GetKeyDown(revealKey))
 			{
-				reveal.Reveal(characterDelay, message);
-			}
+                textension.Initialize();
+            }
 		}
 	}
 }

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -12,30 +10,43 @@ namespace Textensions.Core
 	public class Textension: MonoBehaviour
 	{
 		// PUBLIC MEMBERS
-		// Note: There should only probably be one textension per given text, but that's to be decided.
+        // TODO: Enforce this note:
+		// Note: There should only be one textension per given text.
 		public TMP_Text text;
 		
 		[Tooltip("The base scale of each character.")]
-		public float characterScale;
+        public float characterScale;
 		
+		// TODO: Convert to array?
+		public List<Character> characters = new List<Character>();
+		public List<Character> unrevealedCharacters = new List<Character>();
 		
 		// PRIVATE MEMBERS
-		// TODO: Convert to array?
-		public List<Character> _characters = new List<Character>();
-		
-		private bool _refreshVertex;
+        private bool _refreshVertex;
 		
 		private TMP_MeshInfo[] _originalMesh;
 		private Vector3[] _targetVertices = new Vector3[0];
 		[SerializeField] private Color32 cachedColor;
-		
+
+        public delegate void InitializeModifiers();
+        
+        /// <summary>
+        /// Gets invoked when the textension initializes
+        /// </summary>
+        public event InitializeModifiers OnInitialize;
+
+        public delegate void Tick();
+        public event Tick OnTick;
+        
 		private void Start()
 		{
-			// TODO: Re-Initialize on text change
-			Initialize();
+            Initialize();
 		}
-
-		private void Initialize()
+        
+        /// <summary>
+        /// Recalculates the TMP_Text and recreates the character list to match the text. This should not be called more than once per frame.
+        /// </summary>
+		public void Initialize()
 		{
 			// Force the mesh update so we don't have to wait a frame to get the data.
 			// Since we need to get information from the mesh we will have to update the mesh a bit earlier than normal.
@@ -45,31 +56,43 @@ namespace Textensions.Core
 			// to manipulate or fetch data from the mesh we should force the mesh to update so the data remains accurate.
 			text.ForceMeshUpdate();
 
+            // Cache our current text color and original mesh data
 			cachedColor = text.color;
 			_originalMesh = text.textInfo.CopyMeshInfoVertexData();
-			
+            
+            // Clear our lists
+            characters.Clear();
+            unrevealedCharacters.Clear();
+            
 			// Create and cache a character class (This will be used for later to keep track of effects and each character state)
 			for (int i = 0; i < text.text.Length; i++)
 			{
-				Character c = new Character(text.textInfo.characterInfo[i]);
-				_characters.Add(c);
+                Character c = new Character(text.textInfo.characterInfo[i]) {index = i};
+                characters.Add(c);
+                
+                // We just created the character so it won't be marked as revealed
+                unrevealedCharacters.Add(c);
 			}
-		}
+            
+            OnInitialize?.Invoke();
+        }
 		
 		// TODO: Create and enforce application loop as described below
 		private void Update()
 		{
-			// Step 0: Init / Reinit dirty text
-			
-			// Step 1: Let each modifier/component do its thing
-			
-			// Step 2: Then finally take all that information and apply it to the TMP_Text
+			// Step 0: Init / Re-init dirty text
+            // TODO: Don't let each component access Initialize() since we might have them invoke it more than once per frame.
+            
+			// Step 1: Let each modifier do its thing
+            OnTick?.Invoke();
+            
+            // Step 2: Then finally take all that information and apply it to the TMP_Text once
 			Render();
 		}
 
 		public void DirtyVertex()
 		{
-			_refreshVertex = true;
+            _refreshVertex = true;
 		}
 
 		private void Render()
@@ -101,10 +124,15 @@ namespace Textensions.Core
 		/// Returns a list of character classes for this textension.
 		/// </summary>
 		/// <returns></returns>
-		public List<Character> GetCharacters()
+		private List<Character> GetCharacters()
 		{
-			return _characters;
+            return characters;
 		}
+
+        public List<Character> GetUnrevealedCharacters()
+        {
+            return unrevealedCharacters;
+        }
 		
 		/// <summary>
 		/// Returns a single character class for this textension at a given index.
@@ -113,12 +141,19 @@ namespace Textensions.Core
 		/// <returns></returns>
 		public Character GetCharacter(int i)
 		{
-			return _characters[i];
+#if DEBUG_TEXT
+            if (characters[i].isRevealed)
+            {
+                Debug.LogWarning("This character has already been revealed.");
+                return null;
+            }
+#endif
+            return characters[i];
 		}
-
+        
 		public int GetIndexOfLastCharacter()
 		{
-			return _characters.Count - 1;
+			return characters.Count - 1;
 		}
 
 		/// <summary>
@@ -205,5 +240,25 @@ namespace Textensions.Core
             // Set our vertex update to true so we can update all the vertex data at once instead of numerous times in a single frame.
             DirtyVertex();
         }
-	}
+        
+        // TMP INPUT FIELD - Incorrect character length value of the input fields text component:
+        // The reason we are using TMP_InputField instead of getting the TextMeshProUGUI component within the input field component
+        // is because the TextMeshProUGUI text.Length and textInfo.CharacterCount values are incorrect. The text field could be an "empty"
+        // string, but it still seems to provides us with a length of 1. 
+        // According to a Unity Technologies user "Stephan_B" we shouldn't be accessing the input fields text component anyways.
+        // However, if you do need to access the text input's TextMeshProUGUI component and you do need to get the character count value from
+        // that component, there does seem to be a workaround a Unity forum user named "Chris-Trueman" has found.
+        // Simply trimming the Unicode character 'ZERO WIDTH SPACE' (Code 8203) from the ugui text string does seem to return the correct length.
+        // I've tested Chris' solution and it does seem to work if you need to use it, however for this case I won't be doing that.
+        // Instead I'll just be using TMP_InputField as mentioned above.
+        // SOURCE: https://forum.unity.com/threads/textmesh-pro-ugui-hidden-characters.505493/
+        /// <summary>
+        /// Replaces the text string with the provided source's text string (Using the TextMeshProUGUI component).
+        /// </summary>
+        /// <param name="source"></param>
+        public void ReplaceStringWithSources(TMP_InputField source)
+        {
+            SetTextString(source.text);
+        }
+    }
 }

@@ -10,11 +10,11 @@ namespace Textensions.Utilities
 	public static class ListUtilities
 	{
 		/// <summary>
-		/// Fisher yates shuffle for lists
+		/// Returns the provided list in a shuffled order using the Fisher yates algorithm
 		/// </summary>
 		/// <param name="list"></param>
 		/// <typeparam name="T"></typeparam>
-		public static void Shuffle<T>(List<T> list)
+		public static List<T> Shuffle<T>(List<T> list)
 		{
 			Random rng = new Random();
 			int length = list.Count;
@@ -26,6 +26,8 @@ namespace Textensions.Utilities
 				list[length] = list[i];
 				list[i] = temp;
 			}
-		}
+
+            return list;
+        }
 	}
 }

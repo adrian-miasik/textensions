@@ -2,6 +2,7 @@
 // Personal Portfolio: http://AdrianMiasik.com
 // Github Account: https://github.com/AdrianMiasik
 
+using Textensions.Core;
 using Textensions.Reveals.Base;
 using TMPro;
 using UnityEngine;
@@ -9,7 +10,7 @@ using UnityEngine;
 namespace Textensions.Reveals
 {
 	/// <summary>
-	/// Reveals text characters over time in a random sequence by changing each characters vertex colors. (Using the TextMeshProUGUI component).
+	/// Reveals text characters over time (from [0] to [length - 1]) by changing each characters vertex colors. (Using the TMP_Text component).
 	/// </summary>
 	/// <summary>
 	/// Color Reveal: Characters are being rendered by TMP but are hidden by changing the alpha of each character mesh to zero.
@@ -18,28 +19,34 @@ namespace Textensions.Reveals
 	/// </summary>
 	public class ColorTypeWriter : TextReveal
 	{
-		protected override void RevealCharacter(int index)
+        protected override void RevealCharacter(int revealNumber)
 		{
-			Debug.Log("Attempting to reveal character " + textension.GetCharacter(index).Info().character);
-			base.RevealCharacter(index);
+            if (textension.unrevealedCharacters[0].isRevealed)
+            {
+                Debug.Log("This has already been revealed idiot.");
+            }
+            
+            // Color
+			ColorSingleCharacter(textension.unrevealedCharacters[0].Info(), textension.GetCachedColor());
 
-			// Skip any characters that aren't visible
-			if (!textension.GetCharacter(index).Info().isVisible)
-				return;
-			
-			// Color
-			ColorSingleCharacter(textension.GetCharacter(index).Info(), textension.GetCachedColor());
-
+            // TODO: Do this once in the Textension
 			// Update the color on the mesh
 			textension.text.textInfo.meshInfo[0].mesh.colors32 = textension.text.textInfo.meshInfo[0].colors32;
 			textension.text.UpdateGeometry(textension.text.textInfo.meshInfo[0].mesh, 0);
+            
+#if DEBUG_TEXT
+            Debug.Log("Character: " + textension.unrevealedCharacters[0].Info().character + " has been revealed by ColorTypeWriter.cs [" + GetInstanceID() + "]");
+#endif
+            
+            // Mark the character as revealed
+            MarkAsRevealed(textension.unrevealedCharacters[0]);
+
 		}
 		
 		protected override void HideAllCharacters()
 		{
 			base.HideAllCharacters();
-			
-			Debug.Log("Hiding all characters!");
+            
 			ColorAllCharacters(new Color32(0,0,0,0));
 		}
 		
@@ -82,7 +89,7 @@ namespace Textensions.Reveals
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="color"></param>
-		private void ColorSingleCharacter(TMP_CharacterInfo character, Color32 color)
+		protected void ColorSingleCharacter(TMP_CharacterInfo character, Color32 color)
 		{
 			// Bottom Left, Top Left, Top Right, Bottom Right
 			textension.Info().meshInfo[0].colors32[character.vertexIndex + 0] = color;
@@ -90,5 +97,5 @@ namespace Textensions.Reveals
 			textension.Info().meshInfo[0].colors32[character.vertexIndex + 2] = color;
 			textension.Info().meshInfo[0].colors32[character.vertexIndex + 3] = color;
 		}
-	}
+    }
 }
