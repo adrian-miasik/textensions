@@ -20,7 +20,7 @@ namespace Textensions.Reveals.Base
         public float characterDelay = 0.05f;
 
         // PRIVATE MEMBERS
-        private bool  _isRevealing;
+        [ShowInInspector] private bool _isRevealing; // TODO: Make readonly in the inspector
         private float _characterTime;
         private float _totalRevealTime;
         private int _numberOfCharacters;
@@ -63,24 +63,23 @@ namespace Textensions.Reveals.Base
         {
             textension.OnHideInitialize -= Reveal;
             textension.OnTick -= Tick;
+            _isRevealing = false;
         }
 
         private void OnDestroy()
         {
-            textension.OnInitialize -= Reveal;
-            textension.OnTick       -= Tick;
-        }
-
         private void Start()
         {
             Initialize();
             _isRevealing = true;
+            textension.OnHideInitialize -= Reveal;
+            textension.OnTick -= Tick;
         }
 
         /// <summary>
         /// Initialize the text, and starts the character reveal.
         /// </summary>
-        public void Reveal()
+        private void Reveal()
         {
             Initialize();
             Play();
@@ -135,6 +134,13 @@ namespace Textensions.Reveals.Base
         {
             if (textension.unrevealedCharacters.Count <= 0)
             {
+                _isRevealing = false;
+                return;
+            }
+
+            if (!enabled)
+            {
+                OnDisable();
                 return;
             }
 
