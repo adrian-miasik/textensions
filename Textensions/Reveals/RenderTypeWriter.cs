@@ -26,6 +26,7 @@ namespace Textensions.Reveals
 		{
 			// Hide the text
 			textension.GetText().maxVisibleCharacters = 0;
+            base.HideAllCharacters();
 		}
 
 		protected override void RevealCharacter(int revealNumber)

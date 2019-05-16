@@ -45,10 +45,9 @@ namespace Textensions.Reveals
 		
 		protected override void HideAllCharacters()
 		{
-			base.HideAllCharacters();
-            
 			ColorAllCharacters(new Color32(0,0,0,0));
-		}
+			base.HideAllCharacters();
+        }
 		
 		/// <summary>
 		/// Hides the text by getting every characters mesh and setting the alpha of each vertex to zero rendering it invisible.
