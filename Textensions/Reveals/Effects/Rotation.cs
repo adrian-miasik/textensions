@@ -3,6 +3,7 @@
 // Github Account: https://github.com/AdrianMiasik
 
 using Textensions.Core;
+using Textensions.Effects.Base;
 using Textensions.Reveals.Base;
 using UnityEngine;
 
