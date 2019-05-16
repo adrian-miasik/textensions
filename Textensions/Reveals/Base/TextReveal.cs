@@ -117,6 +117,10 @@ namespace Textensions.Reveals.Base
         /// <summary>
         /// Gets invoked when the reveal has successfully completed.
         /// </summary>
+        /// <summary>
+        /// Note: This does not take effects into consideration, meaning if a text reveal is playing and is
+        /// finished but the effects are visually hiding it, this will still get invoker before the effect finishes.
+        /// </summary>
         protected virtual void OnCompleted() { }
 
         /// <summary>
