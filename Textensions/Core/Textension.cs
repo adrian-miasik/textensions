@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 namespace Textensions.Core
 {
-	/// <summary>
+    /// <summary>
 	/// A textension is an abstraction layer on top of the TMP 'TMP_Text' class including all it's relevant components. This will be used for later to keep track of effects and each character state.
 	/// </summary>
 	public class Textension: MonoBehaviour
@@ -13,9 +14,12 @@ namespace Textensions.Core
         // TODO: Enforce this note:
 		// Note: There should only be one textension per given text.
 		public TMP_Text text;
-		
+        
 		[Tooltip("The base scale of each character.")]
         public float characterScale;
+
+        [Tooltip("Filled-in if you want to hide the text when it's initialized. If filled in then you are probably looking to attach a reveal to the textension.")]
+        public bool hideOnInitialization = true;
 		
 		// TODO: Convert to array?
 		public List<Character> characters = new List<Character>();
@@ -27,18 +31,19 @@ namespace Textensions.Core
 		private TMP_MeshInfo[] _originalMesh;
 		private Vector3[] _targetVertices = new Vector3[0];
 		[SerializeField] private Color32 cachedColor;
-
-        public delegate void InitializeModifiers();
         
         /// <summary>
-        /// Gets invoked when the textension initializes
+        /// An action that only gets invoked if we are hiding text.
         /// </summary>
-        public event InitializeModifiers OnInitialize;
-
-        public delegate void Tick();
-        public event Tick OnTick;
+        public event Action OnHideInitialize;
         
-		private void Start()
+        public event Action OnTick;
+
+        private void Reset() {
+            text = GetComponent<TMP_Text>();
+        }
+
+        private void Start()
 		{
             Initialize();
 		}
@@ -64,17 +69,26 @@ namespace Textensions.Core
             characters.Clear();
             unrevealedCharacters.Clear();
             
-			// Create and cache a character class (This will be used for later to keep track of effects and each character state)
+            // Create and cache a character class (This will be used for later to keep track of effects and each character state)
 			for (int i = 0; i < text.text.Length; i++)
 			{
                 Character c = new Character(text.textInfo.characterInfo[i]) {index = i};
                 characters.Add(c);
                 
-                // We just created the character so it won't be marked as revealed
-                unrevealedCharacters.Add(c);
-			}
+                // If we are hiding on initialization...
+                if (hideOnInitialization) {
+                    // We just created the character so it won't be marked as revealed
+                    unrevealedCharacters.Add(c);
+                    continue;
+                }
+
+                // In this case we are not hiding the text on initialization so we will be marking this character as already revealed.
+                c.isRevealed = true;
+            }
             
-            OnInitialize?.Invoke();
+            if (hideOnInitialization) {
+                OnHideInitialize?.Invoke();
+            }
         }
 		
 		// TODO: Create and enforce application loop as described below
@@ -107,9 +121,7 @@ namespace Textensions.Core
 		private void ApplyMeshChanges()
 		{
 			if (_targetVertices.Length <= 0) return;
-
-//			text.textInfo.meshInfo[0].mesh.SetVertices(_targetVertices.ToList());
-			
+            
 			// Pass in the modified data back into the text
 			text.textInfo.meshInfo[0].mesh.vertices = _targetVertices;
 
@@ -129,12 +141,16 @@ namespace Textensions.Core
             return characters;
 		}
 
+        /// <summary>
+        /// Returns a list of character classes that have not been revealed.
+        /// </summary>
+        /// <returns></returns>
         public List<Character> GetUnrevealedCharacters()
         {
             return unrevealedCharacters;
         }
-		
-		/// <summary>
+
+        /// <summary>
 		/// Returns a single character class for this textension at a given index.
 		/// </summary>
 		/// <param name="i">Index of the character you want to fetch</param>
@@ -188,24 +204,21 @@ namespace Textensions.Core
 		{
 			return cachedColor;
 		}
-		
-		/// <summary>
-        /// Scales the specified character to a specific size. (Uniform)
+
+        
+        // TODO: Complete and test this function
+        /// <summary>
+        /// WORK IN PROGRESS - Manipulates the characters mesh to achieve the desired transform.
         /// </summary>
         /// <summary>
         /// Note: Remember to update your mesh vertex position data. Update the mesh geometry or use UpdateVertexData() 
         /// </summary>
         /// <param name="character"></param>
         /// <param name="scale"></param>
-        public void SetCharacterScale(Character character, float scale)
+        public void ManipulateCharacter(Character character, Transform t)
         {
-            if (character.cachedScale == scale)
-            {
-                // Cache the scale 
-                character.cachedScale = scale;
-                return;
-            }
-                        
+            // TODO: Early exit
+            
             // Get the characters material vertices from the texts mesh
             Vector3[] originalVertices = _originalMesh[character.Info().materialReferenceIndex].vertices;
             
@@ -225,7 +238,7 @@ namespace Textensions.Core
             _targetVertices[index + 3] -= characterOrigin;
              
             // Scale the mesh of this character by our factor
-            Matrix4x4 matrix = Matrix4x4.Scale((scale + characterScale) * Vector3.one);
+            Matrix4x4 matrix = Matrix4x4.TRS(t.position, t.rotation, t.localScale);
             _targetVertices[index + 0] = matrix.MultiplyPoint3x4(_targetVertices[index + 0]);
             _targetVertices[index + 1] = matrix.MultiplyPoint3x4(_targetVertices[index + 1]);
             _targetVertices[index + 2] = matrix.MultiplyPoint3x4(_targetVertices[index + 2]);

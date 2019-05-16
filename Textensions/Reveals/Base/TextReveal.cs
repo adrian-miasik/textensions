@@ -68,10 +68,6 @@ namespace Textensions.Reveals.Base
 
         private void OnDestroy()
         {
-        private void Start()
-        {
-            Initialize();
-            _isRevealing = true;
             textension.OnHideInitialize -= Reveal;
             textension.OnTick -= Tick;
         }
