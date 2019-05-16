@@ -23,10 +23,10 @@ namespace Textensions.Reveals.Base
         private bool  _isRevealing;
         private float _characterTime;
         private float _totalRevealTime;
-        private int   _numberOfCharacters;
-        private int   _numberOfCharactersRevealed;
-        private bool  _vertexUpdate;
-        private bool  _colorUpdate;
+        private int _numberOfCharacters;
+        private int _numberOfCharactersRevealed;
+        private bool _vertexUpdate;
+        private bool _colorUpdate;
 
         protected virtual void RevealCharacter(int revealNumber)
         {
@@ -49,20 +49,20 @@ namespace Textensions.Reveals.Base
 
         private void Awake()
         {
-            textension.OnInitialize += Reveal;
-            textension.OnTick       += Tick;
+            textension.OnHideInitialize += Reveal;
+            textension.OnTick += Tick;
         }
 
         private void OnEnable()
         {
-            textension.OnInitialize += Reveal;
-            textension.OnTick       += Tick;
+            textension.OnHideInitialize += Reveal;
+            textension.OnTick += Tick;
         }
 
         private void OnDisable()
         {
-            textension.OnInitialize -= Reveal;
-            textension.OnTick       -= Tick;
+            textension.OnHideInitialize -= Reveal;
+            textension.OnTick -= Tick;
         }
 
         private void OnDestroy()
@@ -97,8 +97,8 @@ namespace Textensions.Reveals.Base
             }
 
             _numberOfCharactersRevealed = 0;
-            _numberOfCharacters         = textension.GetTextLength();
-            _totalRevealTime            = 0f;
+            _numberOfCharacters = textension.GetTextLength();
+            _totalRevealTime = 0f;
 
             HideAllCharacters();
         }
@@ -117,16 +117,12 @@ namespace Textensions.Reveals.Base
         /// <summary>
         /// Gets invoked when the reveal has successfully completed.
         /// </summary>
-        protected virtual void OnCompleted()
-        {
-        }
+        protected virtual void OnCompleted() { }
 
         /// <summary>
         /// Gets invoked when we re-initialize an in-progress reveal.
         /// </summary>
-        protected virtual void OnInterrupted()
-        {
-        }
+        protected virtual void OnInterrupted() { }
 
         /// <summary>
         /// An update function that gets subscribed to the textension delegate
@@ -152,7 +148,7 @@ namespace Textensions.Reveals.Base
                 }
 
                 _totalRevealTime += Time.deltaTime;
-                _characterTime   += Time.deltaTime;
+                _characterTime += Time.deltaTime;
 
                 // While loop used to calculate how many letters on the same frame needs to be drawn
                 while (_characterTime > characterDelay)
@@ -166,7 +162,7 @@ namespace Textensions.Reveals.Base
                     if (_numberOfCharactersRevealed == _numberOfCharacters)
                     {
                         _characterTime = 0f;
-                        _isRevealing   = false;
+                        _isRevealing = false;
                         OnCompleted();
                         break;
                     }
