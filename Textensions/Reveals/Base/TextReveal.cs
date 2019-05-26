@@ -2,10 +2,7 @@
 // Personal Portfolio: http://AdrianMiasik.com
 // Github Account: https://github.com/AdrianMiasik
 
-using System;
-using Sirenix.OdinInspector;
 using Textensions.Core;
-using TMPro;
 using UnityEngine;
 
 namespace Textensions.Reveals.Base
@@ -20,7 +17,7 @@ namespace Textensions.Reveals.Base
         public float characterDelay = 0.05f;
 
         // PRIVATE MEMBERS
-        [ShowInInspector] private bool _isRevealing; // TODO: Make readonly in the inspector
+        private bool _isRevealing; // TODO: Make readonly in the inspector
         private float _characterTime;
         private float _totalRevealTime;
         private int _numberOfCharacters;
@@ -28,6 +25,10 @@ namespace Textensions.Reveals.Base
         private bool _vertexUpdate;
         private bool _colorUpdate;
 
+        /// <summary>
+        /// Reveals the character at a specific index 
+        /// </summary>
+        /// <param name="revealNumber"></param>
         protected virtual void RevealCharacter(int revealNumber)
         {
             MarkAsRevealed(textension.unrevealedCharacters[revealNumber]);
@@ -43,33 +44,33 @@ namespace Textensions.Reveals.Base
 
         private void Reset()
         {
-            // Quickly Fetch References.
+            // Quickly Fetch Reference
             textension = GetComponent<Textension>();
         }
 
         private void Awake()
         {
             textension.OnHideInitialize += Reveal;
-            textension.OnTick += Tick;
+            textension.RevealTick += Tick;
         }
 
         private void OnEnable()
         {
             textension.OnHideInitialize += Reveal;
-            textension.OnTick += Tick;
+            textension.RevealTick += Tick;
         }
 
         private void OnDisable()
         {
             textension.OnHideInitialize -= Reveal;
-            textension.OnTick -= Tick;
+            textension.RevealTick -= Tick;
             _isRevealing = false;
         }
 
         private void OnDestroy()
         {
             textension.OnHideInitialize -= Reveal;
-            textension.OnTick -= Tick;
+            textension.RevealTick -= Tick;
         }
 
         /// <summary>
@@ -153,6 +154,7 @@ namespace Textensions.Reveals.Base
                     return;
                 }
 
+                // Add time
                 _totalRevealTime += Time.deltaTime;
                 _characterTime += Time.deltaTime;
 
@@ -161,7 +163,7 @@ namespace Textensions.Reveals.Base
                 {
                     RevealCharacter(_numberOfCharactersRevealed);
                     _numberOfCharactersRevealed++;
-
+                    
                     _characterTime -= characterDelay;
 
                     // If all characters are revealed, set the _isRevealing flag as dirty and break out of this while loop 
