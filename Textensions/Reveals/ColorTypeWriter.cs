@@ -21,11 +21,6 @@ namespace Textensions.Reveals
 	{
         protected override void RevealCharacter(int revealNumber)
 		{
-            if (textension.unrevealedCharacters[0].isRevealed)
-            {
-                Debug.Log("This has already been revealed idiot.");
-            }
-            
             // Color
 			ColorSingleCharacter(textension.unrevealedCharacters[0].Info(), textension.GetCachedColor());
 
