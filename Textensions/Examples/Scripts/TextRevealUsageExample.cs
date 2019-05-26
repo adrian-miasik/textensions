@@ -23,7 +23,7 @@ namespace Textensions.Examples.Scripts
 		{
 			if (Input.GetKeyDown(revealKey))
 			{
-                textension.Initialize();
+//                textension();
             }
 		}
 	}
