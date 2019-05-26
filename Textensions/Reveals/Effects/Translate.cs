@@ -4,7 +4,6 @@
 
 using Textensions.Core;
 using Textensions.Effects.Base;
-using Textensions.Reveals.Base;
 using UnityEngine;
 
 namespace Textensions.Reveals.Effects
