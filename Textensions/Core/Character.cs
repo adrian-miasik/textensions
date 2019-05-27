@@ -34,7 +34,6 @@ namespace Textensions.Core
         private List<Effect> effects = new List<Effect>();
 
         public CharacterStruct cs;
-        public CharacterStruct cachedcs;
 
         /// <summary>
         /// Index position within the given text component. E.g. ("Hello", "o" would be index 4)
@@ -63,7 +62,6 @@ namespace Textensions.Core
 
         public void AddScale(Vector3 scale)
         {
-            cachedcs.scale = scale;
             cs.scale += scale;
         }
 
@@ -95,11 +93,6 @@ namespace Textensions.Core
         public int GetEffectsCount()
         {
             return effects.Count;
-        }
-
-        public CharacterStruct GetTransform()
-        {
-            return cs;
         }
 
         public Character(TMP_CharacterInfo info)

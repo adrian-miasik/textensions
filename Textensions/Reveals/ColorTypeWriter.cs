@@ -19,8 +19,19 @@ namespace Textensions.Reveals
 	/// </summary>
 	public class ColorTypeWriter : TextReveal
 	{
+        // TODO: Remove unused revealNumber parameter?
         protected override void RevealCharacter(int revealNumber)
 		{
+            // If this character is not visible (it's a space or not being rendered by TMP) then lets skip it
+            if (!textension.unrevealedCharacters[0].Info().isVisible)
+            {
+                // Mark this one as revealed so the text reveal can continue.
+                MarkAsRevealed(textension.unrevealedCharacters[0]);
+                
+                // Early exit, we don't need to update the color of this character nor do we need to update the entire text mesh.
+                return;
+            }
+            
             // Color
 			ColorSingleCharacter(textension.unrevealedCharacters[0].Info(), textension.GetCachedColor());
 
@@ -35,8 +46,7 @@ namespace Textensions.Reveals
             
             // Mark the character as revealed
             MarkAsRevealed(textension.unrevealedCharacters[0]);
-
-		}
+        }
 		
 		protected override void HideAllCharacters()
 		{

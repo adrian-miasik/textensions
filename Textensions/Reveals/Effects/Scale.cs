@@ -16,9 +16,9 @@ namespace Textensions.Reveals.Effects
 		public override float Calculate(Character c)
 		{
 			// If our current character is not revealed or not visible, then skip it.
-			if (!c.isRevealed) return 0f;
+            if (!c.isRevealed || !c.Info().isVisible) return 0f;
 
-			// Accumulate time to this specific character
+            // Accumulate time to this specific character
 			c.timeSinceReveal += Time.deltaTime;
 
 			return uniform.Evaluate(c.timeSinceReveal);

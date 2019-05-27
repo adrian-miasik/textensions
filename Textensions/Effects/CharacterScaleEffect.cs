@@ -1,4 +1,5 @@
-﻿using Textensions.Core;
+﻿using System.Collections.Generic;
+using Textensions.Core;
 using Textensions.Effects.Base;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace Textensions.Effects
     public class CharacterScaleEffect : MonoBehaviour
     {
         public Textension textension;
-        public Effect fx;
+        public List<Effect> fxs;
 
         private void Reset()
         {
@@ -21,7 +22,10 @@ namespace Textensions.Effects
 
         private void AddEffectToCharacters()
         {
-            textension.effectsToApply.Add(fx);
+            foreach (Effect fx in fxs)
+            {
+                textension.effectsToApply.Add(fx);
+            }
         }
     }
 }
