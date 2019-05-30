@@ -10,97 +10,77 @@ using UnityEngine;
 
 namespace Textensions.Core
 {
-    public struct CharacterStruct
-    {
-        public Vector3 position;
-        public Quaternion rotation;
-        public Vector3 scale;
-
-        public CharacterStruct(Vector3 position, Quaternion rotation, Vector3 scale)
-        {
-            this.position = position;
-            this.rotation = rotation;
-            this.scale = scale;
-        }
-    }
-
     [Serializable]
     public class Character
     {
         public float timeSinceReveal;
-        public bool isRevealed = false;
+        public bool isRevealed;
         private TMP_CharacterInfo _info;
-
-        private List<Effect> effects = new List<Effect>();
-
-        public CharacterStruct cs;
-
+        
+        public Vector3 position;
+        public Quaternion rotation;
+        public Vector3 scale;
+        
         /// <summary>
         /// Index position within the given text component. E.g. ("Hello", "o" would be index 4)
         /// </summary>
         public int index;
 
+        public Character(TMP_CharacterInfo info)
+        {
+            _info = info;
+            position = Vector3.zero;
+            rotation = Quaternion.identity;
+            scale = Vector3.one;
+            timeSinceReveal = 0f;
+            index = info.index;
+            isRevealed = false;
+        }
+        
         public void AddPosition(Vector3 position)
         {
-            cs.position += position;
+            this.position += position;
         }
 
         public void RemovePosition(Vector3 position)
         {
-            cs.position -= position;
+            this.position -= position;
         }
 
         public void AddRotation(Quaternion rotation)
         {
-            cs.rotation *= rotation;
+            this.rotation *= rotation;
         }
 
         public void RemoveRotation(Quaternion rotation)
         {
-            cs.rotation = rotation * Quaternion.Inverse(cs.rotation);
+            this.rotation = rotation * Quaternion.Inverse(this.rotation);
         }
 
         public void AddScale(Vector3 scale)
         {
-            cs.scale += scale;
+            this.scale += scale;
         }
 
         public void SetScale(Vector3 scale)
         {
-            cs.scale = scale;
+            this.scale = scale;
         }
 
         public void RemoveScale(Vector3 scale)
         {
-            cs.scale -= scale;
+            this.scale -= scale;
         }
-
-        public void AddEffect(Effect fx)
-        {
-            effects.Add(fx);
+        
+        public void Reveal() {
+            isRevealed = true;
         }
-
-        /// <summary>
-        /// Returns an effect at a given index.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public Effect GetEffect(int index)
-        {
-            return effects[index];
+        
+        public void Unreveal() {
+            isRevealed = false;
         }
-
-        public int GetEffectsCount()
-        {
-            return effects.Count;
-        }
-
-        public Character(TMP_CharacterInfo info)
-        {
-            _info = info;
-            cs = new CharacterStruct(Vector3.zero, Quaternion.identity, Vector3.one);
-        }
-
+        
+        // TODO: Look if there is performance overhead for getters
         public TMP_CharacterInfo Info()
         {
             return _info;

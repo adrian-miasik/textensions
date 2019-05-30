@@ -2,13 +2,14 @@
 // Personal Portfolio: http://AdrianMiasik.com
 // Github Account: https://github.com/AdrianMiasik
 
+using System.Collections.Generic;
 using Textensions.Core;
 using UnityEngine;
 
 namespace Textensions.Effects.Base
 {
-	public abstract class Effect : ScriptableObject
-	{
-		public abstract float Calculate(Character character);
+	public abstract class Effect : ScriptableObject {
+        public List<int> indexToEffect;
+        public abstract float Calculate(Character character);
 	}
 }

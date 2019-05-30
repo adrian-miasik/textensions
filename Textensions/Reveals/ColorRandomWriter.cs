@@ -40,7 +40,7 @@ namespace Textensions.Reveals
 #endif
             
             // Mark the character as revealed
-            MarkAsRevealed(textension.unrevealedCharacters[characterIndex]);
+            MarkAsRevealed(characterIndex);
         }
 
         protected override void OnCompleted()

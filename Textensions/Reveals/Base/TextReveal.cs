@@ -31,14 +31,13 @@ namespace Textensions.Reveals.Base
         /// <param name="revealNumber"></param>
         protected virtual void RevealCharacter(int revealNumber)
         {
-            MarkAsRevealed(textension.unrevealedCharacters[revealNumber]);
+            MarkAsRevealed(revealNumber);
         }
 
         protected virtual void HideAllCharacters()
         {
-            for (int i = 0; i < textension.GetUnrevealedCharacters().Count; i++)
-            {
-                textension.GetCharacter(i).isRevealed = false;
+            for (int i = 0; i < textension.GetUnrevealedCharacters().Count; i++) {
+                textension.GetCharacter(i).Unreveal();
             }
         }
 
@@ -178,10 +177,10 @@ namespace Textensions.Reveals.Base
             }
         }
 
-        protected void MarkAsRevealed(Character character)
+        protected void MarkAsRevealed(int index)
         {
-            character.isRevealed = true;
-            textension.unrevealedCharacters.Remove(character);
+            textension.unrevealedCharacters[index].Reveal();
+            textension.unrevealedCharacters.RemoveAt(index);
         }
     }
 }
