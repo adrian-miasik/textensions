@@ -12,21 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b23e34ea9431480da6a614efce3d39e9, type: 3}
   m_Name: Bubble
   m_EditorClassIdentifier: 
-  indexToEffect: 0000000004000000
+  title: Bubble Scale
+  indexToEffect: 000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d000000
   uniform:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 10.971921
-      outSlope: 10.971921
+      inSlope: 9.635955
+      outSlope: 9.635955
       tangentMode: 0
       weightedMode: 3
       inWeight: 0
-      outWeight: 0.7134532
+      outWeight: 0.6207202
     - serializedVersion: 3
-      time: 0.35
+      time: 0.42716262
       value: 1
       inSlope: 2.1284108
       outSlope: 0
@@ -34,6 +35,15 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.13587448
       outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 3
+      value: 1
+      inSlope: -0
+      outSlope: 0
+      tangentMode: 5
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     m_PreInfinity: 2
-    m_PostInfinity: 2
+    m_PostInfinity: 1
     m_RotationOrder: 4
