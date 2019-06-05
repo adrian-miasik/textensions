@@ -5,11 +5,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-namespace Textensions.Core {
+namespace Textensions.Core
+{
     /// <summary>
     /// A textension is an abstraction layer on top of the TMP 'TMP_Text' class including all it's relevant components. This will be used for later to keep track of effects and each character state.
     /// </summary>
-    public class Textension : MonoBehaviour {
+    public class Textension : MonoBehaviour
+    {
         // PUBLIC MEMBERS
         // TODO: There should only be one textension per given text. Enforce this.
         public TMP_Text text;
@@ -27,6 +29,7 @@ namespace Textensions.Core {
         public List<Character> characters = new List<Character>();
         public List<Character> unrevealedCharacters = new List<Character>();
 
+        // These are the effects that we will be updating in EffectTick() every frame
         public List<Effect> effectsToApply = new List<Effect>();
 
         // PRIVATE MEMBERS
@@ -43,18 +46,21 @@ namespace Textensions.Core {
 
         public event Action RevealTick;
 
-        private void Reset() {
+        private void Reset()
+        {
             text = GetComponent<TMP_Text>();
         }
 
-        private void Start() {
+        private void Start()
+        {
             Initialize();
         }
 
         /// <summary>
         /// Recalculates the TMP_Text and recreates the character list to match the text. This should not be called more than once per frame.
         /// </summary>
-        private void Initialize() {
+        private void Initialize()
+        {
             // Force the mesh update so we don't have to wait a frame to get the data.
             // Since we need to get information from the mesh we will have to update the mesh a bit earlier than normal.
             // "TMP generates/processes the mesh once per frame (if needed) just before Unity renders the frame."
@@ -72,22 +78,16 @@ namespace Textensions.Core {
             unrevealedCharacters.Clear();
 
             // Create and cache a character class (This will be used for later to keep track of effects and each character state)
-            for (int i = 0; i < text.text.Length; i++) {
+            for (int i = 0; i < text.text.Length; i++)
+            {
                 Character character = new Character(text.textInfo.characterInfo[i]);
                 characters.Add(character);
 
-//                // If this character is visible (like not a space)
-//                if (character.Info().isVisible)
-//                {
-//                    // Add our effects to the visible character
-//                    foreach (Effect fx in effectsToApply)
-//                    {
-//                        character.AddEffect(fx);
-//                    }
-//                }
+                // TODO: Effect init here?
 
                 // If we are hiding on initialization...
-                if (hideOnInitialization) {
+                if (hideOnInitialization)
+                {
                     // We just created the character so it won't be marked as revealed
                     unrevealedCharacters.Add(character);
                     continue;
@@ -97,7 +97,8 @@ namespace Textensions.Core {
                 character.isRevealed = true;
             }
 
-            if (hideOnInitialization) {
+            if (hideOnInitialization)
+            {
                 OnHideInitialize?.Invoke();
             }
 
@@ -105,8 +106,10 @@ namespace Textensions.Core {
         }
 
         // TODO: Create and enforce application loop as described below
-        private void Update() {
-            if (hasInitialized) {
+        private void Update()
+        {
+            if (hasInitialized)
+            {
                 // Step 0: Init / Re-init dirty text
                 // TODO: Don't let each component access Initialize() since we might have them invoke it more than once per frame.
 
@@ -116,73 +119,116 @@ namespace Textensions.Core {
                 // Step 2: Calculate the effect for each character
                 EffectTick();
 
-                // Step 3: Then finally take all that information and apply it to the TMP_Text only once this frame
+                // Step 3: Apply the effect to the character class
+                RenderEffects();
+
+                // Step 4: Then finally take all that information and apply it to the TMP_Text only once this frame
                 Render();
             }
         }
 
-        // TODO: Improve performance & architecture
-        private void EffectTick() {
-            
-            // For each effect
-            foreach (Effect effect in effectsToApply) {
-                
-                // If this effect has character indexs to apply to...
-                if (effect.indexToEffect.Count > 0) {
-                    
-                    // Iterate through all the index you will need to effect
-                    for (int i = 0; i < effect.indexToEffect.Count; i++) {
-
-                        if ((effect.indexToEffect[i]) >= GetCharacters().Count) {
-                            Debug.LogWarning("Effect out of range");
-                            return;
-                        }
-                        
-                        // TODO: Don't cache this for each effect. Just do it once for this character.
-                        Character character = GetCharacter(effect.indexToEffect[i]);
-                        
-                        // TODO: Determine when the effect is over, when it is over. Delete data
-                        // Set scale to that individual character using it's own data
-                        character.AddScale(effect.Calculate(character) * Vector3.one - character.scale);
-                        
-                        // TODO: Don't do this once for each effect, run this once at the end of the frame if the character needs it
-                        // Update the character mesh data
-                        UpdateCharacter(character);
-                    }
+        /// <summary>
+        /// Checks if the provided effect will modify the characters, if it does modify the characters we will add the effect to use it next time we Initialize().
+        /// </summary>
+        /// <summary>
+        /// However, if the effect does not modify the characters, we will simply ignore it. (To see if an effect has been ignored use the "DEBUG_TEXT" scripting define)
+        /// </summary>>
+        public void AddEffects(List<Effect> fxs)
+        {
+            foreach (Effect fx in fxs)
+            {
+                if (fx.indexToEffect.Count > 0)
+                {
+                    ForceAddEffect(fx);
                 }
+#if DEBUG_TEXT
+                else
+                {
+                    Debug.Log("Effect '" + fx.title +
+                              " does not modify characters and has not been added to the textension");
+                }
+#endif
             }
-      
-//            // TODO: Don't update all characters every frame. Delete data that is no longer relevant to a reveal.
-//            // Iterate through all the characters
-//            for (int i = 0; i < GetCharacters().Count; i++)
-//            {
-//                // If our character has no effects on it...
-//                if (GetCharacter(i).GetEffectsCount() <= 0)
-//                {
-////                    GetCharacter(i).SetScale(characterScale);
-//                    
-//                    // Go to the next character
-//                    continue;
-//                }
-//
-//                // Iterate through all the effects on this character...
-//                for (int j = 0; j < GetCharacter(i).GetEffectsCount(); j++)
-//                {
-//                    // Set scale to that individual character using it's own data
-//                    GetCharacter(i).AddScale(GetCharacter(i).GetEffect(j).Calculate(GetCharacter(i)) * Vector3.one - GetCharacter(i).scale);
-//
-//                    // Update the character mesh data
-//                    UpdateCharacter(GetCharacter(i));
-//                }
-//            }
         }
 
-        public void DirtyVertex() {
+        /// <summary>
+        /// Adds the provided effect without checking if it will apply to all characters.
+        /// </summary>
+        /// <param name="fx"></param>
+        private void ForceAddEffect(Effect fx)
+        {
+#if DEBUG_TEXT
+            Debug.Log("Applying '" + fx.title + "' to this textension: " + gameObject, gameObject);
+#endif
+            effectsToApply.Add(fx);
+        }
+
+        // TODO: Improve performance & architecture
+        private void EffectTick()
+        {
+            // For each effect...
+            foreach (Effect effect in effectsToApply)
+            {
+                // Iterate through all the index you will need to effect
+                for (int i = 0; i < effect.indexToEffect.Count; i++)
+                {
+                    if (effect.indexToEffect[i] >= GetCharacters().Count)
+                    {
+#if DEBUG_TEXT
+                        Debug.LogWarning("Effect out of range");
+#endif
+                        return;
+                    }
+
+                    // TODO: Don't cache this for each effect. Just do it once for each character. (Maybe store each effect in a list at specific indexes)
+                    Character character = GetCharacter(effect.indexToEffect[i]);
+
+                    // Don't even bother effecting characters that aren't revealed
+                    if (!character.isRevealed)
+                    {
+                        return;
+                    }
+
+                    // TODO: Determine when the effect is over, when it is over. Delete data
+                    // Set scale to that individual character using it's own data
+                    character.AddScale(effect.Calculate(character) * Vector3.one - character.scale);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update each character that needs to be updated. (If an effect doesn't not effect a character, we will not update the characters mesh)
+        /// </summary>
+        private void RenderEffects()
+        {
+            // Iterate through each character...
+            foreach (Character character in characters)
+            {
+                // TODO: Maybe split UpdateCharacter() into different functions? Will need to stress test and see if certain matrix modifications are cheaper than others.
+                // If the character's position, rotation or scale has been modified...
+                if (character.updatePosition || character.updateRotation || character.updateScale)
+                {
+#if DEBUG_TEXT
+//                    Debug.Log("Updating character: " + character.Info().character);
+#endif
+                    // Update the character mesh data
+                    UpdateCharacter(character);
+                }
+            }
+        }
+
+        public void DirtyVertex()
+        {
             _refreshVertex = true;
         }
 
-        private void Render() {
-            if (_refreshVertex) {
+        /// <summary>
+        /// See if we need to apply changes to the mesh this frame, if we do we will apply the changes to the mesh and copy the data for next time.
+        /// </summary>
+        private void Render()
+        {
+            if (_refreshVertex)
+            {
                 ApplyMeshChanges();
                 _refreshVertex = false;
             }
@@ -192,7 +238,8 @@ namespace Textensions.Core {
         /// Returns a list of character structs for this textension.
         /// </summary>
         /// <returns></returns>
-        private List<Character> GetCharacters() {
+        private List<Character> GetCharacters()
+        {
             return characters;
         }
 
@@ -200,7 +247,8 @@ namespace Textensions.Core {
         /// Returns a list of character structs that have not been revealed.
         /// </summary>
         /// <returns></returns>
-        public List<Character> GetUnrevealedCharacters() {
+        public List<Character> GetUnrevealedCharacters()
+        {
             return unrevealedCharacters;
         }
 
@@ -209,7 +257,8 @@ namespace Textensions.Core {
         /// </summary>
         /// <param name="i">Index of the character you want to fetch</param>
         /// <returns></returns>
-        public Character GetCharacter(int i) {
+        public Character GetCharacter(int i)
+        {
             return characters[i];
         }
 
@@ -218,16 +267,17 @@ namespace Textensions.Core {
         /// </summary>
         /// <param name="i">Index of the character you want to fetch</param>
         /// <returns></returns>
-        public Character GetUnrevealedCharacter(int i) {
+        public Character GetUnrevealedCharacter(int i)
+        {
             return unrevealedCharacters[i];
         }
-
 
         /// <summary>
         /// Changes the TMP text string to the provided message.
         /// </summary>
         /// <param name="message"></param>
-        private void SetTextString(string message) {
+        private void SetTextString(string message)
+        {
             text.text = message;
         }
 
@@ -235,19 +285,27 @@ namespace Textensions.Core {
         /// Returns the length of the string
         /// </summary>
         /// <returns></returns>
-        public int GetTextLength() {
+        public int GetTextLength()
+        {
             return text.text.Length;
         }
 
-        public TMP_TextInfo Info() {
+        /// <summary>
+        /// Returns the TextInfo class for this text
+        /// </summary>
+        /// <returns></returns>
+        public TMP_TextInfo Info()
+        {
             return text.textInfo;
         }
 
-        public TMP_Text GetText() {
+        public TMP_Text GetText()
+        {
             return text;
         }
 
-        public Color32 GetCachedColor() {
+        public Color32 GetCachedColor()
+        {
             return _cachedColor;
         }
 
@@ -259,13 +317,21 @@ namespace Textensions.Core {
         /// Note: Remember to update your mesh vertex position data. Update the mesh geometry or use UpdateVertexData() 
         /// </summary>
         /// <param name="character"></param>
-        public void UpdateCharacter(Character character) {
+        private void UpdateCharacter(Character character)
+        {
             Profiler.BeginSample("Update Character");
-
-            // Early exit and also necessary for spaces
-            if (!character.isRevealed || !character.Info().isVisible) {
+            
+            // Don't update characters that haven't been revealed by a TextReveal.cs or don't update when the character is not visible (Determined by TMP)
+            if (!character.isRevealed || !character.Info().isVisible)
+            {
+                // Early exit and also necessary for spaces
                 return;
             }
+            
+            // Clean the update flags
+            character.updatePosition = false;
+            character.updateRotation = false;
+            character.updateScale = false;
 
             // TODO: Move these 2 lines outside of this function since they aren't specific to this character (It can probably just done once in initialization)
             // Get the characters material vertices from the texts mesh
@@ -298,14 +364,19 @@ namespace Textensions.Core {
             _targetVertices[index + 1] += characterOrigin;
             _targetVertices[index + 2] += characterOrigin;
             _targetVertices[index + 3] += characterOrigin;
-
+            
             // Set our vertex update to true so we can update all the vertex data at once instead of numerous times in a single frame.
             DirtyVertex();
 
             Profiler.EndSample();
         }
 
-        private void ApplyMeshChanges() {
+        /// <summary>
+        /// Takes the modified mesh data and apply it to our text, 
+        /// </summary>
+        private void ApplyMeshChanges()
+        {
+            // TODO: See if we need this
             if (_targetVertices.Length <= 0) return;
 
             // Pass in the modified data back into the text
@@ -333,7 +404,8 @@ namespace Textensions.Core {
         /// Replaces the text string with the provided source's text string (Using the TextMeshProUGUI component).
         /// </summary>
         /// <param name="source"></param>
-        public void ReplaceStringWithSources(TMP_InputField source) {
+        public void ReplaceStringWithSources(TMP_InputField source)
+        {
             SetTextString(source.text);
         }
     }

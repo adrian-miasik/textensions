@@ -20,7 +20,9 @@ namespace Textensions.Reveals.Effects
 
             // Accumulate time to this specific character
 			c.timeSinceReveal += Time.deltaTime;
-
+            
+            // TODO: Detect when this effect is over (We will then take that data to remove certain effects that are not playing)
+            
 			return uniform.Evaluate(c.timeSinceReveal);
 		}
 	}

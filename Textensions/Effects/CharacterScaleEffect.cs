@@ -22,10 +22,7 @@ namespace Textensions.Effects
 
         private void AddEffectToCharacters()
         {
-            foreach (Effect fx in fxs)
-            {
-                textension.effectsToApply.Add(fx);
-            }
+            textension.AddEffects(fxs);
         }
     }
 }
