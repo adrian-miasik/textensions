@@ -35,7 +35,7 @@ namespace Textensions.Reveals
             // Color
 			ColorSingleCharacter(textension.unrevealedCharacters[0].Info(), textension.GetCachedColor());
 
-            // TODO: Do this once in the Textension
+            // TODO: Do the color update once in the Textension
 			// Update the color on the mesh
 			textension.text.textInfo.meshInfo[0].mesh.colors32 = textension.text.textInfo.meshInfo[0].colors32;
 			textension.text.UpdateGeometry(textension.text.textInfo.meshInfo[0].mesh, 0);
