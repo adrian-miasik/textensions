@@ -16,11 +16,17 @@ namespace Textensions.Core
         public float timeSinceReveal;
         public bool isRevealed;
         private TMP_CharacterInfo _info;
-        
+
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
-        
+
+        public bool updatePosition;
+        public bool updateRotation;
+        public bool updateScale;
+
+        public List<Effect> fxs;
+
         /// <summary>
         /// Index position within the given text component. E.g. ("Hello", "o" would be index 4)
         /// </summary>
@@ -36,50 +42,64 @@ namespace Textensions.Core
             index = info.index;
             isRevealed = false;
         }
-        
+
         public void AddPosition(Vector3 position)
         {
+            updatePosition = true;
             this.position += position;
         }
 
         public void RemovePosition(Vector3 position)
         {
+            updatePosition = true;
             this.position -= position;
         }
 
         public void AddRotation(Quaternion rotation)
         {
+            updateRotation = true;
             this.rotation *= rotation;
         }
 
         public void RemoveRotation(Quaternion rotation)
         {
+            updateRotation = true;
             this.rotation = rotation * Quaternion.Inverse(this.rotation);
         }
 
         public void AddScale(Vector3 scale)
         {
+            if (scale == Vector3.zero)
+            {
+                return;
+            }
+            
+            updateScale = true;
             this.scale += scale;
         }
 
         public void SetScale(Vector3 scale)
         {
+            updateScale = true;
             this.scale = scale;
         }
 
         public void RemoveScale(Vector3 scale)
         {
+            updateScale = true;
             this.scale -= scale;
         }
-        
-        public void Reveal() {
+
+        public void Reveal()
+        {
             isRevealed = true;
         }
-        
-        public void Unreveal() {
+
+        public void Unreveal()
+        {
             isRevealed = false;
         }
-        
+
         // TODO: Look if there is performance overhead for getters
         public TMP_CharacterInfo Info()
         {
