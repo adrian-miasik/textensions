@@ -21,16 +21,13 @@ namespace Textensions.Core
 
         public bool hasInitialized = false;
 
-        [Tooltip(
-            "Filled-in if you want to hide the text when it's initialized. If filled in then you are probably looking to attach a reveal to the textension.")]
+        [Tooltip("Filled-in if you want to hide the text when it's initialized. If filled in then you are probably looking to attach a reveal to the textension.")]
         public bool hideOnInitialization = true;
 
         // TODO: Convert to array?
         public List<Character> characters = new List<Character>();
         public List<Character> unrevealedCharacters = new List<Character>();
 
-        // These are the effects that we will be updating in EffectTick() every frame
-        public List<Effect> effectsToApply = new List<Effect>();
 
         // PRIVATE MEMBERS
         private bool _refreshVertex;
@@ -38,6 +35,9 @@ namespace Textensions.Core
         private TMP_MeshInfo[] _originalMesh;
         private Vector3[] _targetVertices = new Vector3[0];
         private Color32 _cachedColor;
+        
+        // These are the effects that we will be updating in EffectTick() every frame
+        private Dictionary<int, List<Effect>> appliedEffects = new Dictionary<int, List<Effect>>();
 
         /// <summary>
         /// An action that only gets invoked if we are hiding text.
@@ -105,13 +105,13 @@ namespace Textensions.Core
             hasInitialized = true;
         }
 
-        // TODO: Create and enforce application loop as described below
+        // TODO: Enforce application loop as described below
         private void Update()
         {
             if (hasInitialized)
             {
                 // Step 0: Init / Re-init dirty text
-                // TODO: Don't let each component access Initialize() since we might have them invoke it more than once per frame.
+                // TODO
 
                 // Step 1: Let each reveal do its thing
                 RevealTick?.Invoke();
@@ -127,77 +127,116 @@ namespace Textensions.Core
             }
         }
 
+        // TODO: Move the effects outside of the textension. Not all textensions will have effects on them, so doing this in every textension is not necessary
         /// <summary>
-        /// Checks if the provided effect will modify the characters, if it does modify the characters we will add the effect to use it next time we Initialize().
+        /// Adds the provided effects to our textension
         /// </summary>
         /// <summary>
-        /// However, if the effect does not modify the characters, we will simply ignore it. (To see if an effect has been ignored use the "DEBUG_TEXT" scripting define)
-        /// </summary>>
-        public void AddEffects(List<Effect> fxs)
+        /// If the provided effect does not exist within the dictionary we will create a key in the dictionary along with a new list
+        /// </summary>
+        /// <summary>
+        /// However if the provided effect does exist within the dictionary we will access that key and add the effect to the list within that key value
+        /// </summary>
+        public void AddEffects(List<Effect> effectsToApply)
         {
-            foreach (Effect fx in fxs)
+            // Iterate through each array
+            for (int i = 0; i < effectsToApply.Count; i++)
             {
-                if (fx.indexToEffect.Count > 0)
+                // Iterate through all the indexes this effect will effect
+                for (int j = 0; j < effectsToApply[i].indexToEffect.Count; j++)
                 {
-                    ForceAddEffect(fx);
-                }
+                    // If this key index exists...
+                    if (appliedEffects.TryGetValue(effectsToApply[i].indexToEffect[j], out List<Effect> effectsList))
+                    {
 #if DEBUG_TEXT
-                else
-                {
-                    Debug.Log("Effect '" + fx.title +
-                              " does not modify characters and has not been added to the textension");
-                }
+                        Debug.Log("Key value " + effectsToApply[i].indexToEffect[j] + " already exists.");
 #endif
+                        // This key already exists, lets add this effect to the effects list at this index.
+                        effectsList.Add(effectsToApply[i]);
+                    }
+                    // This key index does not exist...
+                    else
+                    {
+#if DEBUG_TEXT
+//                        Debug.Log(effectsToApply[i].title + " is not being applied to " + effectsToApply[i].indexToEffect[j] + " therefore we will create a new list for it at index " + j);
+                        Debug.Log("Applying effect '" + effectsToApply[i].title + "' ");
+#endif
+                        // Create a new effects list                  
+                        List<Effect> stackingEffect = new List<Effect>();
+
+                        // Add this effect to the list
+                        stackingEffect.Add(effectsToApply[i]);
+
+                        // Create an entry in our dictionary with our list (if the key exists then other effects will be added to this list)
+                        appliedEffects.Add(effectsToApply[i].indexToEffect[j], stackingEffect);
+                    }
+                }
+            }
+
+#if DEBUG_TEXT
+            LogAppliedEffects();
+        }
+        
+        /// <summary>
+        /// A developer function that Debug.Logs all the applied effects on each character.
+        /// </summary>
+        private void LogAppliedEffects()
+        {
+            Debug.Log(appliedEffects.Keys.Count + " characters have effects on them.");
+
+            foreach (int key in appliedEffects.Keys)
+            {
+                List<Effect> stackingEffect;
+                if (appliedEffects.TryGetValue(key, out stackingEffect))
+                {
+                    // Create a string that will have all the effect titles
+                    string allEffectsStr = "";
+                    
+                    // Iterate through all the effects at a given character index / key
+                    for (int j = 0; j < stackingEffect.Count; j++)
+                    {
+                        // Add the effect name to the end of this string with a space at the end
+                        allEffectsStr += stackingEffect[j].title + " ";
+                    }
+
+                    // Remove the last space at the end
+                    allEffectsStr = allEffectsStr.TrimEnd(allEffectsStr[allEffectsStr.Length - 1]);
+                    
+                    // Add a period to the end
+                    allEffectsStr += ".";
+                                         
+                    // Print
+                    Debug.Log("Index " + key + " has these effect(s): " + allEffectsStr);
+                }
             }
         }
-
-        /// <summary>
-        /// Adds the provided effect without checking if it will apply to all characters.
-        /// </summary>
-        /// <param name="fx"></param>
-        private void ForceAddEffect(Effect fx)
-        {
-#if DEBUG_TEXT
-            Debug.Log("Applying '" + fx.title + "' to this textension: " + gameObject, gameObject);
 #endif
-            effectsToApply.Add(fx);
-        }
-
-        // TODO: Improve performance & architecture
+        
         private void EffectTick()
         {
-            // For each effect...
-            foreach (Effect effect in effectsToApply)
+            // For each key (character index to apply and effect to)...
+            foreach (int key in appliedEffects.Keys)
             {
-                // Iterate through all the index you will need to effect
-                for (int i = 0; i < effect.indexToEffect.Count; i++)
+                Character character = GetCharacter(key);
+
+                // Don't even bother effecting characters that aren't revealed
+                if (!character.isRevealed)
                 {
-                    if (effect.indexToEffect[i] >= GetCharacters().Count)
-                    {
-#if DEBUG_TEXT
-                        Debug.LogWarning("Effect out of range");
-#endif
-                        return;
-                    }
-
-                    // TODO: Don't cache this for each effect. Just do it once for each character. (Maybe store each effect in a list at specific indexes)
-                    Character character = GetCharacter(effect.indexToEffect[i]);
-
-                    // Don't even bother effecting characters that aren't revealed
-                    if (!character.isRevealed)
-                    {
-                        return;
-                    }
-
+                    return;
+                }
+                
+                // Iterate through all the effects at this dictionary key (character index)
+                foreach (Effect effect in appliedEffects[key])
+                {
                     // TODO: Determine when the effect is over, when it is over. Delete data
                     // Set scale to that individual character using it's own data
-                    character.AddScale(effect.Calculate(character) * Vector3.one - character.scale);
+                    character.AddScale(effect.Calculate(character) * Vector3.one - character.scale); 
                 }
             }
         }
 
         /// <summary>
-        /// Update each character that needs to be updated. (If an effect doesn't not effect a character, we will not update the characters mesh)
+        /// Update each character that has been dirtied. (If an effect didn't modify a character, we will not update that characters mesh)
         /// </summary>
         private void RenderEffects()
         {
@@ -217,6 +256,9 @@ namespace Textensions.Core
             }
         }
 
+        /// <summary>
+        /// Dirty flag
+        /// </summary>
         public void DirtyVertex()
         {
             _refreshVertex = true;
@@ -320,14 +362,14 @@ namespace Textensions.Core
         private void UpdateCharacter(Character character)
         {
             Profiler.BeginSample("Update Character");
-            
+
             // Don't update characters that haven't been revealed by a TextReveal.cs or don't update when the character is not visible (Determined by TMP)
             if (!character.isRevealed || !character.Info().isVisible)
             {
                 // Early exit and also necessary for spaces
                 return;
             }
-            
+
             // Clean the update flags
             character.updatePosition = false;
             character.updateRotation = false;
@@ -364,7 +406,7 @@ namespace Textensions.Core
             _targetVertices[index + 1] += characterOrigin;
             _targetVertices[index + 2] += characterOrigin;
             _targetVertices[index + 3] += characterOrigin;
-            
+
             // Set our vertex update to true so we can update all the vertex data at once instead of numerous times in a single frame.
             DirtyVertex();
 
@@ -372,11 +414,10 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Takes the modified mesh data and apply it to our text, 
+        /// Takes the modified mesh data and applies it to our TMP_Text
         /// </summary>
         private void ApplyMeshChanges()
         {
-            // TODO: See if we need this
             if (_targetVertices.Length <= 0) return;
 
             // Pass in the modified data back into the text
