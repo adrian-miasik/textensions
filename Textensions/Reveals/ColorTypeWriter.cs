@@ -41,7 +41,7 @@ namespace Textensions.Reveals
 			textension.text.UpdateGeometry(textension.text.textInfo.meshInfo[0].mesh, 0);
             
 #if DEBUG_TEXT
-            Debug.Log("Character: " + textension.unrevealedCharacters[0].Info().character + " has been revealed by ColorTypeWriter.cs [" + GetInstanceID() + "]");
+//            Debug.Log("Character: " + textension.unrevealedCharacters[0].Info().character + " has been revealed by ColorTypeWriter.cs [" + GetInstanceID() + "]");
 #endif
             
             // Mark the character as revealed

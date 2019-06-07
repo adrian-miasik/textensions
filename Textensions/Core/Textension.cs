@@ -72,7 +72,7 @@ namespace Textensions.Core
             // Cache our current text color and original mesh data
             _cachedColor = text.color;
             _originalMesh = text.textInfo.CopyMeshInfoVertexData();
-
+            
             // Clear our lists
             characters.Clear();
             unrevealedCharacters.Clear();
@@ -82,9 +82,7 @@ namespace Textensions.Core
             {
                 Character character = new Character(text.textInfo.characterInfo[i]);
                 characters.Add(character);
-
-                // TODO: Effect init here?
-
+                
                 // If we are hiding on initialization...
                 if (hideOnInitialization)
                 {
@@ -101,7 +99,7 @@ namespace Textensions.Core
             {
                 OnHideInitialize?.Invoke();
             }
-
+            
             hasInitialized = true;
         }
 
@@ -121,7 +119,7 @@ namespace Textensions.Core
 
                 // Step 3: Apply the effect to the character class
                 RenderEffects();
-
+                    
                 // Step 4: Then finally take all that information and apply it to the TMP_Text only once this frame
                 Render();
             }
@@ -214,23 +212,39 @@ namespace Textensions.Core
         
         private void EffectTick()
         {
+            if (characters.Count <= 0)
+            {
+                return;
+            }
+
             // For each key (character index to apply and effect to)...
             foreach (int key in appliedEffects.Keys)
             {
                 Character character = GetCharacter(key);
-
+                
                 // Don't even bother effecting characters that aren't revealed
                 if (!character.isRevealed)
                 {
                     return;
                 }
-                
+
                 // Iterate through all the effects at this dictionary key (character index)
-                foreach (Effect effect in appliedEffects[key])
+                for (int i = 0; i < appliedEffects[key].Count; i++)
                 {
-                    // TODO: Determine when the effect is over, when it is over. Delete data
-                    // Set scale to that individual character using it's own data
-                    character.AddScale(effect.Calculate(character) * Vector3.one - character.scale); 
+                    // Cache the effect
+                    Effect fx = appliedEffects[key][i];
+                    
+                    // TODO: don't rely on x (try to use character.revealTime and fx.lastframetime)
+                    // If there are are no changes from the last frame...
+                    if ((fx.Calculate(character) * Vector3.one - character.scale).x == 0)
+                    {
+                        // Remove the effect since it's done
+//                        appliedEffects[key].Remove(fx);
+                    }
+                    else
+                    {
+                        character.AddScale(fx.Calculate(character) * Vector3.one - character.scale); 
+                    }
                 }
             }
         }
