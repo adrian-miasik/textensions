@@ -13,5 +13,7 @@ namespace Textensions.Effects.Base
         public string title = "Default Effect Title";
         public List<int> indexToEffect;
         public abstract float Calculate(Character character);
-	}
+
+        protected float cachedCalculatedValue;
+    }
 }
