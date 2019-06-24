@@ -43,33 +43,33 @@ namespace Textensions.Reveals.Base
 
         private void Reset()
         {
-            // Quickly Fetch Reference
+            // Quickly fetch the textension reference
             textension = GetComponent<Textension>();
         }
 
         private void Awake()
         {
             textension.OnHideInitialize += Reveal;
-            textension.RevealTick += Tick;
+            textension.RevealsTick += Tick;
         }
 
         private void OnEnable()
         {
             textension.OnHideInitialize += Reveal;
-            textension.RevealTick += Tick;
+            textension.RevealsTick += Tick;
         }
 
         private void OnDisable()
         {
             textension.OnHideInitialize -= Reveal;
-            textension.RevealTick -= Tick;
+            textension.RevealsTick -= Tick;
             _isRevealing = false;
         }
 
         private void OnDestroy()
         {
             textension.OnHideInitialize -= Reveal;
-            textension.RevealTick -= Tick;
+            textension.RevealsTick -= Tick;
         }
 
         /// <summary>

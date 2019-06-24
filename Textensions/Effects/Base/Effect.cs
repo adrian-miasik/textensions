@@ -11,7 +11,17 @@ namespace Textensions.Effects.Base
 	public abstract class Effect : ScriptableObject {
 
         public string title = "Default Effect Title";
-        public List<int> indexToEffect;
+        
+        public enum Style
+        {
+            ALL_CHARACTERS,
+            ALL_ODD_CHARACTERS,
+            ALL_EVEN_CHARACTERS,
+            CUSTOM_INDICES
+        }
+
+        public Style style;
+        
         public abstract float Calculate(Character character);
 
         protected float cachedCalculatedValue;
