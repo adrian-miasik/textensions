@@ -11,6 +11,7 @@ namespace Textensions.Effects.Base
 	public abstract class Effect : ScriptableObject {
 
         public string title = "Default Effect Title";
+        public AnimationCurve uniform;
         
         public enum Style
         {

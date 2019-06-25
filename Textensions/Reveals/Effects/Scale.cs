@@ -11,7 +11,6 @@ namespace Textensions.Reveals.Effects
 	[CreateAssetMenu(menuName = "Text Reveals/Effects/Scale", fileName = "New Scale Effect")]
 	public class Scale: Effect
 	{
-		public AnimationCurve uniform;
 //        public bool isEffectOver = false;
 
         public override float Calculate(Character c)

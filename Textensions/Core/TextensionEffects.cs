@@ -13,20 +13,14 @@ namespace Textensions.Core
         public List<Effect> fxs;
 
         // These are the effects that we will be updating in EffectTick() every frame
-        public Dictionary<int, List<Effect>> appliedEffects;
+        public Dictionary<int, List<Effect>> appliedEffects = new Dictionary<int, List<Effect>>();
 
         private void Reset()
         {
             // Quickly fetch the textension reference
             textension = GetComponent<Textension>();
         }
-
-//        private void Awake()
-//        {
-//            textension.EffectsTick += EffectsTick;
-//            textension.EffectsInitialize += Initialize;
-//        }
-
+        
         private void OnEnable()
         {
             textension.EffectsTick += EffectsTick;
@@ -38,22 +32,16 @@ namespace Textensions.Core
             textension.EffectsTick -= EffectsTick;
             textension.EffectsInitialize -= Initialize;
         }
-
-//        private void OnDestroy()
-//        {
-//            textension.EffectsTick -= EffectsTick;
-//            textension.EffectsInitialize -= Initialize;
-//        }
         
         /// <summary>
         /// This gets initialized by the textension
         /// </summary>
         private void Initialize()
         {
-            appliedEffects = new Dictionary<int, List<Effect>>();
+            appliedEffects.Clear();
             AddEffectsToTextension();
         }
-        
+
         /// <summary>
         /// Adds our list of effects to the textensions class (which gets applied each applicable character)
         /// </summary>
@@ -124,10 +112,10 @@ namespace Textensions.Core
         /// <summary>
         /// However if the provided effect does exist within the dictionary we will access that key and add the effect to the list within that key value
         /// </summary>
-        public void AddEffects(List<Effect> effectsToApply)
+        private void AddEffects(List<Effect> effectsToApply)
         {
             Debug.Log("Adding effect!");
-            
+
             // Iterate through each array
             for (int i = 0; i < effectsToApply.Count; i++)
             {
@@ -162,11 +150,9 @@ namespace Textensions.Core
                     }
                 }
             }
-
-#if DEBUG_TEXT
             LogAppliedEffects();
         }
-
+        
         /// <summary>
         /// A developer function that Debug.Logs all the applied effects on each character.
         /// </summary>
@@ -200,7 +186,6 @@ namespace Textensions.Core
                 }
             }
         }
-#endif
 
         private void EffectsTick()
         {
@@ -210,19 +195,16 @@ namespace Textensions.Core
             }
 
             // For each key (character index to apply and effect to)...
-            foreach (int key in appliedEffects.Keys)
+            for (int i = 0; i < appliedEffects.Keys.Count; i++)
             {
-                if (key > textension.GetTextLength() - 1)
+                if (i > textension.GetTextLength() - 1)
                 {
                     Debug.Log("Our effects need to be re-initialized since the text has changed.");
                     // TODO: Throw out all character data past the characters length
-//                    Initialize();
-//                    appliedEffects.Clear();
-//                    AddEffectsToTextension();
                     return;
                 }
 
-                Character character = textension.GetCharacter(key);
+                Character character = textension.GetCharacter(i);
 
                 // Don't even bother effecting characters that aren't revealed
                 if (!character.isRevealed)
@@ -230,18 +212,29 @@ namespace Textensions.Core
                     return;
                 }
 
+                // Skip blame characters
+                if (!character.Info().isVisible)
+                {
+                    continue;
+                }
+
                 // Iterate through all the effects at this dictionary key (character index)
-                for (int i = 0; i < appliedEffects[key].Count; i++)
+                for (int j = 0; j < appliedEffects[i].Count; j++)
                 {
                     // Cache the effect
-                    Effect fx = appliedEffects[key][i];
-
-                    // TODO: don't rely on x (try to use character.revealTime and fx.lastframetime)
-                    // If there are are no changes from the last frame...
-                    if ((fx.Calculate(character) * Vector3.one - character.scale).x == 0)
+                    Effect fx = appliedEffects[i][j];
+                    
+                    // TODO: Support multiple character effect animations
+                    // If this animation is completed...
+                    if (character.timeSinceReveal > fx.uniform[fx.uniform.length - 1].time)
                     {
-                        // Remove the effect since it's done
-//                        appliedEffects[key].Remove(fx);
+                        // TODO: Flicker happens cause I'm assuming the scale is set too late and is late a frame after textension.cs. Possible fix? Update the character after we set the scale on the character below.
+                        // TODO: Set to characters base scale
+                        // Dirty scale for now
+                        character.SetScale(Vector3.one);
+
+                        // TODO: Remove this character from the dictionary along with the associated character class
+                        character.effectCompleted = true; // Redundant?
                     }
                     else
                     {
