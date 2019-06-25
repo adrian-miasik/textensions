@@ -15,6 +15,7 @@ namespace Textensions.Core
     {
         public float timeSinceReveal;
         public bool isRevealed;
+        public bool effectCompleted;
         private TMP_CharacterInfo _info;
 
         public Vector3 position;
@@ -24,9 +25,7 @@ namespace Textensions.Core
         public bool updatePosition;
         public bool updateRotation;
         public bool updateScale;
-
-        public List<Effect> fxs;
-
+        
         /// <summary>
         /// Index position within the given text component. E.g. ("Hello", "o" would be index 4)
         /// </summary>
@@ -69,11 +68,6 @@ namespace Textensions.Core
 
         public void AddScale(Vector3 scale)
         {
-            if (scale == Vector3.zero)
-            {
-                return;
-            }
-            
             updateScale = true;
             this.scale += scale;
         }
@@ -100,7 +94,7 @@ namespace Textensions.Core
             isRevealed = false;
         }
 
-        // TODO: Look if there is performance overhead for getters
+        // Getters have a performance overhead when they are not optimized out. Most getters and setters are optimized out by the compiler anyways
         public TMP_CharacterInfo Info()
         {
             return _info;
