@@ -46,13 +46,7 @@ namespace Textensions.Reveals.Base
             // Quickly fetch the textension reference
             textension = GetComponent<Textension>();
         }
-
-        private void Awake()
-        {
-            textension.OnHideInitialize += Reveal;
-            textension.RevealsTick += Tick;
-        }
-
+        
         private void OnEnable()
         {
             textension.OnHideInitialize += Reveal;
@@ -65,13 +59,7 @@ namespace Textensions.Reveals.Base
             textension.RevealsTick -= Tick;
             _isRevealing = false;
         }
-
-        private void OnDestroy()
-        {
-            textension.OnHideInitialize -= Reveal;
-            textension.RevealsTick -= Tick;
-        }
-
+        
         /// <summary>
         /// Initialize the text, and starts the character reveal.
         /// </summary>
