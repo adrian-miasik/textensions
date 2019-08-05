@@ -135,9 +135,10 @@ namespace Textensions.Reveals.Base
             if (_isRevealing)
             {
                 // If we have no character to reveal...
-                if (_numberOfCharacters == 0)
+                if (textension.unrevealedCharacters.Count <= 0)
                 {
                     // Stop the reveal
+                    _isRevealing = false;
                     return;
                 }
 
