@@ -97,9 +97,14 @@ namespace Textensions.Core
                 if(OnHideInitialize == null)
                 {
                     // TODO: Default to a certain hide method.
-                    Debug.LogWarning("Can't hide this textension since I'm not sure which way you want to hide it. In textensions we have 2 reveal types currently: Render and Color Reveals. In order to hide properly on initialization please provide a text revealer");
+                    Debug.LogWarning("Can't hide this textension since I'm not sure which way you want to hide it. " +
+                                     "In textensions we have 2 reveal types currently: Render and Color Reveals. " +
+                                     "In order to hide properly on initialization please provide a text revealer");
                 }
-                OnHideInitialize?.Invoke();
+                else
+                {
+                    OnHideInitialize.Invoke();
+                }
             }
             
             // Initialize our effects
