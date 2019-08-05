@@ -29,14 +29,31 @@ namespace Textensions.Core
         
         private void OnEnable()
         {
-            textension.EffectsTick += EffectsTick;
-            textension.EffectsInitialize += Initialize;
+            Subscribe();
         }
 
         private void OnDisable()
         {
-            textension.EffectsTick -= EffectsTick;
+            Unsubscribe();
+        }
+        /// <summary>
+        /// Subscribe to the textension action events so that this effect script can get invoked. (EffectsInitialize & EffectsTick)
+        /// </summary>
+        private void Subscribe()
+        {
+            // Subscribe to the effect action events
+            textension.EffectsInitialize += Initialize;
+            textension.EffectsTick += EffectsTick;
+        }
+
+        /// <summary>
+        /// Unsubscribe to the textension action events so that this effect script will no longer get invoked. (EffectsInitialize & EffectsTick)
+        /// </summary>
+        private void Unsubscribe()
+        {
+            // Unsubscribe to the effect action events
             textension.EffectsInitialize -= Initialize;
+            textension.EffectsTick -= EffectsTick;
         }
         
         /// <summary>
@@ -197,6 +214,7 @@ namespace Textensions.Core
         {
             if (textension.characters.Count <= 0)
             {
+                Unsubscribe();
                 return;
             }
 
