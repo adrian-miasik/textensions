@@ -13,16 +13,12 @@ namespace Textensions.Core
     /// </summary>
     public class Textension : MonoBehaviour
     {
-        // PUBLIC MEMBERS
         // TODO: There should only be one textension per given text. Enforce this.
         public TMP_Text text;
 
-//        [Tooltip("The base scale of each character.")]
-//        public Vector3 characterScale = Vector3.one;
-
         // TODO: Make this a read-only inspector bool
         [SerializeField] private bool _hasInitialized = false;
-        
+
         [Tooltip("Filled-in if you want to hide the text when it's initialized. If filled in then you are probably looking to attach a reveal to the textension.")]
         public bool hideOnInitialization = true;
 
@@ -30,7 +26,6 @@ namespace Textensions.Core
         public List<Character> characters = new List<Character>();
         public List<Character> unrevealedCharacters = new List<Character>();
         
-        // PRIVATE MEMBERS
         private bool _refreshVertex;
 
         private TMP_MeshInfo[] _originalMesh;
@@ -59,7 +54,7 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Recalculates the TMP_Text and recreates the character list to match the text. This should not be called more than once per frame.
+        /// Recalculates the TMP_Text and creates multiple character classes to match the source text. This should not be called more than once per frame.
         /// </summary>
         private void Initialize()
         {
@@ -121,7 +116,7 @@ namespace Textensions.Core
                 // Step 0: Init / Re-init dirty text
                 // TODO
 
-                // Step 1: Let each reveal do its thing
+                // Step 1: Tick each text reveal to determine if they should reveal a/multiple text character(s) (A tick does not equal a character reveal)
                 RevealsTick?.Invoke();
 
                 // Step 2: Calculate the effect for each character
