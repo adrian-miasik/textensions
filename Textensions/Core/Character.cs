@@ -3,8 +3,6 @@
 // Github Account: https://github.com/AdrianMiasik
 
 using System;
-using System.Collections.Generic;
-using Textensions.Effects.Base;
 using TMPro;
 using UnityEngine;
 
