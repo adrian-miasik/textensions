@@ -14,8 +14,19 @@ namespace Textensions.Effects.Base
         
         public enum Style
         {
+            /// <summary>
+            /// This effect will apply to all characters in this textension
+            /// </summary>
             ALL_CHARACTERS,
+            
+            /// <summary>
+            /// This effect will only apply to characters in odd index positions.
+            /// </summary>
             ALL_ODD_CHARACTERS,
+            
+            /// <summary>
+            /// This effect will only apply to characters in even index positions.
+            /// </summary>
             ALL_EVEN_CHARACTERS,
             CUSTOM_INDICES
         }
