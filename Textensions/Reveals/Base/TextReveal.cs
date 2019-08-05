@@ -116,18 +116,6 @@ namespace Textensions.Reveals.Base
         /// </summary>
         private void Tick()
         {
-            if (textension.unrevealedCharacters.Count <= 0)
-            {
-                _isRevealing = false;
-                return;
-            }
-
-            if (!enabled)
-            {
-                OnDisable();
-                return;
-            }
-
             // Prevent a negative value from being assigned
             characterDelay = Mathf.Clamp(characterDelay, 0, characterDelay);
 
