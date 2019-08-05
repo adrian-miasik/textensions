@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using Textensions.Effects.Base;
 using UnityEngine;
@@ -21,6 +22,11 @@ namespace Textensions.Core
         /// </summary>
         public Dictionary<int, List<Effect>> appliedEffects = new Dictionary<int, List<Effect>>();
 
+        /// <summary>
+        /// Theses are the keys we are going to remove from appliedEffects after we are done iterating through them.
+        /// </summary>
+        private List<int> _keysToClean = new List<int>();
+        
         private void Reset()
         {
             // Quickly fetch the textension reference
@@ -36,6 +42,19 @@ namespace Textensions.Core
         {
             Unsubscribe();
         }
+
+        private void Update()
+        {
+#if DEBUG_TEXT
+            // If the user presses f5...
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                // Print to the console all the effects on the characters.
+                LogAppliedEffects();
+            }
+#endif
+        }
+
         /// <summary>
         /// Subscribe to the textension action events so that this effect script can get invoked. (EffectsInitialize & EffectsTick)
         /// </summary>
@@ -82,8 +101,6 @@ namespace Textensions.Core
         /// <param name="fx"></param>
         private List<int> DetermineWhatCharactersToAffect(Effect fx)
         {
-            Debug.Log(fx.style);
-
             List<int> characterIndicesToAffect = new List<int>();
 
             switch (fx.style)
@@ -92,33 +109,60 @@ namespace Textensions.Core
                 case Effect.Style.ALL_CHARACTERS:
                     for (int i = 0; i < textension.characters.Count; i++)
                     {
+                        // If this specific character is not visible to TMP...
+                        if (!textension.characters[i].Info().isVisible)
+                        {
+#if DEBUG_TEXT
+                            Debug.LogWarning("Not applying effect to character index [" + i + "], because it is not visible.");
+#endif
+                            // Skip it
+                            continue;
+                        }
+                        
                         characterIndicesToAffect.Add(i);
                     }
-
                     break;
-
+                // This effect will only apply to characters in odd index positions...
                 case Effect.Style.ALL_ODD_CHARACTERS:
                     for (int i = 0; i < textension.characters.Count; i++)
                     {
                         // Odd
                         if (i % 2 == 1)
                         {
+                            // If this specific character is not visible to TMP...
+                            if (!textension.characters[i].Info().isVisible)
+                            {
+#if DEBUG_TEXT
+                                Debug.LogWarning("Not applying effect to character index [" + i + "], because it is not visible.");
+#endif
+                                // Skip it
+                                continue;
+                            }
+                            
                             characterIndicesToAffect.Add(i);
                         }
                     }
-
                     break;
-
+                // This effect will only apply to character in the even index positions...
                 case Effect.Style.ALL_EVEN_CHARACTERS:
                     for (int i = 0; i < textension.characters.Count; i++)
                     {
                         // Even
                         if (i % 2 == 0)
                         {
+                            // If this specific character is not visible to TMP...
+                            if (!textension.characters[i].Info().isVisible)
+                            {
+#if DEBUG_TEXT
+                                Debug.LogWarning("Not applying effect to character index [" + i + "], because it is not visible.");
+#endif
+                                // Skip it
+                                continue;
+                            }
+                            
                             characterIndicesToAffect.Add(i);
                         }
                     }
-
                     break;
 
                 default:
@@ -128,23 +172,51 @@ namespace Textensions.Core
 
             return characterIndicesToAffect;
         }
+        
+        // TODO: Fix comments
+        /// <summary>
+        /// Removes the provided effect at a certain key within appliedEffects.
+        /// </summary>
+        /// <summary>
+        /// Note: If the key value has no more effects after removal, the key will remain intact.
+        /// </summary>
+        /// <summary>
+        /// Meaning just because we are removing the effect value from the key, doesn't mean we will remove the key if there are no effects within.
+        /// Instead we are leaving the key alone even if it has no effects within it's value.
+        /// </summary>
+        /// <param name="characterIndex"></param>
+        /// <param name="effectToRemove"></param>
+        private void RemoveEffect(int characterIndex, Effect effectToRemove)
+        {
+            // If we have found the character index...
+            if (appliedEffects.TryGetValue(characterIndex, out List<Effect> effectsList))
+            {
+                // Remove the specific effect from this character
+                effectsList.Remove(effectToRemove);
+            }
+            else
+            {
+                Debug.LogWarning("Could not find " + characterIndex + " in the applied effects list." +
+                                 "It looks like you are trying to access a character that has no effects on it." +
+                                 "Are you sure this character index has been created on the appliedEffect list?");
+            }
+        }
 
         /// <summary>
-        /// Adds the provided effects to our textension
+        /// Adds the provided effects to our textension.
         /// </summary>
         /// <summary>
-        /// If the provided effect does not exist within the dictionary we will create a key in the dictionary along with a new list
+        /// If the provided effect does not exist within the dictionary we will create a key in the dictionary along with a new list.
         /// </summary>
         /// <summary>
-        /// However if the provided effect does exist within the dictionary we will access that key and add the effect to the list within that key value
+        /// However if the provided effect does exist within the dictionary we will access that key and add the effect to the list within that key value.
         /// </summary>
         private void AddEffects(List<Effect> effectsToApply)
         {
-            Debug.Log("Adding effect!");
-
-            // Iterate through each array
+            // Iterate through each effect...
             for (int i = 0; i < effectsToApply.Count; i++)
             {
+                // Get the indices that this effect is going to be applied to. (We don't want to apply this effect to every character)
                 List<int> indicesToEffect = DetermineWhatCharactersToAffect(effectsToApply[i]);
                 
                 // Iterate through all the character indices this effect will affect...
@@ -163,28 +235,31 @@ namespace Textensions.Core
                     else
                     {
 #if DEBUG_TEXT
-                        Debug.Log(effectsToApply[i].title + " is not being applied to " + indicesToEffect[j] + " therefore we will create a new list for it at index " + j);
+                        Debug.Log(effectsToApply[i].title + " is not being applied to " + indicesToEffect[j] + " therefore we will create a new list for it at index " + indicesToEffect[j]);
 #endif
                         // Create a new effects list                  
                         List<Effect> stackingEffect = new List<Effect>();
 
                         // Add this effect to the list
                         stackingEffect.Add(effectsToApply[i]);
-
+                        
                         // Create an entry in our dictionary with our list (if the key exists then other effects will be added to this list)
                         appliedEffects.Add(indicesToEffect[j], stackingEffect);
                     }
                 }
             }
+#if DEBUG_TEXT
             LogAppliedEffects();
+#endif
         }
         
+#if DEBUG_TEXT
         /// <summary>
         /// A developer function that Debug.Logs all the applied effects on each character.
         /// </summary>
         private void LogAppliedEffects()
         {
-            Debug.Log(appliedEffects.Keys.Count + " characters have effects on them.");
+            Debug.Log(appliedEffects.Keys.Count + " characters have keys on them.");
 
             foreach (int key in appliedEffects.Keys)
             {
@@ -197,13 +272,22 @@ namespace Textensions.Core
                     // Iterate through all the effects at a given character index / key
                     for (int j = 0; j < stackingEffect.Count; j++)
                     {
-                        // Add the effect name to the end of this string with a space at the end
-                        allEffectsStr += stackingEffect[j].title + " ";
+                        // Add the effect name to the end of this string
+                        allEffectsStr += stackingEffect[j].title;
+
+                        // If we have another effect after this one...
+                        if (j != stackingEffect.Count - 1)
+                        {
+                            allEffectsStr += ", ";
+                        }
                     }
-
-                    // Remove the last space at the end
-                    allEffectsStr = allEffectsStr.TrimEnd(allEffectsStr[allEffectsStr.Length - 1]);
-
+                    
+                    // If we have no effects on this character...
+                    if (stackingEffect.Count <= 0)
+                    {
+                        allEffectsStr += "[NO EFFECTS FOUND]";
+                    }
+                    
                     // Add a period to the end
                     allEffectsStr += ".";
 
@@ -212,7 +296,8 @@ namespace Textensions.Core
                 }
             }
         }
-
+#endif
+        
         /// <summary>
         /// Note: This gets invoked by the textension.
         /// </summary>
@@ -224,54 +309,72 @@ namespace Textensions.Core
                 return;
             }
 
-            // For each key (character index to apply and effect to)...
-            for (int i = 0; i < appliedEffects.Keys.Count; i++)
+            // For each key...(each character index to apply an effect to)
+            foreach (int key in appliedEffects.Keys)
             {
-                if (i > textension.GetTextLength() - 1)
+                if (key > textension.GetTextLength() - 1)
                 {
                     Debug.Log("Our effects need to be re-initialized since the text has changed.");
                     // TODO: Throw out all character data past the characters length
                     return;
                 }
 
-                Character character = textension.GetCharacter(i);
+                Character character = textension.GetCharacter(key);
 
-                // Don't even bother effecting characters that aren't revealed
-                if (!character.isRevealed)
-                {
-                    return;
-                }
-
-                // Skip blame characters
-                if (!character.Info().isVisible)
+                // If our current character is not revealed or not visible, then skip it.
+                if (!character.isRevealed || !character.Info().isVisible)
                 {
                     continue;
                 }
 
+                // Accumulate time to this specific character
+                character.timeSinceReveal += Time.deltaTime;
+                
                 // Iterate through all the effects at this dictionary key (character index)
-                for (int j = 0; j < appliedEffects[i].Count; j++)
+                for (int j = 0; j < appliedEffects[key].Count; j++)
                 {
                     // Cache the effect
-                    Effect fx = appliedEffects[i][j];
+                    Effect fx = appliedEffects[key][j];
                     
-                    // TODO: Support multiple character effect animations
-                    // If this animation is completed...
-                    if (character.timeSinceReveal > fx.uniform[fx.uniform.length - 1].time)
+                    // If this effect is not completed...
+                    if (character.timeSinceReveal <= fx.uniform[fx.uniform.length - 1].time || fx.uniform.postWrapMode == WrapMode.PingPong || fx.uniform.postWrapMode == WrapMode.Loop)
                     {
-                        // TODO: Flicker happens cause I'm assuming the scale is set too late and is late a frame after textension.cs. Possible fix? Update the character after we set the scale on the character below.
-                        // TODO: Set to characters base scale
-                        // Dirty scale for now
-                        character.SetScale(Vector3.one);
-
-                        // TODO: Remove this character from the dictionary along with the associated character class
-                        character.effectCompleted = true; // Redundant?
+                        character.AddScale(fx.Calculate(character) * Vector3.one);
                     }
+                    // This effect has been completed...
                     else
                     {
-                        character.AddScale(fx.Calculate(character) * Vector3.one - character.scale);
+                        // Remove the completed effect from this character
+                        RemoveEffect(key, fx);
+                        
+                        // If the specific character index has a value...
+                        if (appliedEffects.TryGetValue(key, out List<Effect> effectsList))
+                        {
+                            // If the specific character has no more effects...
+                            if (effectsList.Count <= 0)
+                            {
+                                // Mark this key as ready to be removed. (The reason we are doing it this way
+                                // is we can't remove it while we are still iterating through it.)
+                                _keysToClean.Add(key);
+                            }
+                        }
                     }
                 }
             }
+
+            // Since we are no longer iterating through the appliedEffects collection.
+            // Iterate through all the keys to remove from appliedEffects...
+            foreach (int i in _keysToClean)
+            {
+                // Remove the cleaned key
+                appliedEffects.Remove(i);
+                Debug.Log("Character index [" + i + "] has no more effects on it, therefore the dictionary key is being revoked.");
+
+                textension.characters[i].effectCompleted = true;
+            }
+            
+            // We have just cleaned the keys, we can now clear this memory up for the next tick.
+            _keysToClean.Clear();
         }
     }
 }

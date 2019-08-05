@@ -155,6 +155,8 @@ namespace Textensions.Core
 #if DEBUG_TEXT
 //                    Debug.Log("Updating character: " + character.Info().character);
 #endif
+                    character.ApplyScale();
+                    
                     // Update the character mesh data
                     UpdateCharacter(character);
                 }
