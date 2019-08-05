@@ -2,7 +2,6 @@
 // Personal Portfolio: http://AdrianMiasik.com
 // Github Account: https://github.com/AdrianMiasik
 
-using System.Collections.Generic;
 using Textensions.Core;
 using UnityEngine;
 
@@ -24,7 +23,5 @@ namespace Textensions.Effects.Base
         public Style style;
         
         public abstract float Calculate(Character character);
-
-        protected float cachedCalculatedValue;
     }
 }
