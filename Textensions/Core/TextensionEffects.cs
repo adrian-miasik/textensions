@@ -57,7 +57,7 @@ namespace Textensions.Core
         }
         
         /// <summary>
-        /// This gets initialized by the textension
+        /// Note: This gets invoked by the textension.
         /// </summary>
         private void Initialize()
         {
@@ -66,7 +66,7 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Adds our list of effects to the textensions class (which gets applied each applicable character)
+        /// Adds our list of effects to the textensions class (which gets applied each applicable character).
         /// </summary>
         private void AddEffectsToTextension()
         {
@@ -75,6 +75,9 @@ namespace Textensions.Core
 
         /// <summary>
         /// Determine what character indices this effect will apply to.
+        /// </summary>
+        /// <summary>
+        /// Note: Any characters that are not visible to TMP, will not be returned.
         /// </summary>
         /// <param name="fx"></param>
         private List<int> DetermineWhatCharactersToAffect(Effect fx)
@@ -143,8 +146,8 @@ namespace Textensions.Core
             for (int i = 0; i < effectsToApply.Count; i++)
             {
                 List<int> indicesToEffect = DetermineWhatCharactersToAffect(effectsToApply[i]);
-
-                // Iterate through all the indexes this effect will effect
+                
+                // Iterate through all the character indices this effect will affect...
                 for (int j = 0; j < indicesToEffect.Count; j++)
                 {
                     // If this key index exists...
@@ -210,6 +213,9 @@ namespace Textensions.Core
             }
         }
 
+        /// <summary>
+        /// Note: This gets invoked by the textension.
+        /// </summary>
         private void EffectsTick()
         {
             if (textension.characters.Count <= 0)
