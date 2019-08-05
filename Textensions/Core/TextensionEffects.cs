@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Textensions.Effects.Base;
 using UnityEngine;
 
@@ -6,13 +6,19 @@ namespace Textensions.Core
 {
     public class TextensionEffects : MonoBehaviour
     {
-        // The text we want to apply effects to
+        /// <summary>
+        /// The text we want to apply effects to
+        /// </summary>
         public Textension textension;
 
-        // The effects we want to apply to this textension
+        /// <summary>
+        /// The effects we want to apply to this textension
+        /// </summary>
         public List<Effect> fxs;
 
-        // These are the effects that we will be updating in EffectTick() every frame
+        /// <summary>
+        /// These are the effects that we will be updating in EffectTick() every frame
+        /// </summary>
         public Dictionary<int, List<Effect>> appliedEffects = new Dictionary<int, List<Effect>>();
 
         private void Reset()
