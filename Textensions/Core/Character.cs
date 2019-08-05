@@ -19,7 +19,11 @@ namespace Textensions.Core
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
-
+        
+        private Vector3 _positionCached;
+        private Quaternion _rotationCached;
+        private Vector3 _scaleCached;
+        
         public bool updatePosition;
         public bool updateRotation;
         public bool updateScale;
@@ -37,27 +41,32 @@ namespace Textensions.Core
             scale = Vector3.one;
             timeSinceReveal = 0f;
             index = info.index;
+            effectCompleted = false;
             isRevealed = false;
         }
 
+        // TODO: Revisit
         public void AddPosition(Vector3 position)
         {
             updatePosition = true;
             this.position += position;
         }
 
+        // TODO: Revisit
         public void RemovePosition(Vector3 position)
         {
             updatePosition = true;
             this.position -= position;
         }
 
+        // TODO: Revisit
         public void AddRotation(Quaternion rotation)
         {
             updateRotation = true;
             this.rotation *= rotation;
         }
 
+        // TODO: Revisit
         public void RemoveRotation(Quaternion rotation)
         {
             updateRotation = true;
@@ -67,15 +76,27 @@ namespace Textensions.Core
         public void AddScale(Vector3 scale)
         {
             updateScale = true;
-            this.scale += scale;
+            _scaleCached += scale;
         }
 
+        public void ApplyScale()
+        {
+            if (updateScale)
+            {
+                updateScale = false;
+                scale = _scaleCached;
+                _scaleCached = Vector3.zero;
+            }
+        }
+
+        // TODO: Revisit
         public void SetScale(Vector3 scale)
         {
             updateScale = true;
             this.scale = scale;
         }
 
+        // TODO: Revisit
         public void RemoveScale(Vector3 scale)
         {
             updateScale = true;
