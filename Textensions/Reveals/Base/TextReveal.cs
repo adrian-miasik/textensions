@@ -134,10 +134,10 @@ namespace Textensions.Reveals.Base
             // If we are text revealing...
             if (_isRevealing)
             {
-                // If we don't have anything to reveal...
+                // If we have no character to reveal...
                 if (_numberOfCharacters == 0)
                 {
-                    // Early exit
+                    // Stop the reveal
                     return;
                 }
 
@@ -165,6 +165,10 @@ namespace Textensions.Reveals.Base
             }
         }
 
+        /// <summary>
+        /// Marks the specific character index as revealed and removes it from the unrevealedCharacters list.
+        /// </summary>
+        /// <param name="index"></param>
         protected void MarkAsRevealed(int index)
         {
             textension.unrevealedCharacters[index].Reveal();
