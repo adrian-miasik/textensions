@@ -33,6 +33,6 @@ namespace Textensions.Effects.Base
 
         public Style style;
         
-        public abstract float Calculate(Character character);
+        public abstract void Calculate(Character character);
     }
 }

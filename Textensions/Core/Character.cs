@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Textensions.Core
 {
+    // TODO: Ability to explicitly set the position, rotation, and/or scale of this character for one frame. (So we set variables directly)
     [Serializable]
     public class Character
     {
@@ -23,10 +24,18 @@ namespace Textensions.Core
         private Vector3 _positionCached;
         private Quaternion _rotationCached;
         private Vector3 _scaleCached;
+
+        /// <summary>
+        /// If this bool is on, then the character will tell itself to update and rebuild despite not being modified.
+        /// </summary>
+        /// <summary>
+        /// Note: This is good for live editing in the editor.
+        /// </summary>
+        public bool forceUpdate;
         
-        public bool updatePosition;
-        public bool updateRotation;
-        public bool updateScale;
+        public bool hasPositionUpdated;
+        public bool hasRotationUpdated;
+        public bool hasScaleUpdated;
         
         /// <summary>
         /// Index position within the given text component. E.g. ("Hello", "o" would be index 4)
@@ -45,64 +54,82 @@ namespace Textensions.Core
             isRevealed = false;
         }
 
-        // TODO: Revisit
+        /// <summary>
+        /// Flags all position, rotation, and scale flags as being modified this frame. Causing rebuilding later on in the lifecycle/tick.
+        /// </summary>
+        public void DirtyCharacter()
+        {
+            hasPositionUpdated = true;
+            hasRotationUpdated = true;
+            hasScaleUpdated = true;
+        }
+        
         public void AddPosition(Vector3 position)
         {
-            updatePosition = true;
-            this.position += position;
+            hasPositionUpdated = true;
+            _positionCached += position;
         }
-
-        // TODO: Revisit
+        
         public void RemovePosition(Vector3 position)
         {
-            updatePosition = true;
-            this.position -= position;
+            hasPositionUpdated = true;
+            _positionCached -= position;
         }
 
-        // TODO: Revisit
+        public void ApplyPosition()
+        {
+            if (hasPositionUpdated)
+            {
+                hasPositionUpdated = false;
+                position = _positionCached;
+                _positionCached = Vector3.zero;
+            }
+        }
+        
         public void AddRotation(Quaternion rotation)
         {
-            updateRotation = true;
-            this.rotation *= rotation;
+            hasRotationUpdated = true;
+            _rotationCached *= rotation;
         }
-
-        // TODO: Revisit
+        
         public void RemoveRotation(Quaternion rotation)
         {
-            updateRotation = true;
-            this.rotation = rotation * Quaternion.Inverse(this.rotation);
+            hasRotationUpdated = true;
+            _rotationCached = rotation * Quaternion.Inverse(_rotationCached);
+        }
+
+        public void ApplyRotation()
+        {
+            if (hasRotationUpdated)
+            {
+                hasRotationUpdated = false;
+                rotation = _rotationCached;
+                _rotationCached = Quaternion.identity;
+            }
         }
 
         public void AddScale(Vector3 scale)
         {
-            updateScale = true;
+            hasScaleUpdated = true;
             _scaleCached += scale;
+        }
+        
+        public void RemoveScale(Vector3 scale)
+        {
+            hasScaleUpdated = true;
+            _scaleCached -= scale;
         }
 
         public void ApplyScale()
         {
-            if (updateScale)
+            if (hasScaleUpdated)
             {
-                updateScale = false;
+                hasScaleUpdated = false;
                 scale = _scaleCached;
                 _scaleCached = Vector3.zero;
             }
         }
-
-        // TODO: Revisit
-        public void SetScale(Vector3 scale)
-        {
-            updateScale = true;
-            this.scale = scale;
-        }
-
-        // TODO: Revisit
-        public void RemoveScale(Vector3 scale)
-        {
-            updateScale = true;
-            this.scale -= scale;
-        }
-
+        
         public void Reveal()
         {
             isRevealed = true;

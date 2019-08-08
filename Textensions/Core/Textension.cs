@@ -145,20 +145,44 @@ namespace Textensions.Core
         /// </summary>
         private void UpdateCharacters()
         {
+            bool markCharacterAsDirty = false;
+                
             // Iterate through each character...
             foreach (Character character in characters)
             {
-                // TODO: Maybe split UpdateCharacter() into different functions? Will need to stress test and see if certain matrix modifications are cheaper than others.
-                // If the character's position, rotation or scale has been modified...
-                if (character.updatePosition || character.updateRotation || character.updateScale)
+                // If the characters position has been modified...
+                if (character.hasPositionUpdated)
                 {
-#if DEBUG_TEXT
-//                    Debug.Log("Updating character: " + character.Info().character);
-#endif
+                    character.ApplyPosition();
+                    markCharacterAsDirty = true;
+                }
+                
+                // If the characters rotation has been modified...
+                if (character.hasRotationUpdated)
+                {
+                    character.ApplyRotation();
+                    markCharacterAsDirty = true;
+                }
+                
+                // If the characters scale has been modified...
+                if (character.hasScaleUpdated)
+                {
                     character.ApplyScale();
-                    
+                    markCharacterAsDirty = true;
+                }
+                
+                // If this character has been marked as dirty... (We will need to update its mesh data)
+                if (markCharacterAsDirty || character.forceUpdate)
+                {
+                    // TODO: Maybe split UpdateCharacter() into different functions? Will need to stress test and see if certain matrix modifications are cheaper than others.
                     // Update the character mesh data
                     UpdateCharacter(character);
+                    
+                    // Disable flag, so it can get marked next iteration / character
+                    markCharacterAsDirty = false;
+#if DEBUG_TEXT
+//                    Debug.Log("Updated character: " + character.Info().character);
+#endif
                 }
             }
         }
@@ -278,9 +302,9 @@ namespace Textensions.Core
             }
 
             // Clean the update flags
-            character.updatePosition = false;
-            character.updateRotation = false;
-            character.updateScale = false;
+            character.hasPositionUpdated = false;
+            character.hasRotationUpdated = false;
+            character.hasScaleUpdated = false;
 
             // TODO: Move these 2 lines outside of this function since they aren't specific to this character (It can probably just done once in initialization)
             // Get the characters material vertices from the texts mesh

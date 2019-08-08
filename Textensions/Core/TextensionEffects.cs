@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Textensions.Effects.Base;
+using Textensions.Reveals.Effects;
 using UnityEngine;
 
 namespace Textensions.Core
@@ -321,9 +322,10 @@ namespace Textensions.Core
 
                 Character character = textension.GetCharacter(key);
 
-                // If our current character is not revealed or not visible, then skip it.
-                if (!character.isRevealed || !character.Info().isVisible)
+                // If our current character is not revealed, or not visible, or the effects are completed...
+                if (!character.isRevealed || !character.Info().isVisible || character.effectCompleted)
                 {
+                    // then skip it
                     continue;
                 }
 
@@ -335,18 +337,19 @@ namespace Textensions.Core
                 {
                     // Cache the effect
                     Effect fx = appliedEffects[key][j];
-                    
+
                     // If this effect is not completed...
                     if (character.timeSinceReveal <= fx.uniform[fx.uniform.length - 1].time || fx.uniform.postWrapMode == WrapMode.PingPong || fx.uniform.postWrapMode == WrapMode.Loop)
                     {
-                        character.AddScale(fx.Calculate(character) * Vector3.one);
+                        // Execute the effect
+                        fx.Calculate(character);
                     }
                     // This effect has been completed...
                     else
                     {
                         // Remove the completed effect from this character
                         RemoveEffect(key, fx);
-                        
+
                         // If the specific character index has a value...
                         if (appliedEffects.TryGetValue(key, out List<Effect> effectsList))
                         {
@@ -356,12 +359,15 @@ namespace Textensions.Core
                                 // Mark this key as ready to be removed. (The reason we are doing it this way
                                 // is we can't remove it while we are still iterating through it.)
                                 _keysToClean.Add(key);
+
+                                // This character has no more effects, therefore we will mark it as effectCompleted.
+                                character.effectCompleted = true;
                             }
                         }
                     }
                 }
             }
-
+            
             // Since we are no longer iterating through the appliedEffects collection.
             // Iterate through all the keys to remove from appliedEffects...
             foreach (int i in _keysToClean)
@@ -369,8 +375,6 @@ namespace Textensions.Core
                 // Remove the cleaned key
                 appliedEffects.Remove(i);
                 Debug.Log("Character index [" + i + "] has no more effects on it, therefore the dictionary key is being revoked.");
-
-                textension.characters[i].effectCompleted = true;
             }
             
             // We have just cleaned the keys, we can now clear this memory up for the next tick.
