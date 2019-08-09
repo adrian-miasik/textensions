@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using Textensions.Effects.Base;
 using Textensions.Reveals.Effects;
@@ -27,6 +27,8 @@ namespace Textensions.Core
         /// Theses are the keys we are going to remove from appliedEffects after we are done iterating through them.
         /// </summary>
         private List<int> _keysToClean = new List<int>();
+
+        public Character lastRemovedCharacter;
         
         private void Reset()
         {
@@ -304,25 +306,25 @@ namespace Textensions.Core
         /// </summary>
         private void EffectsTick()
         {
-            if (textension.characters.Count <= 0)
-            {
-                Unsubscribe();
-                return;
-            }
+//            if (textension.characters.Count <= 0)
+//            {
+//                Unsubscribe();
+//                return;
+//            }
 
             // For each key...(each character index to apply an effect to)
             foreach (int key in appliedEffects.Keys)
             {
-                if (key > textension.GetTextLength() - 1)
-                {
-                    Debug.Log("Our effects need to be re-initialized since the text has changed.");
-                    // TODO: Throw out all character data past the characters length
-                    return;
-                }
+//                if (key > textension.GetTextLength() - 1)
+//                {
+//                    Debug.Log("Our effects need to be re-initialized since the text has changed.");
+//                    // TODO: Throw out all character data past the characters length
+//                    return;
+//                }
 
                 Character character = textension.GetCharacter(key);
 
-                // If our current character is not revealed, or not visible, or the effects are completed...
+                    // If our current character is not revealed, or not visible, or the effects are completed...
                 if (!character.isRevealed || !character.Info().isVisible || character.effectCompleted)
                 {
                     // then skip it
@@ -349,6 +351,12 @@ namespace Textensions.Core
                     {
                         // Remove the completed effect from this character
                         RemoveEffect(key, fx);
+                        
+                        // This character has no more effects, therefore we will mark it as effectCompleted.
+                        character.effectCompleted = true;
+                        
+                        // TODO: Fix the last character bug
+                        lastRemovedCharacter = character;
 
                         // If the specific character index has a value...
                         if (appliedEffects.TryGetValue(key, out List<Effect> effectsList))
@@ -359,13 +367,17 @@ namespace Textensions.Core
                                 // Mark this key as ready to be removed. (The reason we are doing it this way
                                 // is we can't remove it while we are still iterating through it.)
                                 _keysToClean.Add(key);
-
-                                // This character has no more effects, therefore we will mark it as effectCompleted.
-                                character.effectCompleted = true;
                             }
                         }
                     }
                 }
+            }
+
+            // If we don't have keys to clean...
+            if (_keysToClean.Count <= 0)
+            {
+                // Early exit
+                return;
             }
             
             // Since we are no longer iterating through the appliedEffects collection.
@@ -375,8 +387,18 @@ namespace Textensions.Core
                 // Remove the cleaned key
                 appliedEffects.Remove(i);
                 Debug.Log("Character index [" + i + "] has no more effects on it, therefore the dictionary key is being revoked.");
+                
+                Debug.Log(textension.GetCharacter(i).Info().character);
             }
-            
+
+            // This solves the last character bug... :/ 
+            // Note: Textensions.cs line:#142 executes before line:#136 despite it being earlier in the update loop?
+            if (lastRemovedCharacter != null && lastRemovedCharacter.index == textension.GetTextLength() - 1)
+            {
+                lastRemovedCharacter = null;
+                textension.DirtyVertex();
+            }
+
             // We have just cleaned the keys, we can now clear this memory up for the next tick.
             _keysToClean.Clear();
         }

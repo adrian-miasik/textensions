@@ -32,10 +32,11 @@ namespace Textensions.Core
         /// Note: This is good for live editing in the editor.
         /// </summary>
         public bool forceUpdate;
-        
-        public bool hasPositionUpdated;
-        public bool hasRotationUpdated;
-        public bool hasScaleUpdated;
+
+        public bool isDirty;
+        [HideInInspector] public bool hasPositionUpdated;
+        [HideInInspector] public bool hasRotationUpdated;
+        [HideInInspector] public bool hasScaleUpdated;
         
         /// <summary>
         /// Index position within the given text component. E.g. ("Hello", "o" would be index 4)
@@ -55,13 +56,11 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Flags all position, rotation, and scale flags as being modified this frame. Causing rebuilding later on in the lifecycle/tick.
+        /// Dirty this character so it can rebuild later on in the lifecycle/tick.
         /// </summary>
         public void DirtyCharacter()
         {
-            hasPositionUpdated = true;
-            hasRotationUpdated = true;
-            hasScaleUpdated = true;
+            isDirty = true;
         }
         
         public void AddPosition(Vector3 position)

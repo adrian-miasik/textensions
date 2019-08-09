@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Textensions.Effects.Base;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -113,6 +112,15 @@ namespace Textensions.Core
             _hasInitialized = true;
         }
 
+        /// <summary>
+        /// Removes the provided character from the characters list so the GC can clean up the class instance.
+        /// </summary>
+        /// <param name="character"></param>
+        public void RemoveCharacter(Character character)
+        {
+            characters.Remove(character);
+        }
+
         // TODO: Enforce application loop as described below
         private void Update()
         {
@@ -123,19 +131,18 @@ namespace Textensions.Core
 
                 // Step 1: Tick each text reveal to determine if they should reveal a/multiple text character(s) (A tick does not equal a character reveal)
                 RevealsTick?.Invoke();
-
+                
                 // Step 2: Calculate the effect for each character
                 EffectsTick?.Invoke();
 
                 // Step 3: Apply the effect to the character class
                 UpdateCharacters();
-                    
+                  
                 // Step 4: Then finally take all that information and apply it to the TMP_Text only once this frame
                 Render();
             }
         }
-        
-        
+
         /// <summary>
         /// Update each character that has been dirtied. (If an effect didn't modify a character, we will not update that characters mesh)
         /// </summary>
@@ -145,11 +152,11 @@ namespace Textensions.Core
         /// </summary>
         private void UpdateCharacters()
         {
-            bool markCharacterAsDirty = false;
-                
             // Iterate through each character...
             foreach (Character character in characters)
             {
+                bool markCharacterAsDirty = false;
+
                 // If the characters position has been modified...
                 if (character.hasPositionUpdated)
                 {
@@ -174,12 +181,12 @@ namespace Textensions.Core
                 // If this character has been marked as dirty... (We will need to update its mesh data)
                 if (markCharacterAsDirty || character.forceUpdate)
                 {
+                    // Set our vertex update to true so we can update all the vertex data at once instead of numerous times in a single frame.
+                    DirtyVertex();
+                    
                     // TODO: Maybe split UpdateCharacter() into different functions? Will need to stress test and see if certain matrix modifications are cheaper than others.
                     // Update the character mesh data
                     UpdateCharacter(character);
-                    
-                    // Disable flag, so it can get marked next iteration / character
-                    markCharacterAsDirty = false;
 #if DEBUG_TEXT
 //                    Debug.Log("Updated character: " + character.Info().character);
 #endif
@@ -198,7 +205,7 @@ namespace Textensions.Core
         /// <summary>
         /// See if we need to apply changes to the mesh this frame, if we do we will apply the changes to the mesh and copy the data for next time.
         /// </summary>
-        private void Render()
+        public void Render()
         {
             if (_refreshVertex)
             {
@@ -208,7 +215,7 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Returns a list of character structs for this textension.
+        /// Returns a list of character classes for this textension.
         /// </summary>
         /// <returns></returns>
         private List<Character> GetCharacters()
@@ -217,7 +224,7 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Returns a list of character structs that have not been revealed.
+        /// Returns a list of character classes that have not been revealed.
         /// </summary>
         /// <returns></returns>
         public List<Character> GetUnrevealedCharacters()
@@ -226,7 +233,7 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Returns a single character struct for this textension at a given index.
+        /// Returns a single character class for this textension at a given index.
         /// </summary>
         /// <param name="i">Index of the character you want to fetch</param>
         /// <returns></returns>
@@ -236,7 +243,7 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Returns a single character struct for this textension at a given index.
+        /// Returns a single character class for this textension at a given index.
         /// </summary>
         /// <param name="i">Index of the character you want to fetch</param>
         /// <returns></returns>
@@ -294,6 +301,7 @@ namespace Textensions.Core
         {
             Profiler.BeginSample("Update Character");
 
+            // TODO: This check isn't needed for characters with effects on them
             // Don't update characters that haven't been revealed by a TextReveal.cs or don't update when the character is not visible (Determined by TMP)
             if (!character.isRevealed || !character.Info().isVisible)
             {
@@ -337,10 +345,7 @@ namespace Textensions.Core
             _targetVertices[index + 1] += characterOrigin;
             _targetVertices[index + 2] += characterOrigin;
             _targetVertices[index + 3] += characterOrigin;
-
-            // Set our vertex update to true so we can update all the vertex data at once instead of numerous times in a single frame.
-            DirtyVertex();
-
+            
             Profiler.EndSample();
         }
 
@@ -349,6 +354,8 @@ namespace Textensions.Core
         /// </summary>
         private void ApplyMeshChanges()
         {
+            Debug.Log("Updating mesh.");
+            
             if (_targetVertices.Length <= 0) return;
 
             // Pass in the modified data back into the text
