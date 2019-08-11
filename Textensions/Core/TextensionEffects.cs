@@ -1,7 +1,5 @@
-﻿﻿﻿using System;
 using System.Collections.Generic;
 using Textensions.Effects.Base;
-using Textensions.Reveals.Effects;
 using UnityEngine;
 
 namespace Textensions.Core
@@ -28,8 +26,6 @@ namespace Textensions.Core
         /// </summary>
         private List<int> _keysToClean = new List<int>();
 
-        public Character lastRemovedCharacter;
-        
         private void Reset()
         {
             // Quickly fetch the textension reference
@@ -94,7 +90,7 @@ namespace Textensions.Core
         {
             AddEffects(fxs);
         }
-
+        
         /// <summary>
         /// Determine what character indices this effect will apply to.
         /// </summary>
@@ -219,6 +215,7 @@ namespace Textensions.Core
             // Iterate through each effect...
             for (int i = 0; i < effectsToApply.Count; i++)
             {
+                // TODO: Allow the indices to be changed during runtime
                 // Get the indices that this effect is going to be applied to. (We don't want to apply this effect to every character)
                 List<int> indicesToEffect = DetermineWhatCharactersToAffect(effectsToApply[i]);
                 
@@ -306,11 +303,13 @@ namespace Textensions.Core
         /// </summary>
         private void EffectsTick()
         {
-//            if (textension.characters.Count <= 0)
-//            {
-//                Unsubscribe();
-//                return;
-//            }
+            // If we have no characters on the textension...
+            if (textension.characters.Count <= 0)
+            {
+                // Then we don't have any objects to apply our effects to. So we will Unsubscribe() as a result
+                Unsubscribe();
+                return;
+            }
 
             // For each key...(each character index to apply an effect to)
             foreach (int key in appliedEffects.Keys)
@@ -324,8 +323,8 @@ namespace Textensions.Core
 
                 Character character = textension.GetCharacter(key);
 
-                    // If our current character is not revealed, or not visible, or the effects are completed...
-                if (!character.isRevealed || !character.Info().isVisible || character.effectCompleted)
+                // If our current character is not revealed, or not visible...
+                if (!character.isRevealed || !character.Info().isVisible)
                 {
                     // then skip it
                     continue;
@@ -340,24 +339,25 @@ namespace Textensions.Core
                     // Cache the effect
                     Effect fx = appliedEffects[key][j];
 
-                    // If this effect is not completed...
-                    if (character.timeSinceReveal <= fx.uniform[fx.uniform.length - 1].time || fx.uniform.postWrapMode == WrapMode.PingPong || fx.uniform.postWrapMode == WrapMode.Loop)
+                    // Execute/Play the effect
+                    fx.Calculate(character);
+                    
+                    // If this effect has surpassed the animation curve time...
+                    if (character.timeSinceReveal >= fx.uniform[fx.uniform.length - 1].time)
                     {
-                        // Execute the effect
-                        fx.Calculate(character);
-                    }
-                    // This effect has been completed...
-                    else
-                    {
+                        // If this effect animation curve has either a ping pong effect or a loop effect at the end...
+                        if (fx.uniform.postWrapMode == WrapMode.PingPong || fx.uniform.postWrapMode == WrapMode.Loop)
+                        {
+                            // This effect is still playing, let's go to the next effect instead
+                            continue;
+                        }
+                        
                         // Remove the completed effect from this character
                         RemoveEffect(key, fx);
                         
                         // This character has no more effects, therefore we will mark it as effectCompleted.
                         character.effectCompleted = true;
                         
-                        // TODO: Fix the last character bug
-                        lastRemovedCharacter = character;
-
                         // If the specific character index has a value...
                         if (appliedEffects.TryGetValue(key, out List<Effect> effectsList))
                         {

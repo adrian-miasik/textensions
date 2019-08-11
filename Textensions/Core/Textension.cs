@@ -126,8 +126,8 @@ namespace Textensions.Core
         {
             if (_hasInitialized)
             {
-                // Step 0: Init / Re-init dirty text
-                // TODO
+                // Step 0: Initialize the text so it's ready for manipulation.
+                text.ForceMeshUpdate();
 
                 // Step 1: Tick each text reveal to determine if they should reveal a/multiple text character(s) (A tick does not equal a character reveal)
                 RevealsTick?.Invoke();
