@@ -373,34 +373,33 @@ namespace Textensions.Core
                 }
             }
 
-            // If we don't have keys to clean...
-            if (_keysToClean.Count <= 0)
+            CleanUnusedEffects();
+        }
+        
+        /// <summary>
+        /// Removes the dictionary entry for character indices that no longer have any effect playing.
+        /// </summary>
+        private void CleanUnusedEffects()
+        {
+            // If we have keys to clean...
+            if (_keysToClean.Count > 0)
             {
-                // Early exit
-                return;
-            }
-            
-            // Since we are no longer iterating through the appliedEffects collection.
-            // Iterate through all the keys to remove from appliedEffects...
-            foreach (int i in _keysToClean)
-            {
-                // Remove the cleaned key
-                appliedEffects.Remove(i);
-                Debug.Log("Character index [" + i + "] has no more effects on it, therefore the dictionary key is being revoked.");
+                // Since we are no longer iterating through the appliedEffects collection, we can now remove the effects
+                // Iterate through all the keys to remove from appliedEffects...
+                foreach (int i in _keysToClean)
+                {
+                    // Remove the cleaned key
+                    appliedEffects.Remove(i);
+
+#if DEBUG_TEXT
+                    Debug.Log("Character index [" + i + "] has no more effects on it, therefore the dictionary key is being revoked.");
+                    Debug.Log(textension.GetCharacter(i).Info().character);
+#endif
+                }
                 
-                Debug.Log(textension.GetCharacter(i).Info().character);
+                // We have just cleaned the keys, we can now clear this memory up for the next tick.
+                _keysToClean.Clear();
             }
-
-            // This solves the last character bug... :/ 
-            // Note: Textensions.cs line:#142 executes before line:#136 despite it being earlier in the update loop?
-            if (lastRemovedCharacter != null && lastRemovedCharacter.index == textension.GetTextLength() - 1)
-            {
-                lastRemovedCharacter = null;
-                textension.DirtyVertex();
-            }
-
-            // We have just cleaned the keys, we can now clear this memory up for the next tick.
-            _keysToClean.Clear();
         }
     }
 }
