@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Textensions.Core
 {
-    // TODO: Ability to explicitly set the position, rotation, and/or scale of this character for one frame. (So we set variables directly)
     [Serializable]
     public class Character
     {
@@ -71,6 +70,12 @@ namespace Textensions.Core
             _positionCached -= position;
         }
 
+        public void SetPosition(Vector3 position)
+        {
+            hasPositionUpdated = true;
+            this.position = position;
+        }
+
         public void ApplyPosition()
         {
             if (hasPositionUpdated)
@@ -93,6 +98,12 @@ namespace Textensions.Core
             _rotationCached = rotation * Quaternion.Inverse(_rotationCached);
         }
 
+        public void SetRotation(Quaternion rotation)
+        {
+            hasRotationUpdated = true;
+            this.rotation = rotation;
+        }
+
         public void ApplyRotation()
         {
             if (hasRotationUpdated)
@@ -113,6 +124,12 @@ namespace Textensions.Core
         {
             hasScaleUpdated = true;
             _scaleCached -= scale;
+        }
+
+        public void SetScale(Vector3 scale)
+        {
+            hasScaleUpdated = true;
+            this.scale = scale;
         }
 
         public void ApplyScale()
