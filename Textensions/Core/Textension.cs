@@ -24,13 +24,13 @@ namespace Textensions.Core
         // TODO: Convert to array?
         public List<Character> characters = new List<Character>();
         public List<Character> unrevealedCharacters = new List<Character>();
-        
+
         private bool _refreshVertex;
 
         private TMP_MeshInfo[] _originalMesh;
         private Vector3[] _targetVertices = new Vector3[0];
         private Color32 _cachedColor;
-        
+
         /// <summary>
         /// An action that only gets invoked if we are hiding text.
         /// </summary>
@@ -40,7 +40,7 @@ namespace Textensions.Core
 
         public event Action EffectsInitialize;
         public event Action EffectsTick;
-        
+
         private void Reset()
         {
             // Quickly fetch references
@@ -68,7 +68,7 @@ namespace Textensions.Core
             // Cache our current text color and original mesh data
             _cachedColor = text.color;
             _originalMesh = text.textInfo.CopyMeshInfoVertexData();
-            
+
             // Clear our lists
             characters.Clear();
             unrevealedCharacters.Clear();
@@ -78,7 +78,7 @@ namespace Textensions.Core
             {
                 Character character = new Character(text.textInfo.characterInfo[i]);
                 characters.Add(character);
-                
+
                 // If we are hiding on initialization...
                 if (hideOnInitialization)
                 {
@@ -105,10 +105,10 @@ namespace Textensions.Core
                     OnHideInitialize.Invoke();
                 }
             }
-            
+
             // Initialize our effects
             EffectsInitialize?.Invoke();
-            
+
             _hasInitialized = true;
         }
 
@@ -131,13 +131,13 @@ namespace Textensions.Core
 
                 // Step 1: Tick each text reveal to determine if they should reveal a/multiple text character(s) (A tick does not equal a character reveal)
                 RevealsTick?.Invoke();
-                
+
                 // Step 2: Calculate the effect for each character
                 EffectsTick?.Invoke();
 
                 // Step 3: Apply the effect to the character class
                 UpdateCharacters();
-                  
+
                 // Step 4: Then finally take all that information and apply it to the TMP_Text only once this frame
                 Render();
             }
@@ -163,27 +163,27 @@ namespace Textensions.Core
                     character.ApplyPosition();
                     markCharacterAsDirty = true;
                 }
-                
+
                 // If the characters rotation has been modified...
                 if (character.hasRotationUpdated)
                 {
                     character.ApplyRotation();
                     markCharacterAsDirty = true;
                 }
-                
+
                 // If the characters scale has been modified...
                 if (character.hasScaleUpdated)
                 {
                     character.ApplyScale();
                     markCharacterAsDirty = true;
                 }
-                
+
                 // If this character has been marked as dirty... (We will need to update its mesh data)
                 if (markCharacterAsDirty || character.forceUpdate)
                 {
                     // Set our vertex update to true so we can update all the vertex data at once instead of numerous times in a single frame.
                     DirtyVertex();
-                    
+
                     // TODO: Maybe split UpdateCharacter() into different functions? Will need to stress test and see if certain matrix modifications are cheaper than others.
                     // Update the character mesh data
                     UpdateCharacter(character);
@@ -294,7 +294,7 @@ namespace Textensions.Core
         /// WORK IN PROGRESS
         /// </summary>
         /// <summary>
-        /// Note: Remember to update your mesh vertex position data. Update the mesh geometry or use UpdateVertexData() 
+        /// Note: Remember to update your mesh vertex position data. Update the mesh geometry or use UpdateVertexData()
         /// </summary>
         /// <param name="character"></param>
         private void UpdateCharacter(Character character)
@@ -340,12 +340,12 @@ namespace Textensions.Core
             _targetVertices[index + 2] = matrix.MultiplyPoint3x4(_targetVertices[index + 2]);
             _targetVertices[index + 3] = matrix.MultiplyPoint3x4(_targetVertices[index + 3]);
 
-            // Re-add the center of the mesh 
+            // Re-add the center of the mesh
             _targetVertices[index + 0] += characterOrigin;
             _targetVertices[index + 1] += characterOrigin;
             _targetVertices[index + 2] += characterOrigin;
             _targetVertices[index + 3] += characterOrigin;
-            
+
             Profiler.EndSample();
         }
 
@@ -355,7 +355,7 @@ namespace Textensions.Core
         private void ApplyMeshChanges()
         {
             Debug.Log("Updating mesh.");
-            
+
             if (_targetVertices.Length <= 0) return;
 
             // Pass in the modified data back into the text
@@ -371,7 +371,7 @@ namespace Textensions.Core
         // TMP INPUT FIELD - Incorrect character length value of the input fields text component:
         // The reason we are using TMP_InputField instead of getting the TextMeshProUGUI component within the input field component
         // is because the TextMeshProUGUI text.Length and textInfo.CharacterCount values are incorrect. The text field could be an "empty"
-        // string, but it still seems to provides us with a length of 1. 
+        // string, but it still seems to provides us with a length of 1.
         // According to a Unity Technologies user "Stephan_B" we shouldn't be accessing the input fields text component anyways.
         // However, if you do need to access the text input's TextMeshProUGUI component and you do need to get the character count value from
         // that component, there does seem to be a workaround a Unity forum user named "Chris-Trueman" has found.
