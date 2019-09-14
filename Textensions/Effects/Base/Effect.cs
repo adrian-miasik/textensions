@@ -7,19 +7,19 @@ namespace Textensions.Effects.Base
 
         public string title = "Default Effect Title";
         public AnimationCurve uniform;
-        
+
         public enum Style
         {
             /// <summary>
             /// This effect will apply to all characters in this textension
             /// </summary>
             ALL_CHARACTERS,
-            
+
             /// <summary>
             /// This effect will only apply to characters in odd index positions.
             /// </summary>
             ALL_ODD_CHARACTERS,
-            
+
             /// <summary>
             /// This effect will only apply to characters in even index positions.
             /// </summary>
@@ -28,7 +28,7 @@ namespace Textensions.Effects.Base
         }
 
         public Style style;
-        
+
         public abstract void Calculate(Character character);
     }
 }
