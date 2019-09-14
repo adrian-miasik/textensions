@@ -172,19 +172,16 @@ namespace Textensions.Core
             return characterIndicesToAffect;
         }
 
-        // TODO: Fix comments
         /// <summary>
         /// Removes the provided effect at a certain key within appliedEffects.
         /// </summary>
         /// <summary>
         /// Note: If the key value has no more effects after removal, the key will remain intact.
-        /// </summary>
-        /// <summary>
         /// Meaning just because we are removing the effect value from the key, doesn't mean we will remove the key if there are no effects within.
         /// Instead we are leaving the key alone even if it has no effects within it's value.
         /// </summary>
-        /// <param name="characterIndex"></param>
-        /// <param name="effectToRemove"></param>
+        /// <param name="characterIndex">The character you want to target on this textension.</param>
+        /// <param name="effectToRemove">The effect you want to remove from this character.</param>
         private void RemoveEffect(int characterIndex, Effect effectToRemove)
         {
             // If we have found the character index...
@@ -215,7 +212,6 @@ namespace Textensions.Core
             // Iterate through each effect...
             for (int i = 0; i < effectsToApply.Count; i++)
             {
-                // TODO: Allow the indices to be changed during runtime
                 // Get the indices that this effect is going to be applied to. (We don't want to apply this effect to every character)
                 List<int> indicesToEffect = DetermineWhatCharactersToAffect(effectsToApply[i]);
 
