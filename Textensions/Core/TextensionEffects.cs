@@ -31,7 +31,7 @@ namespace Textensions.Core
             // Quickly fetch the textension reference
             textension = GetComponent<Textension>();
         }
-        
+
         private void OnEnable()
         {
             Subscribe();
@@ -73,7 +73,7 @@ namespace Textensions.Core
             textension.EffectsInitialize -= Initialize;
             textension.EffectsTick -= EffectsTick;
         }
-        
+
         /// <summary>
         /// Note: This gets invoked by the textension.
         /// </summary>
@@ -90,7 +90,7 @@ namespace Textensions.Core
         {
             AddEffects(fxs);
         }
-        
+
         /// <summary>
         /// Determine what character indices this effect will apply to.
         /// </summary>
@@ -117,7 +117,7 @@ namespace Textensions.Core
                             // Skip it
                             continue;
                         }
-                        
+
                         characterIndicesToAffect.Add(i);
                     }
                     break;
@@ -137,7 +137,7 @@ namespace Textensions.Core
                                 // Skip it
                                 continue;
                             }
-                            
+
                             characterIndicesToAffect.Add(i);
                         }
                     }
@@ -158,7 +158,7 @@ namespace Textensions.Core
                                 // Skip it
                                 continue;
                             }
-                            
+
                             characterIndicesToAffect.Add(i);
                         }
                     }
@@ -171,7 +171,7 @@ namespace Textensions.Core
 
             return characterIndicesToAffect;
         }
-        
+
         // TODO: Fix comments
         /// <summary>
         /// Removes the provided effect at a certain key within appliedEffects.
@@ -218,7 +218,7 @@ namespace Textensions.Core
                 // TODO: Allow the indices to be changed during runtime
                 // Get the indices that this effect is going to be applied to. (We don't want to apply this effect to every character)
                 List<int> indicesToEffect = DetermineWhatCharactersToAffect(effectsToApply[i]);
-                
+
                 // Iterate through all the character indices this effect will affect...
                 for (int j = 0; j < indicesToEffect.Count; j++)
                 {
@@ -237,12 +237,12 @@ namespace Textensions.Core
 #if DEBUG_TEXT
                         Debug.Log(effectsToApply[i].title + " is not being applied to " + indicesToEffect[j] + " therefore we will create a new list for it at index " + indicesToEffect[j]);
 #endif
-                        // Create a new effects list                  
+                        // Create a new effects list
                         List<Effect> stackingEffect = new List<Effect>();
 
                         // Add this effect to the list
                         stackingEffect.Add(effectsToApply[i]);
-                        
+
                         // Create an entry in our dictionary with our list (if the key exists then other effects will be added to this list)
                         appliedEffects.Add(indicesToEffect[j], stackingEffect);
                     }
@@ -252,7 +252,7 @@ namespace Textensions.Core
             LogAppliedEffects();
 #endif
         }
-        
+
 #if DEBUG_TEXT
         /// <summary>
         /// A developer function that Debug.Logs all the applied effects on each character.
@@ -281,13 +281,13 @@ namespace Textensions.Core
                             allEffectsStr += ", ";
                         }
                     }
-                    
+
                     // If we have no effects on this character...
                     if (stackingEffect.Count <= 0)
                     {
                         allEffectsStr += "[NO EFFECTS FOUND]";
                     }
-                    
+
                     // Add a period to the end
                     allEffectsStr += ".";
 
@@ -297,7 +297,7 @@ namespace Textensions.Core
             }
         }
 #endif
-        
+
         /// <summary>
         /// Note: This gets invoked by the textension.
         /// </summary>
@@ -332,7 +332,7 @@ namespace Textensions.Core
 
                 // Accumulate time to this specific character
                 character.timeSinceReveal += Time.deltaTime;
-                
+
                 // Iterate through all the effects at this dictionary key (character index)
                 for (int j = 0; j < appliedEffects[key].Count; j++)
                 {
@@ -341,7 +341,7 @@ namespace Textensions.Core
 
                     // Execute/Play the effect
                     fx.Calculate(character);
-                    
+
                     // If this effect has surpassed the animation curve time...
                     if (character.timeSinceReveal >= fx.uniform[fx.uniform.length - 1].time)
                     {
@@ -351,13 +351,13 @@ namespace Textensions.Core
                             // This effect is still playing, let's go to the next effect instead
                             continue;
                         }
-                        
+
                         // Remove the completed effect from this character
                         RemoveEffect(key, fx);
-                        
+
                         // This character has no more effects, therefore we will mark it as effectCompleted.
                         character.effectCompleted = true;
-                        
+
                         // If the specific character index has a value...
                         if (appliedEffects.TryGetValue(key, out List<Effect> effectsList))
                         {
@@ -375,7 +375,7 @@ namespace Textensions.Core
 
             CleanUnusedEffects();
         }
-        
+
         /// <summary>
         /// Removes the dictionary entry for character indices that no longer have any effect playing.
         /// </summary>
@@ -396,7 +396,7 @@ namespace Textensions.Core
                     Debug.Log(textension.GetCharacter(i).Info().character);
 #endif
                 }
-                
+
                 // We have just cleaned the keys, we can now clear this memory up for the next tick.
                 _keysToClean.Clear();
             }
