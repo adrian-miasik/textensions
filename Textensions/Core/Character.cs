@@ -15,7 +15,7 @@ namespace Textensions.Core
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
-        
+
         private Vector3 _positionCached;
         private Quaternion _rotationCached;
         private Vector3 _scaleCached;
@@ -32,7 +32,7 @@ namespace Textensions.Core
         [HideInInspector] public bool hasPositionUpdated;
         [HideInInspector] public bool hasRotationUpdated;
         [HideInInspector] public bool hasScaleUpdated;
-        
+
         /// <summary>
         /// Index position within the given text component. E.g. ("Hello", "o" would be index 4)
         /// </summary>
@@ -63,7 +63,7 @@ namespace Textensions.Core
             hasPositionUpdated = true;
             _positionCached += position;
         }
-        
+
         public void RemovePosition(Vector3 position)
         {
             hasPositionUpdated = true;
@@ -85,13 +85,13 @@ namespace Textensions.Core
                 _positionCached = Vector3.zero;
             }
         }
-        
+
         public void AddRotation(Quaternion rotation)
         {
             hasRotationUpdated = true;
             _rotationCached *= rotation;
         }
-        
+
         public void RemoveRotation(Quaternion rotation)
         {
             hasRotationUpdated = true;
@@ -119,7 +119,7 @@ namespace Textensions.Core
             hasScaleUpdated = true;
             _scaleCached += scale;
         }
-        
+
         public void RemoveScale(Vector3 scale)
         {
             hasScaleUpdated = true;
@@ -141,7 +141,7 @@ namespace Textensions.Core
                 _scaleCached = Vector3.zero;
             }
         }
-        
+
         public void Reveal()
         {
             isRevealed = true;
