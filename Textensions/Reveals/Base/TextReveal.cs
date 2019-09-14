@@ -3,161 +3,164 @@ using UnityEngine;
 
 namespace Textensions.Reveals.Base
 {
-    public abstract class TextReveal : MonoBehaviour
-    {
-        // PUBLIC MEMBERS
-        [Tooltip("The text we want to reveal.")]
-        public Textension textension;
+	public abstract class TextReveal : MonoBehaviour
+	{
+		[Tooltip("The amount of time (in seconds) between each character reveal.")]
+		public float characterDelay = 0.05f;
 
-        [Tooltip("The amount of time (in seconds) between each character reveal.")]
-        public float characterDelay = 0.05f;
+		private float characterTime;
+		private bool colorUpdate;
 
-        // PRIVATE MEMBERS
-        private bool _isRevealing; // TODO: Make readonly in the inspector
-        private float _characterTime;
-        private float _totalRevealTime;
-        private int _numberOfCharacters;
-        private int _numberOfCharactersRevealed;
-        private bool _vertexUpdate;
-        private bool _colorUpdate;
+		// PRIVATE MEMBERS
+		private bool isRevealing; // TODO: Make readonly in the inspector
+		private int numberOfCharacters;
 
-        /// <summary>
-        /// Reveals the character at a specific index
-        /// </summary>
-        /// <param name="revealNumber"></param>
-        protected virtual void RevealCharacter(int revealNumber)
-        {
-            MarkAsRevealed(revealNumber);
-        }
+		private int numberOfCharactersRevealed;
 
-        protected virtual void HideAllCharacters()
-        {
-            for (int i = 0; i < textension.GetUnrevealedCharacters().Count; i++) {
-                textension.GetCharacter(i).Unreveal();
-            }
-        }
+		// PUBLIC MEMBERS
+		[Tooltip("The text we want to reveal.")]
+		public Textension textension;
 
-        private void Reset()
-        {
-            // Quickly fetch the textension reference
-            textension = GetComponent<Textension>();
-        }
+		// ReSharper disable once NotAccessedField.Local
+		private float totalRevealTime; // TODO: Utilize this somewhere
+		private bool vertexUpdate;
 
-        private void OnEnable()
-        {
-            textension.OnHideInitialize += Reveal;
-            textension.RevealsTick += Tick;
-        }
+		/// <summary>
+		/// Reveals the character at a specific index
+		/// </summary>
+		/// <param name="_revealNumber"></param>
+		protected virtual void RevealCharacter(int _revealNumber)
+		{
+			MarkAsRevealed(_revealNumber);
+		}
 
-        private void OnDisable()
-        {
-            textension.OnHideInitialize -= Reveal;
-            textension.RevealsTick -= Tick;
-            _isRevealing = false;
-        }
+		protected virtual void HideAllCharacters()
+		{
+			for (int i = 0; i < textension.GetUnrevealedCharacters().Count; i++) textension.GetCharacter(i).Unreveal();
+		}
 
-        /// <summary>
-        /// Initialize the text, and starts the character reveal.
-        /// </summary>
-        private void Reveal()
-        {
-            Initialize();
-            Play();
-        }
+		private void Reset()
+		{
+			// Quickly fetch the textension reference
+			textension = GetComponent<Textension>();
+		}
 
-        /// <summary>
-        /// Initializes the text by defaulting some variables, and hiding the text.
-        /// </summary>
-        private void Initialize()
-        {
-            if (_isRevealing)
-            {
-                OnInterrupted();
-            }
+		private void OnEnable()
+		{
+			textension.OnHideInitialize += Reveal;
+			textension.RevealsTick += Tick;
+		}
 
-            _numberOfCharactersRevealed = 0;
-            _numberOfCharacters = textension.GetTextLength();
-            _totalRevealTime = 0f;
+		private void OnDisable()
+		{
+			textension.OnHideInitialize -= Reveal;
+			textension.RevealsTick -= Tick;
+			isRevealing = false;
+		}
 
-            HideAllCharacters();
-        }
+		/// <summary>
+		/// Initialize the text, and starts the character reveal.
+		/// </summary>
+		private void Reveal()
+		{
+			Initialize();
+			Play();
+		}
 
-        /// <summary>
-        /// Starts revealing the characters.
-        /// </summary>
-        /// <summary>
-        /// Note: You might need to call Initialize() first.
-        /// </summary>
-        private void Play()
-        {
-            _isRevealing = true;
-        }
+		/// <summary>
+		/// Initializes the text by defaulting some variables, and hiding the text.
+		/// </summary>
+		private void Initialize()
+		{
+			if (isRevealing) OnInterrupted();
 
-        /// <summary>
-        /// Gets invoked when the reveal has successfully completed.
-        /// </summary>
-        /// <summary>
-        /// Note: This does not take effects into consideration, meaning if a text reveal is playing and is
-        /// finished but the effects are visually hiding it, this will still get invoker before the effect finishes.
-        /// </summary>
-        protected virtual void OnCompleted() { }
+			numberOfCharactersRevealed = 0;
+			numberOfCharacters = textension.GetTextLength();
+			totalRevealTime = 0f;
 
-        /// <summary>
-        /// Gets invoked when we re-initialize an in-progress reveal.
-        /// </summary>
-        protected virtual void OnInterrupted() { }
+			HideAllCharacters();
+		}
 
-        /// <summary>
-        /// An update function that gets subscribed to the textension delegate
-        /// </summary>
-        private void Tick()
-        {
-            // Prevent a negative value from being assigned
-            characterDelay = Mathf.Clamp(characterDelay, 0, characterDelay);
+		/// <summary>
+		/// Starts revealing the characters.
+		/// </summary>
+		/// <summary>
+		/// Note: You might need to call Initialize() first.
+		/// </summary>
+		private void Play()
+		{
+			isRevealing = true;
+		}
 
-            // If we are text revealing...
-            if (_isRevealing)
-            {
-                // If we have no character to reveal...
-                if (textension.unrevealedCharacters.Count <= 0)
-                {
-                    // Stop the reveal
-                    _isRevealing = false;
-                    return;
-                }
+		/// <summary>
+		/// Gets invoked when the reveal has successfully completed.
+		/// </summary>
+		/// <summary>
+		/// Note: This does not take effects into consideration, meaning if a text reveal is playing and is
+		/// finished but the effects are visually hiding it, this will still get invoker before the effect finishes.
+		/// </summary>
+		protected virtual void OnCompleted()
+		{
+		}
 
-                // Add time
-                _totalRevealTime += Time.deltaTime;
-                _characterTime += Time.deltaTime;
+		/// <summary>
+		/// Gets invoked when we re-initialize an in-progress reveal.
+		/// </summary>
+		protected virtual void OnInterrupted()
+		{
+		}
 
-                // While loop used to calculate how many letters on the same frame needs to be drawn
-                while (_characterTime > characterDelay)
-                {
-                    RevealCharacter(_numberOfCharactersRevealed);
-                    _numberOfCharactersRevealed++;
+		/// <summary>
+		/// An update function that gets subscribed to the textension delegate
+		/// </summary>
+		private void Tick()
+		{
+			// Prevent a negative value from being assigned
+			characterDelay = Mathf.Clamp(characterDelay, 0, characterDelay);
 
-                    _characterTime -= characterDelay;
+			// If we are text revealing...
+			if (isRevealing)
+			{
+				// If we have no character to reveal...
+				if (textension.unrevealedCharacters.Count <= 0)
+				{
+					// Stop the reveal
+					isRevealing = false;
+					return;
+				}
 
-                    // If all characters are revealed, set the _isRevealing flag as dirty and break out of this while loop
-                    if (_numberOfCharactersRevealed == _numberOfCharacters)
-                    {
-                        _characterTime = 0f;
-                        _isRevealing = false;
-                        OnCompleted();
-                        break;
-                    }
-                }
-            }
-        }
+				// Add time
+				totalRevealTime += Time.deltaTime;
+				characterTime += Time.deltaTime;
 
-        /// <summary>
-        /// Marks the specific character index as revealed and removes it from the unrevealedCharacters list.
-        /// </summary>
-        /// <param name="index"></param>
-        protected void MarkAsRevealed(int index)
-        {
-            textension.unrevealedCharacters[index].Reveal();
-            textension.unrevealedCharacters.RemoveAt(index);
-        }
-    }
+				// While loop used to calculate how many letters on the same frame needs to be drawn
+				while (characterTime > characterDelay)
+				{
+					RevealCharacter(numberOfCharactersRevealed);
+					numberOfCharactersRevealed++;
+
+					characterTime -= characterDelay;
+
+					// If all characters are revealed, set the _isRevealing flag as dirty and break out of this while loop
+					if (numberOfCharactersRevealed == numberOfCharacters)
+					{
+						characterTime = 0f;
+						isRevealing = false;
+						OnCompleted();
+						break;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Marks the specific character index as revealed and removes it from the unrevealedCharacters list.
+		/// </summary>
+		/// <param name="_index"></param>
+		protected void MarkAsRevealed(int _index)
+		{
+			textension.unrevealedCharacters[_index].Reveal();
+			textension.unrevealedCharacters.RemoveAt(_index);
+		}
+	}
 }

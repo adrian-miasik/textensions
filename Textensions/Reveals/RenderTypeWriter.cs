@@ -1,5 +1,4 @@
 using System;
-using Textensions.Core;
 using Textensions.Reveals.Base;
 
 namespace Textensions.Reveals
@@ -12,8 +11,8 @@ namespace Textensions.Reveals
 	/// (This means that the mesh for each character isn't being generated/calculated until told)
 	/// The way we are revealing each character is by incrementing the maxVisibleCharacters int on the TextMeshProUGUI class.
 	/// </summary>
-    [Obsolete("Temporarily unsupported script.")]
-    public class RenderTypeWriter : TextReveal
+	[Obsolete("Temporarily unsupported script.")]
+	public class RenderTypeWriter : TextReveal
 	{
 		/// <summary>
 		/// Hides the text by not rendering any of the character
@@ -22,14 +21,14 @@ namespace Textensions.Reveals
 		{
 			// Hide the text
 			textension.GetText().maxVisibleCharacters = 0;
-            base.HideAllCharacters();
+			base.HideAllCharacters();
 		}
 
-		protected override void RevealCharacter(int revealNumber)
+		protected override void RevealCharacter(int _revealNumber)
 		{
-            // TODO: Add support for render reveals
+			// TODO: Add support for render reveals
 			// Reveal a character
-            textension.GetText().maxVisibleCharacters = revealNumber + 1;
-        }
+			textension.GetText().maxVisibleCharacters = _revealNumber + 1;
+		}
 	}
 }

@@ -1,4 +1,3 @@
-using Textensions.Core;
 using Textensions.Reveals.Base;
 using TMPro;
 using UnityEngine;
@@ -15,23 +14,23 @@ namespace Textensions.Reveals
 	/// </summary>
 	public class ColorTypeWriter : TextReveal
 	{
-        // TODO: Remove unused revealNumber parameter?
-        protected override void RevealCharacter(int revealNumber)
+		// TODO: Remove unused revealNumber parameter?
+		protected override void RevealCharacter(int _revealNumber)
 		{
-            // If this character is not visible (it's a space or not being rendered by TMP) then lets skip it
-            if (!textension.unrevealedCharacters[0].Info().isVisible)
-            {
-                // Mark this one as revealed so the text reveal can continue.
-                MarkAsRevealed(0);
+			// If this character is not visible (it's a space or not being rendered by TMP) then lets skip it
+			if (!textension.unrevealedCharacters[0].Info().isVisible)
+			{
+				// Mark this one as revealed so the text reveal can continue.
+				MarkAsRevealed(0);
 
-                // Early exit, we don't need to update the color of this character nor do we need to update the entire text mesh.
-                return;
-            }
+				// Early exit, we don't need to update the color of this character nor do we need to update the entire text mesh.
+				return;
+			}
 
-            // Color
+			// Color
 			ColorSingleCharacter(textension.unrevealedCharacters[0].Info(), textension.GetCachedColor());
 
-            // TODO: Do the color update once in the Textension
+			// TODO: Do the color update once in the Textension
 			// Update the color on the mesh
 			textension.text.textInfo.meshInfo[0].mesh.colors32 = textension.text.textInfo.meshInfo[0].colors32;
 			textension.text.UpdateGeometry(textension.text.textInfo.meshInfo[0].mesh, 0);
@@ -40,15 +39,15 @@ namespace Textensions.Reveals
 //            Debug.Log("Character: " + textension.unrevealedCharacters[0].Info().character + " has been revealed by ColorTypeWriter.cs [" + GetInstanceID() + "]");
 #endif
 
-            // Mark the character as revealed
-            MarkAsRevealed(0);
-        }
+			// Mark the character as revealed
+			MarkAsRevealed(0);
+		}
 
 		protected override void HideAllCharacters()
 		{
-			ColorAllCharacters(new Color32(0,0,0,0));
+			ColorAllCharacters(new Color32(0, 0, 0, 0));
 			base.HideAllCharacters();
-        }
+		}
 
 		/// <summary>
 		/// Hides the text by getting every characters mesh and setting the alpha of each vertex to zero rendering it invisible.
@@ -56,16 +55,16 @@ namespace Textensions.Reveals
 		/// <summary>
 		/// Note: Remember to update your mesh vertex color data. Update the mesh colors & update geometry or use UpdateVertexData()
 		/// </summary>
-		private void ColorAllCharacters(Color32 color)
+		private void ColorAllCharacters(Color32 _color)
 		{
 			// Iterate through each character
 			for (int i = 0; i < textension.Info().characterCount; i++)
 			{
 				// Bottom Left, Top Left, Top Right, Bottom Right
-				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 0] = color;
-				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 1] = color;
-				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 2] = color;
-				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 3] = color;
+				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 0] = _color;
+				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 1] = _color;
+				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 2] = _color;
+				textension.Info().meshInfo[0].colors32[textension.GetCharacter(i).Info().vertexIndex + 3] = _color;
 			}
 
 			// TODO: Pass this data back to the associated textension
@@ -87,15 +86,15 @@ namespace Textensions.Reveals
 		/// Colorizes all the vertices on a characters mesh all at once to a certain color.
 		/// Note: Remember to update your mesh vertex color data. Update the mesh colors & update geometry or use UpdateVertexData()
 		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="color"></param>
-		protected void ColorSingleCharacter(TMP_CharacterInfo character, Color32 color)
+		/// <param name="_character"></param>
+		/// <param name="_color"></param>
+		protected void ColorSingleCharacter(TMP_CharacterInfo _character, Color32 _color)
 		{
 			// Bottom Left, Top Left, Top Right, Bottom Right
-			textension.Info().meshInfo[0].colors32[character.vertexIndex + 0] = color;
-			textension.Info().meshInfo[0].colors32[character.vertexIndex + 1] = color;
-			textension.Info().meshInfo[0].colors32[character.vertexIndex + 2] = color;
-			textension.Info().meshInfo[0].colors32[character.vertexIndex + 3] = color;
+			textension.Info().meshInfo[0].colors32[_character.vertexIndex + 0] = _color;
+			textension.Info().meshInfo[0].colors32[_character.vertexIndex + 1] = _color;
+			textension.Info().meshInfo[0].colors32[_character.vertexIndex + 2] = _color;
+			textension.Info().meshInfo[0].colors32[_character.vertexIndex + 3] = _color;
 		}
-    }
+	}
 }

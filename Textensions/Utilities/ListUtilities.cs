@@ -23,7 +23,7 @@ namespace Textensions.Utilities
 				list[i] = temp;
 			}
 
-            return list;
-        }
+			return list;
+		}
 	}
 }
