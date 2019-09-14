@@ -1,7 +1,3 @@
-﻿// Author: Adrian Miasik
-// Personal Portfolio: http://AdrianMiasik.com
-// Github Account: https://github.com/AdrianMiasik
-
 using System;
 using System.Collections.Generic;
 using Textensions.Core;
