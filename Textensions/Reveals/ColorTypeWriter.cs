@@ -23,11 +23,11 @@ namespace Textensions.Reveals
             {
                 // Mark this one as revealed so the text reveal can continue.
                 MarkAsRevealed(0);
-                
+
                 // Early exit, we don't need to update the color of this character nor do we need to update the entire text mesh.
                 return;
             }
-            
+
             // Color
 			ColorSingleCharacter(textension.unrevealedCharacters[0].Info(), textension.GetCachedColor());
 
@@ -35,29 +35,29 @@ namespace Textensions.Reveals
 			// Update the color on the mesh
 			textension.text.textInfo.meshInfo[0].mesh.colors32 = textension.text.textInfo.meshInfo[0].colors32;
 			textension.text.UpdateGeometry(textension.text.textInfo.meshInfo[0].mesh, 0);
-            
+
 #if DEBUG_TEXT
 //            Debug.Log("Character: " + textension.unrevealedCharacters[0].Info().character + " has been revealed by ColorTypeWriter.cs [" + GetInstanceID() + "]");
 #endif
-            
+
             // Mark the character as revealed
             MarkAsRevealed(0);
         }
-		
+
 		protected override void HideAllCharacters()
 		{
 			ColorAllCharacters(new Color32(0,0,0,0));
 			base.HideAllCharacters();
         }
-		
+
 		/// <summary>
 		/// Hides the text by getting every characters mesh and setting the alpha of each vertex to zero rendering it invisible.
 		/// </summary>
 		/// <summary>
-		/// Note: Remember to update your mesh vertex color data. Update the mesh colors & update geometry or use UpdateVertexData() 
+		/// Note: Remember to update your mesh vertex color data. Update the mesh colors & update geometry or use UpdateVertexData()
 		/// </summary>
 		private void ColorAllCharacters(Color32 color)
-		{						
+		{
 			// Iterate through each character
 			for (int i = 0; i < textension.Info().characterCount; i++)
 			{
@@ -76,7 +76,7 @@ namespace Textensions.Reveals
 				textension.text.textInfo.meshInfo[i].mesh.colors32 = textension.text.textInfo.meshInfo[i].colors32;
 				textension.text.UpdateGeometry(textension.text.textInfo.meshInfo[i].mesh, i);
 			}
-			
+
 			textension.DirtyVertex();
 		}
 
@@ -85,7 +85,7 @@ namespace Textensions.Reveals
 		/// </summary>
 		/// <summary>
 		/// Colorizes all the vertices on a characters mesh all at once to a certain color.
-		/// Note: Remember to update your mesh vertex color data. Update the mesh colors & update geometry or use UpdateVertexData() 
+		/// Note: Remember to update your mesh vertex color data. Update the mesh colors & update geometry or use UpdateVertexData()
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="color"></param>
