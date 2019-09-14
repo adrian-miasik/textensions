@@ -1,4 +1,4 @@
-using Textensions.Core;
+﻿using Textensions.Core;
 using UnityEngine;
 
 namespace Textensions.Examples.Scripts
@@ -10,7 +10,7 @@ namespace Textensions.Examples.Scripts
 	{
 		[SerializeField] [Tooltip("The keycode that starts the reveal. When pressing this key down, the reveal will start.")]
 		private KeyCode revealKey = KeyCode.F1;
-        
+
         [SerializeField] private Textension textension;
 
         private const string MESSAGE = "This is a test sentence that was passed in by TextRevealUsageExample.cs";
