@@ -22,7 +22,7 @@ namespace Textensions.Reveals.Base
         private bool _colorUpdate;
 
         /// <summary>
-        /// Reveals the character at a specific index 
+        /// Reveals the character at a specific index
         /// </summary>
         /// <param name="revealNumber"></param>
         protected virtual void RevealCharacter(int revealNumber)
@@ -42,7 +42,7 @@ namespace Textensions.Reveals.Base
             // Quickly fetch the textension reference
             textension = GetComponent<Textension>();
         }
-        
+
         private void OnEnable()
         {
             textension.OnHideInitialize += Reveal;
@@ -55,7 +55,7 @@ namespace Textensions.Reveals.Base
             textension.RevealsTick -= Tick;
             _isRevealing = false;
         }
-        
+
         /// <summary>
         /// Initialize the text, and starts the character reveal.
         /// </summary>
@@ -135,10 +135,10 @@ namespace Textensions.Reveals.Base
                 {
                     RevealCharacter(_numberOfCharactersRevealed);
                     _numberOfCharactersRevealed++;
-                    
+
                     _characterTime -= characterDelay;
 
-                    // If all characters are revealed, set the _isRevealing flag as dirty and break out of this while loop 
+                    // If all characters are revealed, set the _isRevealing flag as dirty and break out of this while loop
                     if (_numberOfCharactersRevealed == _numberOfCharacters)
                     {
                         _characterTime = 0f;
