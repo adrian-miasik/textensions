@@ -10,7 +10,7 @@ namespace Textensions.Reveals.Effects
         public bool applyOnX;
         public bool applyOnY;
         public bool applyOnZ;
-        
+
 		public override void Calculate(Character character)
         {
             // Allocate memory for the movement
