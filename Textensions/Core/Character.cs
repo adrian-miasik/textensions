@@ -57,7 +57,7 @@ namespace Textensions.Core
         {
             isDirty = true;
         }
-        
+
         /// <summary>
         /// Adds a vector3 to our cached position.
         /// </summary>
