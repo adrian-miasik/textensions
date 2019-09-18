@@ -104,7 +104,7 @@ namespace Textensions.Core
 		}
 
 		/// <summary>
-		/// Multiples a quaternion rotation to our cached rotation.
+		/// Multiples a quaternion rotation to our cached (quaternion) rotation.
 		/// </summary>
 		/// <param name="_rotation"></param>
 		public void AddRotation(Quaternion _rotation)
@@ -114,13 +114,33 @@ namespace Textensions.Core
 		}
 
 		/// <summary>
-		/// Multiplies the provided rotation with the inverse of our cached rotation.
+		/// Adds the provided euler rotation to our cached (quaternion) rotation.
+		/// </summary>
+		/// <param name="_rotation"></param>
+		public void AddRotation(Vector3 _rotation)
+		{
+			hasRotationUpdated = true;
+			rotationCached *= Quaternion.Euler(_rotation);
+		}
+
+		/// <summary>
+		/// Multiplies the provided quaternion rotation with the inverse of our cached (quaternion) rotation.
 		/// </summary>
 		/// <param name="_rotation"></param>
 		public void RemoveRotation(Quaternion _rotation)
 		{
 			hasRotationUpdated = true;
 			rotationCached = _rotation * Quaternion.Inverse(rotationCached);
+		}
+
+		/// <summary>
+		/// Multiplies the provided euler rotation with the inverse of our cached (quaternion) rotation.
+		/// </summary>
+		/// <param name="_rotation"></param>
+		public void RemoveRotation(Vector3 _rotation)
+		{
+			hasRotationUpdated = true;
+			rotationCached = Quaternion.Euler(_rotation) * Quaternion.Inverse(rotationCached);
 		}
 
 		/// <summary>
