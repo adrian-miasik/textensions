@@ -192,7 +192,10 @@ namespace Textensions.Core
 		}
 
 		/// <summary>
-		/// Dirty flag
+		/// A dirty flag we use to determine if we need to update the TMP component this frame.
+		/// </summary>
+		/// <summary>
+		/// Note: This is normally used when we have modified any of the textensions characters.
 		/// </summary>
 		public void DirtyVertex()
 		{
