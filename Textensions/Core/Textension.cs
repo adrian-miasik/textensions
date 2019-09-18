@@ -207,11 +207,15 @@ namespace Textensions.Core
 		/// </summary>
 		private void Render()
 		{
-			if (refreshVertex)
+			// If this text hasn't been dirtied...
+			if (!refreshVertex)
 			{
-				ApplyMeshChanges();
-				refreshVertex = false;
+				// Early exit
+				return;
 			}
+
+			ApplyMeshChanges();
+			refreshVertex = false;
 		}
 
 		/// <summary>
