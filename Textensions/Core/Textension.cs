@@ -205,7 +205,7 @@ namespace Textensions.Core
 		/// <summary>
 		/// See if we need to apply changes to the mesh this frame, if we do we will apply the changes to the mesh and copy the data for next time.
 		/// </summary>
-		public void Render()
+		private void Render()
 		{
 			if (refreshVertex)
 			{
