@@ -119,12 +119,11 @@ namespace Textensions.Core
 			characters.Remove(_character);
 		}
 
-		// TODO: Enforce application loop as described below
 		private void Update()
 		{
 			if (hasInitialized)
 			{
-				// Step 0: Initialize the text so it's ready for manipulation.
+				// Step 0: Initialize the text so the data is ready for manipulation.
 				text.ForceMeshUpdate();
 
 				// Step 1: Tick each text reveal to determine if they should reveal a/multiple text character(s) (A tick does not equal a character reveal)
@@ -133,7 +132,7 @@ namespace Textensions.Core
 				// Step 2: Calculate the effect for each character
 				EffectsTick?.Invoke();
 
-				// Step 3: Apply the effect to the character class
+				// Step 3: Apply our effect modifications to the character class
 				UpdateCharacters();
 
 				// Step 4: Then finally take all that information and apply it to the TMP_Text only once this frame
