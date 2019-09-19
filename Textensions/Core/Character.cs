@@ -32,7 +32,6 @@ namespace Textensions.Core
 		/// </summary>
 		public int index;
 
-		public bool isDirty;
 		public bool isRevealed;
 
 		public Vector3 position;
@@ -50,14 +49,6 @@ namespace Textensions.Core
 			index = _info.index;
 			effectCompleted = false;
 			isRevealed = false;
-		}
-
-		/// <summary>
-		/// Dirty this character so it can rebuild later on in the lifecycle/tick.
-		/// </summary>
-		public void DirtyCharacter()
-		{
-			isDirty = true;
 		}
 
 		/// <summary>
