@@ -23,7 +23,7 @@
     "Adrian Miasik"
   ],
   "dependencies": {
-    "com.unity.textmeshpro": "2.0.0",
+    "com.unity.textmeshpro": "1.4.0",
     "com.unity.ugui": "1.0.0"
   }           
 }
