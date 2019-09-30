@@ -13,15 +13,8 @@ namespace Textensions.Core
 		private Quaternion rotationCached;
 		private Vector3 scaleCached;
 
+		// TODO: Utilize this
 		public bool effectCompleted;
-
-		/// <summary>
-		/// If this bool is on, then the character will tell itself to update and rebuild despite not being modified.
-		/// </summary>
-		/// <summary>
-		/// Note: This is good for live editing in the editor.
-		/// </summary>
-		public bool forceUpdate;
 
 		[HideInInspector] public bool hasPositionUpdated;
 		[HideInInspector] public bool hasRotationUpdated;
