@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UXML
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="UnityEngine.UIElements"
+        xmlns:uie="UnityEngine.UIElements"
+        xsi:noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd"
+>
+    <VisualElement>
+        <VisualElement class="body">
+            <Image name="logo" class="logoImg"/>
+            <VisualElement class="logoTextContainer">
+                <Label text="Textensions" class="logoText"/>
+                <Label text="Created by Adrian Miasik" class="logoTagline"/>
+            </VisualElement>
+            <Image name="status-indicator" class="statusIndicator"/>
+        </VisualElement>
+        <VisualElement class="headerBar" />
+    </VisualElement>
+</UXML>
