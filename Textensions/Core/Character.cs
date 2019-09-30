@@ -82,16 +82,22 @@ namespace Textensions.Core
 		}
 
 		/// <summary>
-		/// If our character position has been dirtied, we will move the character to the new position and reset the cached position.
+		/// If our character position has been dirtied, we will move the character to the new position, reset the cached position, and return True.
 		/// </summary>
-		public void ApplyPosition()
+		/// <summary>
+		/// If our character position has not been dirtied, we will return False.
+		/// </summary>
+		public bool ApplyPosition()
 		{
 			if (hasPositionUpdated)
 			{
 				hasPositionUpdated = false;
 				position = positionCached;
 				positionCached = Vector3.zero;
+				return true;
 			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -145,16 +151,22 @@ namespace Textensions.Core
 		}
 
 		/// <summary>
-		/// If our character rotation has been dirtied, we will rotate the character to our new rotation and reset the cached rotation.
+		/// If our character rotation has been dirtied, we will rotate the character to our new rotation, reset the cached rotation, and return True.
 		/// </summary>
-		public void ApplyRotation()
+		/// <summary>
+		/// If our character rotation has not been dirtied, we will return False.
+		/// </summary>
+		public bool ApplyRotation()
 		{
 			if (hasRotationUpdated)
 			{
 				hasRotationUpdated = false;
 				rotation = rotationCached;
 				rotationCached = Quaternion.identity;
+				return true;
 			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -188,16 +200,22 @@ namespace Textensions.Core
 		}
 
 		/// <summary>
-		/// If our character scale has been dirtied, we will scale the character to our new scale and reset the cached scale.
+		/// If our character scale has been dirtied, we will scale the character to our new scale, reset the cached scale, and return True.
 		/// </summary>
-		public void ApplyScale()
+		/// <summary>
+		/// If our character scale has not been dirtied, we will return False.
+		/// </summary>
+		public bool ApplyScale()
 		{
 			if (hasScaleUpdated)
 			{
 				hasScaleUpdated = false;
 				scale = scaleCached;
 				scaleCached = Vector3.zero;
+				return true;
 			}
+
+			return false;
 		}
 
 		/// <summary>
