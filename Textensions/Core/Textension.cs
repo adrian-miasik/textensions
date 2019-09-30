@@ -96,12 +96,16 @@ namespace Textensions.Core
 			if (hideOnInitialization)
 			{
 				if (OnHideInitialize == null)
+				{
 					// TODO: Default to a certain hide method.
 					Debug.LogWarning("Can't hide this textension since I'm not sure which way you want to hide it. " +
 					                 "In textensions we have 2 reveal types currently: Render and Color Reveals. " +
 					                 "In order to hide properly on initialization please provide a text revealer");
+				}
 				else
+				{
 					OnHideInitialize.Invoke();
+				}
 			}
 
 			// Initialize our effects
@@ -129,7 +133,7 @@ namespace Textensions.Core
 				// Step 1: Tick each text reveal to determine if they should reveal a/multiple text character(s) (A tick does not equal a character reveal)
 				RevealsTick?.Invoke();
 
-				// Step 2: Calculate the effect for each character
+				// Step 2: Calculate the effect for each character (If the character has any effects applied to it)
 				EffectsTick?.Invoke();
 
 				// Step 3: Apply our effect modifications to the character class
@@ -152,34 +156,12 @@ namespace Textensions.Core
 			// Iterate through each character...
 			foreach (Character character in characters)
 			{
-				bool markCharacterAsDirty = false;
-
-				// If the characters position has been modified...
-				if (character.hasPositionUpdated)
+				// If this character has been modified in any way (position, rotation, or scale), apply those modifications and return True...
+				if (character.ApplyPosition() || character.ApplyRotation() || character.ApplyScale())
 				{
-					character.ApplyPosition();
-					markCharacterAsDirty = true;
-				}
-
-				// If the characters rotation has been modified...
-				if (character.hasRotationUpdated)
-				{
-					character.ApplyRotation();
-					markCharacterAsDirty = true;
-				}
-
-				// If the characters scale has been modified...
-				if (character.hasScaleUpdated)
-				{
-					character.ApplyScale();
-					markCharacterAsDirty = true;
-				}
-
-				// If this character has been marked as dirty... (We will need to update its mesh data)
-				if (markCharacterAsDirty || character.forceUpdate)
-				{
-					// Set our vertex update to true so we can update all the vertex data at once instead of numerous times in a single frame.
-					DirtyVertex();
+					// The character has been dirtied in some way, so this means we will have to mark the parent mesh data as dirty.
+					// Set our vertex update to true so we can update all the vertex data at once in a single frame later in the core loop.
+					DirtyTextVertex();
 
 					// TODO: Maybe split UpdateCharacter() into different functions? Will need to stress test and see if certain matrix modifications are cheaper than others.
 					// Update the character mesh data
@@ -197,7 +179,7 @@ namespace Textensions.Core
 		/// <summary>
 		/// Note: This is normally used when we have modified any of the textensions characters.
 		/// </summary>
-		public void DirtyVertex()
+		public void DirtyTextVertex()
 		{
 			refreshVertex = true;
 		}
@@ -347,7 +329,9 @@ namespace Textensions.Core
 		/// </summary>
 		private void ApplyMeshChanges()
 		{
+#if DEBUG_TEXT
 			Debug.Log("Updating mesh.");
+#endif
 
 			if (targetVertices.Length <= 0) return;
 
