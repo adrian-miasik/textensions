@@ -76,7 +76,7 @@ namespace Textensions.Reveals
 				textension.text.UpdateGeometry(textension.text.textInfo.meshInfo[i].mesh, i);
 			}
 
-			textension.DirtyVertex();
+			textension.DirtyTextVertex();
 		}
 
 		/// <summary>

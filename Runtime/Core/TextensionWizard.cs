@@ -13,5 +13,14 @@ namespace Textensions.Core
 
 		public WizardStates state = WizardStates.NOT_DETERMINED;
 
+		public bool IsWizardComplete()
+		{
+			if (text != null)
+			{
+				return false;
+			}
+
+			return true;
+		}
 	}
 }
