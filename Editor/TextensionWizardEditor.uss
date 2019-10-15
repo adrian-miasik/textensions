@@ -1,0 +1,51 @@
+.Root {
+    margin-left: -15px;
+    margin-right: -6px;
+    margin-top: -3px;
+    margin-bottom: 0;
+}
+
+.h1 {
+    font-size: 26px;
+    -unity-font-style: bold;
+    margin-top: -2px;
+    color: rgb(244, 193, 60);
+}
+
+.p {
+    color: rgb(255, 255, 255);
+    -unity-font-style: normal;
+    margin-top: 0;
+    font-size: 12px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.column {
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+.wizardAnchor {
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 2px;
+    border-bottom-width: 0;
+    border-left-color: rgb(47, 47, 47);
+    border-right-color: rgb(47, 47, 47);
+    border-top-color: rgb(47, 47, 47);
+    border-bottom-color: rgb(47, 47, 47);
+}
+
+.h2 {
+    font-size: 12px;
+    -unity-font-style: normal;
+    margin-top: 0;
+    color: rgb(244, 193, 60);
+    -unity-font: resource('Chivo-Bold');
+}
+
+.field {
+    -unity-font: resource('Chivo-Bold');
+    font-size: 12px;
+}
