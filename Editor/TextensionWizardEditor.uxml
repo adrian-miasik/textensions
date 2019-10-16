@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
     <ui:VisualElement name="Root" class="Root" style="flex-grow: 1; flex-shrink: 0;">
         <Style src="TextensionWizardEditor.uss" />
-        <ui:VisualElement name="Banner" style="flex-direction: row; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(47, 47, 47); border-right-color: rgb(47, 47, 47); border-top-color: rgb(47, 47, 47); border-bottom-color: rgb(47, 47, 47); border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; padding-left: 0; padding-right: 5px; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
-            <ui:VisualElement name="Logo" style="width: 40px; height: 40px; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;" />
+        <ui:VisualElement name="Banner" style="flex-direction: row; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; padding-left: 0; padding-right: 5px; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; -unity-background-scale-mode: stretch-to-fill; border-left-width: 0; border-bottom-color: rgba(40, 40, 40, 255); border-bottom-width: 2px;">
+            <ui:VisualElement name="Logo" style="width: 40px; height: 40px; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-left-color: rgba(244, 193, 60, 255);" />
             <ui:VisualElement name="Banner Text" style="left: 3px;">
                 <ui:Label text="Textensions" name="Textensions" class="H1 h1" style="margin-left: 0; margin-right: 0; margin-top: -2px; margin-bottom: 0;" />
                 <ui:Label text="Created by Adrian Miasik" name="Textensions Tagline" style="font-size: 10px; margin-top: -4px; padding-top: 0; height: 10px; color: rgb(255, 255, 255); padding-bottom: 0; margin-bottom: 0;" />
@@ -10,22 +10,15 @@
             <ui:VisualElement name="Status Indicator" style="background-image: resource('StatusIndicator10x10'); height: 5px; width: 5px; position: absolute; right: 0; bottom: 0; top: 0; margin-right: 5px; margin-top: 5px;" />
         </ui:VisualElement>
         <ui:VisualElement name="Status Row" style="height: 18px; border-left-color: rgb(47, 47, 47); border-right-color: rgb(47, 47, 47); border-top-color: rgb(47, 47, 47); border-bottom-color: rgb(47, 47, 47); flex-direction: row; margin-top: 1px; justify-content: flex-start; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 2px; display: flex;">
-            <ui:Label text="STATUS" name="Status Text" class="h2" style="color: rgb(255, 255, 255); margin-top: 1px; margin-left: 2px;" />
+            <ui:Label text="STATUS" name="Status Text" class="h2" style="margin-top: 1px; margin-left: 2px; color: rgba(255, 255, 255, 0.95); font-size: 12px;" />
             <ui:Label text="Test Message here" name="Display Message Text" class="p" />
         </ui:VisualElement>
-        <ui:VisualElement name="History" style="padding-top: 2px; flex-grow: 1; flex-shrink: 0; margin-left: 5px; margin-right: 5px; margin-bottom: 2px; margin-top: 0;">
-            <ui:Label name="History Title" text="General:" class="h2" style="-unity-font-style: flex;" />
-            <ui:VisualElement name="History Content" style="border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; flex-grow: 1; align-items: stretch; justify-content: center; -unity-text-align: middle-left; flex-shrink: 0; margin-bottom: 0;">
-                <uie:ObjectField label="Text:" name="TextMeshProTextRef" class="field" style="-unity-font-style: normal; display: flex; margin-left: 1px; margin-right: 1px;" />
-                <ui:Toggle label="Hide On Initialization:" name="HideOnInitializationRef" value="false" class="field" style="-unity-font: resource('Chivo-Bold'); margin-bottom: 1px; flex-grow: 1; margin-right: 1px; margin-left: 1px;" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="Wizard">
+        <ui:VisualElement name="Wizard" style="border-bottom-color: rgba(243, 193, 60, 255); flex-shrink: 1;">
             <ui:VisualElement name="Instructions Row" style="border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; align-items: center; flex-direction: row; justify-content: center; flex-grow: 0; flex-shrink: 0;">
                 <ui:Label text="Step 1:" name="Instruction Title" class="H2 h2" style="font-size: 12px; -unity-font-style: normal; -unity-font: resource('Chivo-Bold');" />
                 <ui:Label text="Display Message Here" name="Instruction Text" class="p" style="-unity-font-style: normal;" />
             </ui:VisualElement>
-            <ui:VisualElement name="Columns" style="flex-direction: row; flex-grow: 1; flex-basis: 50px; align-items: auto;">
+            <ui:VisualElement name="Columns" style="flex-direction: row; flex-grow: 1; flex-basis: 50px; align-items: auto; height: 49px;">
                 <ui:VisualElement name="Left Column" class="column" style="flex-grow: 1; flex-shrink: 1; flex-basis: 50px;" />
                 <ui:VisualElement name="Body" style="margin-bottom: 2px; justify-content: center; flex-grow: 1; flex-shrink: 1; flex-basis: 150px;">
                     <ui:VisualElement name="Content" style="border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; background-color: rgba(0, 0, 0, 0.2); flex-grow: 1; flex-shrink: 1; justify-content: center; flex-direction: column;">
@@ -36,9 +29,14 @@
                             <ui:Button text="No" name="No" style="color: rgb(255, 255, 255); border-left-color: rgb(154, 60, 62); border-right-color: rgb(154, 60, 62); border-top-color: rgb(154, 60, 62); border-bottom-color: rgb(154, 60, 62); -unity-font-style: bold; flex-basis: 0; flex-grow: 1;" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <uie:ProgressBar title=" " name="Step Progress" low-value="0" high-value="5" style="height: 8px; margin-top: 4px; margin-bottom: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="Right Column" class="column" style="flex-grow: 1; flex-shrink: 1; flex-basis: 50px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="History" style="padding-top: 2px; flex-grow: 1; flex-shrink: 1; margin-left: 0; margin-right: 0; margin-bottom: 2px; margin-top: 0; padding-left: 0; align-items: stretch; justify-content: flex-end;">
+            <ui:VisualElement name="History Content" style="border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; flex-grow: 1; align-items: stretch; justify-content: center; -unity-text-align: middle-left; flex-shrink: 0; margin-bottom: 0;">
+                <uie:ObjectField label="Text:" name="TextMeshProTextRef" class="field" style="-unity-font-style: normal; display: flex; margin-left: 1px; margin-right: 1px; margin-bottom: 0; margin-top: 0; border-top-width: 1px; border-bottom-width: 1px; border-right-width: 1px; border-left-width: 1px; -unity-background-image-tint-color: rgb(244, 193, 60);" />
+                <ui:Toggle label="Hide On Initialization:" name="HideOnInitializationRef" value="false" class="field activeField" style="-unity-font: resource('Chivo-Bold'); margin-bottom: 1px; flex-grow: 1; margin-right: 1px; margin-left: 1px;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

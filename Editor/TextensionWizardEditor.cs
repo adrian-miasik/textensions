@@ -13,18 +13,10 @@ namespace Textensions.Editor
 	{
 		private VisualElement parent;
 		private TextElement titleTE;
-		private TextElement textTE;
 		private StyleColor titleColor;
+		private TextElement textTE;
 
-		private List<KeyValuePair<MessageType, string>> console;
-
-		public enum MessageType
-		{
-			NULL,
-			ASSERT,
-			WARNING,
-			SUCCESS
-		}
+		private Queue<KeyValuePair<TextensionWizardEditor.StatusCodes, string>> console;
 
 		public ConsoleRecorder(VisualElement _statusRow, TextElement _statusTitle, StyleColor _titleColor,
 			TextElement _statusText)
@@ -36,22 +28,22 @@ namespace Textensions.Editor
 			textTE = _statusText;
 
 			// Create a console
-			console = new List<KeyValuePair<MessageType, string>>();
+			console = new Queue<KeyValuePair<TextensionWizardEditor.StatusCodes, string>>();
 		}
 
-		public void RecordLog(KeyValuePair<MessageType, string> _log)
+		public void RecordLog(KeyValuePair<TextensionWizardEditor.StatusCodes, string> _log)
 		{
-			console.Add(_log);
+			console.Enqueue(_log);
 		}
 
-		public void RecordLog(MessageType _type, string _message)
+		public void RecordLog(TextensionWizardEditor.StatusCodes _type, string _message)
 		{
-			console.Add(new KeyValuePair<MessageType, string>(_type, _message));
+			console.Enqueue(new KeyValuePair<TextensionWizardEditor.StatusCodes, string>(_type, _message));
 		}
 
 		public void PrintRecords()
 		{
-			foreach (KeyValuePair<MessageType, string> log in console)
+			foreach (KeyValuePair<TextensionWizardEditor.StatusCodes, string> log in console)
 			{
 				Debug.Log(log.Key + ": " + log.Value);
 			}
@@ -61,12 +53,17 @@ namespace Textensions.Editor
 		{
 			VisualElement result = new VisualElement();
 
-			foreach (KeyValuePair<MessageType, string> log in console)
+			foreach (KeyValuePair<TextensionWizardEditor.StatusCodes, string> log in console)
 			{
 				result.Add(titleTE);
 			}
 
 			return result;
+		}
+
+		public KeyValuePair<TextensionWizardEditor.StatusCodes, string> GetFirstLog()
+		{
+			return console.Peek();
 		}
 
 		/// <summary>
@@ -120,7 +117,6 @@ namespace Textensions.Editor
 		private ObjectField step1ObjectField;
 		private Button step2ButtonYes;
 		private Button step2ButtonNo;
-		private ProgressBar stepProgress;
 		private VisualElement historyVisualElement;
 		private ObjectField textMeshProTextRef;
 		private Toggle hideOnInitializationRef;
@@ -141,7 +137,7 @@ namespace Textensions.Editor
 		private StyleColor warningStyleColor = new StyleColor(warningColor);
 		private StyleColor successStyleColor = new StyleColor(successColor);
 
-		private enum StatusCodes
+		public enum StatusCodes
 		{
 			NULL,
 			ASSERT,
@@ -171,7 +167,6 @@ namespace Textensions.Editor
 			step1ObjectField = resultElement.Q<ObjectField>("Step-1");
 			step2ButtonYes = resultElement.Q<Button>("Yes");
 			step2ButtonNo = resultElement.Q<Button>("No");
-			stepProgress = resultElement.Q<ProgressBar>("Step Progress");
 			historyVisualElement = resultElement.Q("History");
 			textMeshProTextRef = resultElement.Q<ObjectField>("TextMeshProTextRef");
 			hideOnInitializationRef = resultElement.Q<Toggle>("HideOnInitializationRef");
@@ -188,62 +183,62 @@ namespace Textensions.Editor
 			// Status Title (E.g. WARNING)
 			if (statusTitleTextElement == null)
 			{
-				console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Status Title Reference");
+				console.RecordLog(StatusCodes.WARNING, "Missing Status Title Reference");
 				isSuccessful = false;
 			}
 
 			// Status Message (E.g. Unable to find textension reference)
 			if (statusTextTextElement == null)
 			{
-				console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Status Message Reference");
+				console.RecordLog(StatusCodes.WARNING, "Missing Status Message Reference");
 				isSuccessful = false;
 			}
 
 			// Instruction Title (E.g. "Step 1:")
 			if (instructionTitleTextElement == null)
 			{
-				console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Instruction Title Reference");
+				console.RecordLog(StatusCodes.WARNING, "Missing Instruction Title Reference");
 				isSuccessful = false;
 			}
 
 			// Instruction Title (E.g. "Please connect your textension.")
 			if (instructionTextTextElement == null)
 			{
-				console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Instruction Message Reference");
+				console.RecordLog(StatusCodes.WARNING, "Missing Instruction Message Reference");
 				isSuccessful = false;
 			}
 
 			// Step 0 Button Connect
 			if (step0ButtonConnect == null)
 			{
-				console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Connect Button Reference");
+				console.RecordLog(StatusCodes.WARNING, "Missing Connect Button Reference");
 				isSuccessful = false;
 			}
 
 			// Step 1 Object Field
 			if (step1ObjectField == null)
 			{
-				console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Object Field Reference");
+				console.RecordLog(StatusCodes.WARNING, "Missing Object Field Reference");
 				isSuccessful = false;
 			}
 
 			// Step 2 Button Yes
 			if (step2ButtonYes == null)
 			{
-				console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Yes Button Reference");
+				console.RecordLog(StatusCodes.WARNING, "Missing Yes Button Reference");
 				isSuccessful = false;
 			}
 
 			// Step 2 Button No
 			if (step2ButtonNo == null)
 			{
-				console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing No Button Reference");
+				console.RecordLog(StatusCodes.WARNING, "Missing No Button Reference");
 				isSuccessful = false;
 			}
 
 			if (wizardVisualElement == null)
 			{
-				console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Wizard Element");
+				console.RecordLog(StatusCodes.WARNING, "Missing Wizard Element");
 				isSuccessful = false;
 			}
 
@@ -287,7 +282,8 @@ namespace Textensions.Editor
 			uxmlReference.CloneTree(resultElement);
 
 			// Create a console
-			console = new ConsoleRecorder(statusRowVisualElement, statusTitleTextElement, defaultStyleColor, statusTextTextElement);
+			console = new ConsoleRecorder(statusRowVisualElement, statusTitleTextElement, defaultStyleColor,
+				statusTextTextElement);
 
 			// Setup all our references, and null check our queries...
 			if (Setup())
@@ -296,13 +292,10 @@ namespace Textensions.Editor
 				LoadImage(logoVisualElement, LOGO_PATH, 40, 40);
 
 				logoVisualElement.RegisterCallback<MouseUpEvent>(_e =>
-					{
-						textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
-						CreateInspectorGUI();
-					});
-
-
-				SetupStepProgress();
+				{
+					textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
+					CreateInspectorGUI();
+				});
 
 				// Load page
 				DeterminePath();
@@ -326,12 +319,6 @@ namespace Textensions.Editor
 			// Verify element validity
 			return CheckElements();
 		}
-
-		private void SetupStepProgress()
-		{
-			stepProgress.value = 0f;
-		}
-
 		private void DeterminePath()
 		{
 			// Remove status
@@ -342,9 +329,6 @@ namespace Textensions.Editor
 			step1ObjectField.style.display = DisplayStyle.None;
 			step2ButtonYes.style.display = DisplayStyle.None;
 			step2ButtonNo.style.display = DisplayStyle.None;
-
-			// Remove the progress bar
-			stepProgress.style.display = DisplayStyle.None;
 
 			// Remove the history
 			historyVisualElement.style.display = DisplayStyle.None;
@@ -374,7 +358,6 @@ namespace Textensions.Editor
 
 					step0ButtonConnect.style.display = DisplayStyle.Flex;
 
-					stepProgress.style.display = DisplayStyle.None;
 					historyVisualElement.style.display = DisplayStyle.None;
 
 					// When the user presses the connect button...
@@ -395,9 +378,6 @@ namespace Textensions.Editor
 					instructionTitleTextElement.text = "Step 1 of 2:";
 					instructionTextTextElement.text = "Please connect your text";
 
-					stepProgress.style.display = DisplayStyle.Flex;
-					stepProgress.SetValueWithoutNotify(2.5f);
-
 					// History
 					historyVisualElement.style.display = DisplayStyle.Flex;
 					textMeshProTextRef.SetEnabled(false);
@@ -407,10 +387,11 @@ namespace Textensions.Editor
 
 					hideOnInitializationRef.style.display = DisplayStyle.Flex;
 					hideOnInitializationRef.SetEnabled(false);
-					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.
-						style.justifyContent = Justify.FlexEnd;
+					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
+						Justify.FlexEnd;
 
-					wizardVisualElement.AddToClassList("wizardAnchor");
+					textMeshProTextRef.AddToClassList("activeField");
+					hideOnInitializationRef.RemoveFromClassList("activeField");
 
 					step1ObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>((_field) =>
 					{
@@ -427,7 +408,7 @@ namespace Textensions.Editor
 						// Else if you have something and you de-referenced it.
 						else if (_field.previousValue != null && _field.newValue == null)
 						{
-							console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Text Reference");
+							console.RecordLog(StatusCodes.WARNING, "Missing Text Reference");
 							textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
 							DeterminePath();
 						}
@@ -438,10 +419,6 @@ namespace Textensions.Editor
 
 					instructionTitleTextElement.text = "Step 2 of 2:";
 					instructionTextTextElement.text = "Hide text on initialization?";
-
-					// Progress bar
-					stepProgress.style.display = DisplayStyle.Flex;
-					stepProgress.SetValueWithoutNotify(5f);
 
 					// Step Buttons
 					step2ButtonYes.parent.style.display = DisplayStyle.Flex;
@@ -468,16 +445,18 @@ namespace Textensions.Editor
 						// Else if you have something and you de-referenced it.
 						else if (_field.previousValue != null && _field.newValue == null)
 						{
-							console.RecordLog(ConsoleRecorder.MessageType.WARNING, "Missing Text Reference");
-							textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
-							CreateInspectorGUI();
+							console.RecordLog(StatusCodes.WARNING, "Missing Text Reference");
+							DisplayStatusMessage(StatusCodes.WARNING, "Missing Text Reference");
 						}
 					});
 
 					hideOnInitializationRef.style.display = DisplayStyle.Flex;
 					hideOnInitializationRef.SetEnabled(false);
-					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.
-						style.justifyContent = Justify.FlexEnd;
+					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
+						Justify.FlexEnd;
+
+					textMeshProTextRef.RemoveFromClassList("activeField");
+					hideOnInitializationRef.AddToClassList("activeField");
 
 					step2ButtonYes.RegisterCallback<MouseUpEvent>(_e =>
 					{
@@ -485,7 +464,6 @@ namespace Textensions.Editor
 						textensionWizard.hideOnInitialization = true;
 						hideOnInitializationRef.value = true;
 						textensionWizard.state = TextensionWizard.WizardStates.COMPLETED;
-						console.RecordLog(ConsoleRecorder.MessageType.NULL, "random log entry");
 						DeterminePath();
 					});
 
@@ -503,7 +481,6 @@ namespace Textensions.Editor
 				case TextensionWizard.WizardStates.COMPLETED:
 
 					instructionsRow.style.display = DisplayStyle.None;
-					stepProgress.value = 50; // Value between 0-100
 
 					contentVisualElement.style.display = DisplayStyle.None;
 					historyVisualElement.style.display = DisplayStyle.Flex;
@@ -512,7 +489,16 @@ namespace Textensions.Editor
 //					hideOnInitializationRef.Q<VisualElement>().style.justifyContent = Justify.FlexEnd;
 					wizardVisualElement.style.display = DisplayStyle.None;
 
+					textMeshProTextRef.value = textensionWizard.text;
+					textMeshProTextRef.RemoveFromClassList("activeField");
+					hideOnInitializationRef.RemoveFromClassList("activeField");
 //					resultElement.Add(new IMGUIContainer(OnInspectorGUI));
+					
+					hideOnInitializationRef.style.display = DisplayStyle.Flex;
+					hideOnInitializationRef.value = textensionWizard.hideOnInitialization;
+					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
+						Justify.FlexEnd;
+
 
 					break;
 
@@ -523,12 +509,28 @@ namespace Textensions.Editor
 			// TODO: Expand the console recorder class - pull data from console instead
 			if (console.GetLogCount() > 0)
 			{
-				DisplayStatusMessage(StatusCodes.SUCCESS, "Textension Active!");
+				DisplayStatusMessage(console.GetFirstLog());
+
+				var hideStatusMessage = resultElement.schedule.Execute(() =>
+				{
+					statusRowVisualElement.style.display = DisplayStyle.None;
+				});
+
+				hideStatusMessage.ExecuteLater(3000);
 			}
 		}
+		
+		private void DisplayStatusMessage(KeyValuePair<StatusCodes, string> log)
+		{
+			Debug.Log(log.Key);
+			Debug.Log(log.Value);
 
+			statusRowVisualElement.style.display = DisplayStyle.Flex;
+			DisplayStatus(StatusCodes.ASSERT);
+			statusTextTextElement.text = log.Value;
+		}
 
-		private void DisplayStatusMessage(StatusCodes _statusCode, string _message)
+		private void DisplayStatusMessage(StatusCodes _statusCode,  string _message)
 		{
 			statusRowVisualElement.style.display = DisplayStyle.Flex;
 			DisplayStatus(_statusCode);
@@ -565,8 +567,6 @@ namespace Textensions.Editor
 					Debug.LogWarning("T.ext: Unable to support this status code.");
 					break;
 			}
-
-
 		}
 
 		/// <summary>
