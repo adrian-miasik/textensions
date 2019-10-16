@@ -446,7 +446,6 @@ namespace Textensions.Editor
 						else if (_field.previousValue != null && _field.newValue == null)
 						{
 							console.RecordLog(StatusCodes.WARNING, "Missing Text Reference");
-							DisplayStatusMessage(StatusCodes.WARNING, "Missing Text Reference");
 						}
 					});
 
@@ -493,7 +492,7 @@ namespace Textensions.Editor
 					textMeshProTextRef.RemoveFromClassList("activeField");
 					hideOnInitializationRef.RemoveFromClassList("activeField");
 //					resultElement.Add(new IMGUIContainer(OnInspectorGUI));
-					
+
 					hideOnInitializationRef.style.display = DisplayStyle.Flex;
 					hideOnInitializationRef.value = textensionWizard.hideOnInitialization;
 					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
@@ -507,19 +506,20 @@ namespace Textensions.Editor
 			}
 
 			// TODO: Expand the console recorder class - pull data from console instead
-			if (console.GetLogCount() > 0)
-			{
-				DisplayStatusMessage(console.GetFirstLog());
-
-				var hideStatusMessage = resultElement.schedule.Execute(() =>
-				{
-					statusRowVisualElement.style.display = DisplayStyle.None;
-				});
-
-				hideStatusMessage.ExecuteLater(3000);
-			}
+//			if (console.GetLogCount() > 0)
+//			{
+//				DisplayStatusMessage(console.GetFirstLog());
+//				DisplayStatusMessage(StatusCodes.SUCCESS, "Ready to use!");
+//
+//				var hideStatusMessage = resultElement.schedule.Execute(() =>
+//				{
+//					statusRowVisualElement.style.display = DisplayStyle.None;
+//				});
+//
+//				hideStatusMessage.ExecuteLater(3000);
+//			}
 		}
-		
+
 		private void DisplayStatusMessage(KeyValuePair<StatusCodes, string> log)
 		{
 			Debug.Log(log.Key);
