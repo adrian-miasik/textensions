@@ -121,6 +121,7 @@ namespace Textensions.Editor
 		private ObjectField textMeshProTextRef;
 		private Toggle hideOnInitializationRef;
 		private VisualElement wizardVisualElement;
+		private TextElement historyTitleTextElement;
 
 		private const string LOGO_PATH =
 			"Packages/com.adrianmiasik.textensions/Resources/TextensionLogo40x40.png";
@@ -171,6 +172,7 @@ namespace Textensions.Editor
 			textMeshProTextRef = resultElement.Q<ObjectField>("TextMeshProTextRef");
 			hideOnInitializationRef = resultElement.Q<Toggle>("HideOnInitializationRef");
 			wizardVisualElement = resultElement.Q("Wizard");
+			historyTitleTextElement = resultElement.Q<TextElement>("History Title");
 		}
 
 		// TODO: Refactor
@@ -382,16 +384,15 @@ namespace Textensions.Editor
 					historyVisualElement.style.display = DisplayStyle.Flex;
 					textMeshProTextRef.SetEnabled(false);
 					textMeshProTextRef.objectType = typeof(TMP_Text);
-					textMeshProTextRef.Q<Label>().style.minWidth = 0;
-					textMeshProTextRef.style.height = 18;
+//					textMeshProTextRef.Q<Label>().style.minWidth = 0;
 
 					hideOnInitializationRef.style.display = DisplayStyle.Flex;
 					hideOnInitializationRef.SetEnabled(false);
-					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
-						Justify.FlexEnd;
+//					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
+//						Justify.FlexEnd;
 
-					textMeshProTextRef.AddToClassList("activeField");
-					hideOnInitializationRef.RemoveFromClassList("activeField");
+					textMeshProTextRef.AddToClassList("active-field");
+					hideOnInitializationRef.RemoveFromClassList("active-field");
 
 					step1ObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>((_field) =>
 					{
@@ -428,8 +429,7 @@ namespace Textensions.Editor
 					// History
 					historyVisualElement.style.display = DisplayStyle.Flex;
 					textMeshProTextRef.SetEnabled(true);
-					textMeshProTextRef.Q<Label>().style.minWidth = 0;
-					textMeshProTextRef.style.height = 18;
+//					textMeshProTextRef.Q<Label>().style.minWidth = 0;
 
 					textMeshProTextRef.RegisterCallback<ChangeEvent<UnityEngine.Object>>(_field =>
 					{
@@ -451,11 +451,11 @@ namespace Textensions.Editor
 
 					hideOnInitializationRef.style.display = DisplayStyle.Flex;
 					hideOnInitializationRef.SetEnabled(false);
-					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
-						Justify.FlexEnd;
+//					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
+//						Justify.FlexEnd;
 
-					textMeshProTextRef.RemoveFromClassList("activeField");
-					hideOnInitializationRef.AddToClassList("activeField");
+					textMeshProTextRef.RemoveFromClassList("active-field");
+					hideOnInitializationRef.AddToClassList("active-field");
 
 					step2ButtonYes.RegisterCallback<MouseUpEvent>(_e =>
 					{
@@ -489,15 +489,29 @@ namespace Textensions.Editor
 					wizardVisualElement.style.display = DisplayStyle.None;
 
 					textMeshProTextRef.value = textensionWizard.text;
-					textMeshProTextRef.RemoveFromClassList("activeField");
-					hideOnInitializationRef.RemoveFromClassList("activeField");
+					textMeshProTextRef.RemoveFromClassList("active-field");
+					hideOnInitializationRef.RemoveFromClassList("active-field");
 //					resultElement.Add(new IMGUIContainer(OnInspectorGUI));
 
 					hideOnInitializationRef.style.display = DisplayStyle.Flex;
 					hideOnInitializationRef.value = textensionWizard.hideOnInitialization;
-					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
-						Justify.FlexEnd;
+//					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
+//						Justify.FlexEnd;
 
+					console.RecordLog(StatusCodes.NULL, "test");
+					// TODO: Expand the console recorder class - pull data from console instead
+					if (console.GetLogCount() > 0)
+					{
+//				DisplayStatusMessage(console.GetFirstLog());
+						DisplayStatusMessage(StatusCodes.SUCCESS, "Ready to use!");
+
+						var hideStatusMessage = resultElement.schedule.Execute(() =>
+						{
+							statusRowVisualElement.style.display = DisplayStyle.None;
+						});
+
+						hideStatusMessage.ExecuteLater(2000);
+					}
 
 					break;
 
@@ -505,19 +519,6 @@ namespace Textensions.Editor
 					break;
 			}
 
-			// TODO: Expand the console recorder class - pull data from console instead
-//			if (console.GetLogCount() > 0)
-//			{
-//				DisplayStatusMessage(console.GetFirstLog());
-//				DisplayStatusMessage(StatusCodes.SUCCESS, "Ready to use!");
-//
-//				var hideStatusMessage = resultElement.schedule.Execute(() =>
-//				{
-//					statusRowVisualElement.style.display = DisplayStyle.None;
-//				});
-//
-//				hideStatusMessage.ExecuteLater(3000);
-//			}
 		}
 
 		private void DisplayStatusMessage(KeyValuePair<StatusCodes, string> log)
