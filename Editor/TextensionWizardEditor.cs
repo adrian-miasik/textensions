@@ -115,6 +115,7 @@ namespace Textensions.Editor
 		private TextElement instructionTextTextElement;
 		private Button step0ButtonConnect;
 		private ObjectField step1ObjectField;
+		private VisualElement step2VisualElement;
 		private Button step2ButtonYes;
 		private Button step2ButtonNo;
 		private VisualElement historyVisualElement;
@@ -166,6 +167,7 @@ namespace Textensions.Editor
 			instructionTextTextElement = resultElement.Q<TextElement>("Instruction Text");
 			step0ButtonConnect = resultElement.Q<Button>("Step-0");
 			step1ObjectField = resultElement.Q<ObjectField>("Step-1");
+			step2VisualElement = resultElement.Q("Step-2");
 			step2ButtonYes = resultElement.Q<Button>("Yes");
 			step2ButtonNo = resultElement.Q<Button>("No");
 			historyVisualElement = resultElement.Q("History");
@@ -175,74 +177,11 @@ namespace Textensions.Editor
 			historyTitleTextElement = resultElement.Q<TextElement>("History Title");
 		}
 
-		// TODO: Refactor
 		private bool CheckElements()
 		{
-			// ReSharper disable once ReplaceWithSingleAssignment.True
 			bool isSuccessful = true;
 
-			// Check our elements
-			// Status Title (E.g. WARNING)
-			if (statusTitleTextElement == null)
-			{
-				console.RecordLog(StatusCodes.WARNING, "Missing Status Title Reference");
-				isSuccessful = false;
-			}
 
-			// Status Message (E.g. Unable to find textension reference)
-			if (statusTextTextElement == null)
-			{
-				console.RecordLog(StatusCodes.WARNING, "Missing Status Message Reference");
-				isSuccessful = false;
-			}
-
-			// Instruction Title (E.g. "Step 1:")
-			if (instructionTitleTextElement == null)
-			{
-				console.RecordLog(StatusCodes.WARNING, "Missing Instruction Title Reference");
-				isSuccessful = false;
-			}
-
-			// Instruction Title (E.g. "Please connect your textension.")
-			if (instructionTextTextElement == null)
-			{
-				console.RecordLog(StatusCodes.WARNING, "Missing Instruction Message Reference");
-				isSuccessful = false;
-			}
-
-			// Step 0 Button Connect
-			if (step0ButtonConnect == null)
-			{
-				console.RecordLog(StatusCodes.WARNING, "Missing Connect Button Reference");
-				isSuccessful = false;
-			}
-
-			// Step 1 Object Field
-			if (step1ObjectField == null)
-			{
-				console.RecordLog(StatusCodes.WARNING, "Missing Object Field Reference");
-				isSuccessful = false;
-			}
-
-			// Step 2 Button Yes
-			if (step2ButtonYes == null)
-			{
-				console.RecordLog(StatusCodes.WARNING, "Missing Yes Button Reference");
-				isSuccessful = false;
-			}
-
-			// Step 2 Button No
-			if (step2ButtonNo == null)
-			{
-				console.RecordLog(StatusCodes.WARNING, "Missing No Button Reference");
-				isSuccessful = false;
-			}
-
-			if (wizardVisualElement == null)
-			{
-				console.RecordLog(StatusCodes.WARNING, "Missing Wizard Element");
-				isSuccessful = false;
-			}
 
 			return isSuccessful;
 		}
@@ -301,10 +240,13 @@ namespace Textensions.Editor
 
 				// Load page
 				DeterminePath();
+
+				// Load the default inspector
+//				resultElement.Add(new IMGUIContainer(OnInspectorGUI));
+
 			}
 
 			console.PrintRecords();
-//			resultElement.Add(console.GenerateRecordVisuals());
 
 			return resultElement;
 		}
@@ -328,9 +270,8 @@ namespace Textensions.Editor
 
 			// Remove all steps
 			step0ButtonConnect.style.display = DisplayStyle.None;
-			step1ObjectField.style.display = DisplayStyle.None;
-			step2ButtonYes.style.display = DisplayStyle.None;
-			step2ButtonNo.style.display = DisplayStyle.None;
+			step1ObjectField.parent.style.display = DisplayStyle.None;
+			step2VisualElement.style.display = DisplayStyle.None;
 
 			// Remove the history
 			historyVisualElement.style.display = DisplayStyle.None;
@@ -358,6 +299,7 @@ namespace Textensions.Editor
 					instructionTitleTextElement.text = "Setup Wizard";
 					instructionTextTextElement.text = "";
 
+					textensionWizard.text = null;
 					step0ButtonConnect.style.display = DisplayStyle.Flex;
 
 					historyVisualElement.style.display = DisplayStyle.None;
@@ -369,11 +311,25 @@ namespace Textensions.Editor
 						textensionWizard.state = TextensionWizard.WizardStates.TEXTENSION_CONNECT;
 						DeterminePath();
 					});
+
+					historyVisualElement.style.display = DisplayStyle.Flex;
+					textMeshProTextRef.SetEnabled(false);
+					textMeshProTextRef.objectType = typeof(TMP_Text);
+					hideOnInitializationRef.SetEnabled(false);
+//					hideOnInitializationRef.Q<VisualElement>().style.justifyContent = Justify.FlexEnd;
+
+					textMeshProTextRef.value = textensionWizard.text;
+					textMeshProTextRef.RemoveFromClassList("active-field");
+					hideOnInitializationRef.RemoveFromClassList("active-field");
+
+					hideOnInitializationRef.style.display = DisplayStyle.Flex;
+					hideOnInitializationRef.value = textensionWizard.hideOnInitialization;
+
 					break;
 
 				case TextensionWizard.WizardStates.TEXTENSION_CONNECT:
 
-					step1ObjectField.style.display = DisplayStyle.Flex;
+					step1ObjectField.parent.style.display = DisplayStyle.Flex;
 					step1ObjectField.Q<Label>().style.minWidth = 0;
 					step1ObjectField.objectType = typeof(TMP_Text);
 
@@ -384,12 +340,9 @@ namespace Textensions.Editor
 					historyVisualElement.style.display = DisplayStyle.Flex;
 					textMeshProTextRef.SetEnabled(false);
 					textMeshProTextRef.objectType = typeof(TMP_Text);
-//					textMeshProTextRef.Q<Label>().style.minWidth = 0;
 
 					hideOnInitializationRef.style.display = DisplayStyle.Flex;
 					hideOnInitializationRef.SetEnabled(false);
-//					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
-//						Justify.FlexEnd;
 
 					textMeshProTextRef.AddToClassList("active-field");
 					hideOnInitializationRef.RemoveFromClassList("active-field");
@@ -429,7 +382,6 @@ namespace Textensions.Editor
 					// History
 					historyVisualElement.style.display = DisplayStyle.Flex;
 					textMeshProTextRef.SetEnabled(true);
-//					textMeshProTextRef.Q<Label>().style.minWidth = 0;
 
 					textMeshProTextRef.RegisterCallback<ChangeEvent<UnityEngine.Object>>(_field =>
 					{
@@ -451,8 +403,6 @@ namespace Textensions.Editor
 
 					hideOnInitializationRef.style.display = DisplayStyle.Flex;
 					hideOnInitializationRef.SetEnabled(false);
-//					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
-//						Justify.FlexEnd;
 
 					textMeshProTextRef.RemoveFromClassList("active-field");
 					hideOnInitializationRef.AddToClassList("active-field");
@@ -502,7 +452,6 @@ namespace Textensions.Editor
 					// TODO: Expand the console recorder class - pull data from console instead
 					if (console.GetLogCount() > 0)
 					{
-//				DisplayStatusMessage(console.GetFirstLog());
 						DisplayStatusMessage(StatusCodes.SUCCESS, "Ready to use!");
 
 						var hideStatusMessage = resultElement.schedule.Execute(() =>
@@ -518,7 +467,6 @@ namespace Textensions.Editor
 				default:
 					break;
 			}
-
 		}
 
 		private void DisplayStatusMessage(KeyValuePair<StatusCodes, string> log)

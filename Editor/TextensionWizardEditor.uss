@@ -12,15 +12,6 @@
     color: rgb(244, 193, 60);
 }
 
-.p {
-    color: rgb(255, 255, 255);
-    -unity-font-style: normal;
-    margin-top: 0;
-    font-size: 12px;
-    white-space: normal;
-    -unity-text-align: middle-center;
-}
-
 .h2 {
     -unity-text-align: upper-center;
     -unity-font: resource('Chivo-Bold');
@@ -50,4 +41,11 @@
     border-top-width: 2px;
     border-bottom-width: 2px;
     flex-shrink: 0;
+}
+
+.p {
+    font-size: 10px;
+    flex-shrink: 1;
+    flex-grow: 0;
+    -unity-font-style: normal;
 }
