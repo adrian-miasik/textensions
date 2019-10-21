@@ -49,3 +49,8 @@
     flex-grow: 0;
     -unity-font-style: normal;
 }
+
+.column {
+    flex-grow: 1;
+    flex-shrink: 1;
+}

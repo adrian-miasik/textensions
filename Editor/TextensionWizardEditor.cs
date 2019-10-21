@@ -102,27 +102,27 @@ namespace Textensions.Editor
 		private readonly string[] propertiesToExclude = {"m_Script"};
 
 		// Cache
-		private VisualElement statusIndicatorVisualElement;
+		private VisualElement statusIndicatorVE;
 		private Texture2D logo;
-		private VisualElement logoVisualElement;
-		private VisualElement statusRowVisualElement;
-		private VisualElement bodyVisualElement;
-		private VisualElement contentVisualElement;
-		private TextElement statusTitleTextElement;
-		private TextElement statusTextTextElement;
-		private VisualElement instructionsRow;
-		private TextElement instructionTitleTextElement;
-		private TextElement instructionTextTextElement;
-		private Button step0ButtonConnect;
+		private VisualElement logoVE;
+		private VisualElement statusRowVE;
+		private VisualElement wizardContentVE;
+		private TextElement statusPrefixTE;
+		private TextElement statusTextTE;
+		private VisualElement instructionsRowVE;
+		private TextElement instructionTitleTE;
+		private TextElement instructionTextTE;
+		private Button step0;
+		private VisualElement step1;
 		private ObjectField step1ObjectField;
-		private VisualElement step2VisualElement;
+		private VisualElement step2;
 		private Button step2ButtonYes;
 		private Button step2ButtonNo;
-		private VisualElement historyVisualElement;
-		private ObjectField textMeshProTextRef;
-		private Toggle hideOnInitializationRef;
-		private VisualElement wizardVisualElement;
-		private TextElement historyTitleTextElement;
+		private VisualElement direct;
+		private ObjectField directTextOF;
+		private Toggle directHideOnInitT;
+		private VisualElement wizardVE;
+		private TextElement directTitleTE;
 
 		private const string LOGO_PATH =
 			"Packages/com.adrianmiasik.textensions/Resources/TextensionLogo40x40.png";
@@ -154,34 +154,53 @@ namespace Textensions.Editor
 		/// </summary>
 		private void QueryElements()
 		{
-			// Fetch our references
-			statusIndicatorVisualElement = resultElement.Q("Status Indicator");
-			logoVisualElement = resultElement.Q("Logo");
-			bodyVisualElement = resultElement.Q("Body");
-			contentVisualElement = resultElement.Q("Content");
-			statusRowVisualElement = resultElement.Q("Status Row");
-			statusTitleTextElement = resultElement.Q<TextElement>("Status Text");
-			statusTextTextElement = resultElement.Q<TextElement>("Display Message Text");
-			instructionsRow = resultElement.Q("Instructions Row");
-			instructionTitleTextElement = resultElement.Q<TextElement>("Instruction Title");
-			instructionTextTextElement = resultElement.Q<TextElement>("Instruction Text");
-			step0ButtonConnect = resultElement.Q<Button>("Step-0");
-			step1ObjectField = resultElement.Q<ObjectField>("Step-1");
-			step2VisualElement = resultElement.Q("Step-2");
-			step2ButtonYes = resultElement.Q<Button>("Yes");
-			step2ButtonNo = resultElement.Q<Button>("No");
-			historyVisualElement = resultElement.Q("History");
-			textMeshProTextRef = resultElement.Q<ObjectField>("TextMeshProTextRef");
-			hideOnInitializationRef = resultElement.Q<Toggle>("HideOnInitializationRef");
-			wizardVisualElement = resultElement.Q("Wizard");
-			historyTitleTextElement = resultElement.Q<TextElement>("History Title");
+			#region Root
+			#region Banner/
+			logoVE = resultElement.Q("Logo*");
+			statusIndicatorVE = resultElement.Q("Status Indicator*");
+			#endregion
+			statusRowVE = resultElement.Q("Status Row*");
+			#region Status Row/
+			statusPrefixTE = resultElement.Q<TextElement>("Status Prefix*");
+			statusTextTE = resultElement.Q<TextElement>("Status Text*");
+			#endregion
+			wizardVE = resultElement.Q("Wizard*");
+			#region Wizard/Wizard Center
+			instructionsRowVE = resultElement.Q("Instructions Row*");
+			#region Wizard/Wizard Center/Instructions Row
+			instructionTitleTE = resultElement.Q<TextElement>("Instruction Title*");
+			instructionTextTE = resultElement.Q<TextElement>("Instruction Text*");
+			#endregion
+			wizardContentVE = resultElement.Q("Wizard Content*");
+			#region Wizard/Wizard Center/Wizard Content
+			step0 = resultElement.Q<Button>("Step 0*");
+			step1 = resultElement.Q("Step 1*");
+			#region Wizard/Wizard Center/Wizard Content/Step 1/
+			step1ObjectField = resultElement.Q<ObjectField>("Step 1 Object Field*");
+			#endregion
+			step2 = resultElement.Q("Step 2*");
+			#region Wizard/Wizard Center/Wizard Content/Step 2/
+			step2ButtonYes = resultElement.Q<Button>("Step 2 Yes*");
+			step2ButtonNo = resultElement.Q<Button>("Step 2 No*");
+			#endregion
+			#endregion
+			#endregion
+			direct = resultElement.Q("Direct*");
+			#region Direct/
+			directTitleTE = resultElement.Q<TextElement>("Direct Title*");
+			#region Direct/Direct Center/Direct Content/
+			directTextOF = resultElement.Q<ObjectField>("Direct Text*");
+			directHideOnInitT = resultElement.Q<Toggle>("Direct Hide On Init*");
+			#endregion
+			#endregion
+			#endregion
 		}
 
 		private bool CheckElements()
 		{
 			bool isSuccessful = true;
 
-
+			// TODO: Implement console system
 
 			return isSuccessful;
 		}
@@ -223,16 +242,16 @@ namespace Textensions.Editor
 			uxmlReference.CloneTree(resultElement);
 
 			// Create a console
-			console = new ConsoleRecorder(statusRowVisualElement, statusTitleTextElement, defaultStyleColor,
-				statusTextTextElement);
+			console = new ConsoleRecorder(statusRowVE, statusPrefixTE, defaultStyleColor,
+				statusTextTE);
 
 			// Setup all our references, and null check our queries...
 			if (Setup())
 			{
 				// Load Logo
-				LoadImage(logoVisualElement, LOGO_PATH, 40, 40);
+				LoadImage(logoVE, LOGO_PATH, 40, 40);
 
-				logoVisualElement.RegisterCallback<MouseUpEvent>(_e =>
+				logoVE.RegisterCallback<MouseUpEvent>(_e =>
 				{
 					textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
 					CreateInspectorGUI();
@@ -243,7 +262,6 @@ namespace Textensions.Editor
 
 				// Load the default inspector
 //				resultElement.Add(new IMGUIContainer(OnInspectorGUI));
-
 			}
 
 			console.PrintRecords();
@@ -263,18 +281,20 @@ namespace Textensions.Editor
 			// Verify element validity
 			return CheckElements();
 		}
+
+		// TODO: Refactor and modularize the redundant code
 		private void DeterminePath()
 		{
 			// Remove status
-			statusRowVisualElement.style.display = DisplayStyle.None;
+			statusRowVE.style.display = DisplayStyle.None;
 
 			// Remove all steps
-			step0ButtonConnect.style.display = DisplayStyle.None;
+			step0.style.display = DisplayStyle.None;
 			step1ObjectField.parent.style.display = DisplayStyle.None;
-			step2VisualElement.style.display = DisplayStyle.None;
+			step2.style.display = DisplayStyle.None;
 
 			// Remove the history
-			historyVisualElement.style.display = DisplayStyle.None;
+			direct.style.display = DisplayStyle.None;
 
 			// Check state of wizard
 			switch (textensionWizard.state)
@@ -282,6 +302,7 @@ namespace Textensions.Editor
 				case TextensionWizard.WizardStates.NOT_DETERMINED:
 					textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
 					DeterminePath();
+
 //					console.RecordLog(ConsoleRecorder.MessageType.NULL, "Not determined");
 //
 //					// Is our required references done?
@@ -295,35 +316,35 @@ namespace Textensions.Editor
 
 				case TextensionWizard.WizardStates.SPLASH_SCREEN:
 
-					statusRowVisualElement.style.display = DisplayStyle.None;
-					instructionTitleTextElement.text = "Setup Wizard";
-					instructionTextTextElement.text = "";
+					statusRowVE.style.display = DisplayStyle.None;
+					instructionTitleTE.text = "Setup Wizard";
+					instructionTextTE.text = "";
 
 					textensionWizard.text = null;
-					step0ButtonConnect.style.display = DisplayStyle.Flex;
+					step0.style.display = DisplayStyle.Flex;
 
-					historyVisualElement.style.display = DisplayStyle.None;
+					direct.style.display = DisplayStyle.None;
 
 					// When the user presses the connect button...
-					step0ButtonConnect.RegisterCallback<MouseUpEvent>(_e =>
+					step0.RegisterCallback<MouseUpEvent>(_e =>
 					{
 						// We will transition to the other state
 						textensionWizard.state = TextensionWizard.WizardStates.TEXTENSION_CONNECT;
 						DeterminePath();
 					});
 
-					historyVisualElement.style.display = DisplayStyle.Flex;
-					textMeshProTextRef.SetEnabled(false);
-					textMeshProTextRef.objectType = typeof(TMP_Text);
-					hideOnInitializationRef.SetEnabled(false);
+					direct.style.display = DisplayStyle.Flex;
+					directTextOF.SetEnabled(false);
+					directTextOF.objectType = typeof(TMP_Text);
+					directHideOnInitT.SetEnabled(false);
 //					hideOnInitializationRef.Q<VisualElement>().style.justifyContent = Justify.FlexEnd;
 
-					textMeshProTextRef.value = textensionWizard.text;
-					textMeshProTextRef.RemoveFromClassList("active-field");
-					hideOnInitializationRef.RemoveFromClassList("active-field");
+					directTextOF.value = textensionWizard.text;
+					directTextOF.RemoveFromClassList("active-field");
+					directHideOnInitT.RemoveFromClassList("active-field");
 
-					hideOnInitializationRef.style.display = DisplayStyle.Flex;
-					hideOnInitializationRef.value = textensionWizard.hideOnInitialization;
+					directHideOnInitT.style.display = DisplayStyle.Flex;
+					directHideOnInitT.value = textensionWizard.hideOnInitialization;
 
 					break;
 
@@ -333,25 +354,25 @@ namespace Textensions.Editor
 					step1ObjectField.Q<Label>().style.minWidth = 0;
 					step1ObjectField.objectType = typeof(TMP_Text);
 
-					instructionTitleTextElement.text = "Step 1 of 2:";
-					instructionTextTextElement.text = "Please connect your text";
+					instructionTitleTE.text = "Step 1 of 2:";
+					instructionTextTE.text = "Please connect your text";
 
 					// History
-					historyVisualElement.style.display = DisplayStyle.Flex;
-					textMeshProTextRef.SetEnabled(false);
-					textMeshProTextRef.objectType = typeof(TMP_Text);
+					direct.style.display = DisplayStyle.Flex;
+					directTextOF.SetEnabled(false);
+					directTextOF.objectType = typeof(TMP_Text);
 
-					hideOnInitializationRef.style.display = DisplayStyle.Flex;
-					hideOnInitializationRef.SetEnabled(false);
+					directHideOnInitT.style.display = DisplayStyle.Flex;
+					directHideOnInitT.SetEnabled(false);
 
-					textMeshProTextRef.AddToClassList("active-field");
-					hideOnInitializationRef.RemoveFromClassList("active-field");
+					directTextOF.AddToClassList("active-field");
+					directHideOnInitT.RemoveFromClassList("active-field");
 
 					step1ObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>((_field) =>
 					{
 						step1ObjectField.value = _field.newValue;
 						textensionWizard.text = _field.newValue as TMP_Text;
-						textMeshProTextRef.value = _field.newValue;
+						directTextOF.value = _field.newValue;
 
 						// If your you are adding a valid reference
 						if (_field.newValue != null && _field.previousValue == null)
@@ -371,8 +392,8 @@ namespace Textensions.Editor
 
 				case TextensionWizard.WizardStates.HIDE_ON_INITIALIZATION:
 
-					instructionTitleTextElement.text = "Step 2 of 2:";
-					instructionTextTextElement.text = "Hide text on initialization?";
+					instructionTitleTE.text = "Step 2 of 2:";
+					instructionTextTE.text = "Hide text on initialization?";
 
 					// Step Buttons
 					step2ButtonYes.parent.style.display = DisplayStyle.Flex;
@@ -380,12 +401,12 @@ namespace Textensions.Editor
 					step2ButtonNo.style.display = DisplayStyle.Flex;
 
 					// History
-					historyVisualElement.style.display = DisplayStyle.Flex;
-					textMeshProTextRef.SetEnabled(true);
+					direct.style.display = DisplayStyle.Flex;
+					directTextOF.SetEnabled(true);
 
-					textMeshProTextRef.RegisterCallback<ChangeEvent<UnityEngine.Object>>(_field =>
+					directTextOF.RegisterCallback<ChangeEvent<UnityEngine.Object>>(_field =>
 					{
-						textMeshProTextRef.value = _field.newValue;
+						directTextOF.value = _field.newValue;
 						textensionWizard.text = _field.newValue as TMP_Text;
 
 						// If your you are adding a valid reference
@@ -401,17 +422,17 @@ namespace Textensions.Editor
 						}
 					});
 
-					hideOnInitializationRef.style.display = DisplayStyle.Flex;
-					hideOnInitializationRef.SetEnabled(false);
+					directHideOnInitT.style.display = DisplayStyle.Flex;
+					directHideOnInitT.SetEnabled(false);
 
-					textMeshProTextRef.RemoveFromClassList("active-field");
-					hideOnInitializationRef.AddToClassList("active-field");
+					directTextOF.RemoveFromClassList("active-field");
+					directHideOnInitT.AddToClassList("active-field");
 
 					step2ButtonYes.RegisterCallback<MouseUpEvent>(_e =>
 					{
 						// We will transition to the other state
 						textensionWizard.hideOnInitialization = true;
-						hideOnInitializationRef.value = true;
+						directHideOnInitT.value = true;
 						textensionWizard.state = TextensionWizard.WizardStates.COMPLETED;
 						DeterminePath();
 					});
@@ -420,7 +441,7 @@ namespace Textensions.Editor
 					{
 						// We will transition to the other state
 						textensionWizard.hideOnInitialization = false;
-						hideOnInitializationRef.value = false;
+						directHideOnInitT.value = false;
 						textensionWizard.state = TextensionWizard.WizardStates.COMPLETED;
 						DeterminePath();
 					});
@@ -429,22 +450,22 @@ namespace Textensions.Editor
 
 				case TextensionWizard.WizardStates.COMPLETED:
 
-					instructionsRow.style.display = DisplayStyle.None;
+					instructionsRowVE.style.display = DisplayStyle.None;
 
-					contentVisualElement.style.display = DisplayStyle.None;
-					historyVisualElement.style.display = DisplayStyle.Flex;
-					textMeshProTextRef.SetEnabled(true);
-					hideOnInitializationRef.SetEnabled(true);
+					wizardContentVE.style.display = DisplayStyle.None;
+					direct.style.display = DisplayStyle.Flex;
+					directTextOF.SetEnabled(true);
+					directHideOnInitT.SetEnabled(true);
 //					hideOnInitializationRef.Q<VisualElement>().style.justifyContent = Justify.FlexEnd;
-					wizardVisualElement.style.display = DisplayStyle.None;
+					wizardVE.style.display = DisplayStyle.None;
 
-					textMeshProTextRef.value = textensionWizard.text;
-					textMeshProTextRef.RemoveFromClassList("active-field");
-					hideOnInitializationRef.RemoveFromClassList("active-field");
+					directTextOF.value = textensionWizard.text;
+					directTextOF.RemoveFromClassList("active-field");
+					directHideOnInitT.RemoveFromClassList("active-field");
 //					resultElement.Add(new IMGUIContainer(OnInspectorGUI));
 
-					hideOnInitializationRef.style.display = DisplayStyle.Flex;
-					hideOnInitializationRef.value = textensionWizard.hideOnInitialization;
+					directHideOnInitT.style.display = DisplayStyle.Flex;
+					directHideOnInitT.value = textensionWizard.hideOnInitialization;
 //					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
 //						Justify.FlexEnd;
 
@@ -456,15 +477,12 @@ namespace Textensions.Editor
 
 						var hideStatusMessage = resultElement.schedule.Execute(() =>
 						{
-							statusRowVisualElement.style.display = DisplayStyle.None;
+							statusRowVE.style.display = DisplayStyle.None;
 						});
 
 						hideStatusMessage.ExecuteLater(2000);
 					}
 
-					break;
-
-				default:
 					break;
 			}
 		}
@@ -474,16 +492,16 @@ namespace Textensions.Editor
 			Debug.Log(log.Key);
 			Debug.Log(log.Value);
 
-			statusRowVisualElement.style.display = DisplayStyle.Flex;
+			statusRowVE.style.display = DisplayStyle.Flex;
 			DisplayStatus(StatusCodes.ASSERT);
-			statusTextTextElement.text = log.Value;
+			statusTextTE.text = log.Value;
 		}
 
 		private void DisplayStatusMessage(StatusCodes _statusCode,  string _message)
 		{
-			statusRowVisualElement.style.display = DisplayStyle.Flex;
+			statusRowVE.style.display = DisplayStyle.Flex;
 			DisplayStatus(_statusCode);
-			statusTextTextElement.text = _message;
+			statusTextTE.text = _message;
 		}
 
 		/// <summary>
@@ -492,25 +510,25 @@ namespace Textensions.Editor
 		/// <param name="_statusCode">A status code<see cref="StatusCodes"/></param>
 		private void DisplayStatus(StatusCodes _statusCode)
 		{
-			statusTitleTextElement.text = _statusCode + ": ";
+			statusPrefixTE.text = _statusCode + ": ";
 
 			switch (_statusCode)
 			{
 				case StatusCodes.NULL:
-					statusIndicatorVisualElement.style.unityBackgroundImageTintColor = defaultStyleColor;
-					statusTitleTextElement.style.color = defaultStyleColor;
+					statusIndicatorVE.style.unityBackgroundImageTintColor = defaultStyleColor;
+					statusPrefixTE.style.color = defaultStyleColor;
 					break;
 				case StatusCodes.ASSERT:
-					statusIndicatorVisualElement.style.unityBackgroundImageTintColor = assetStyleColor;
-					statusTitleTextElement.style.color = assetStyleColor;
+					statusIndicatorVE.style.unityBackgroundImageTintColor = assetStyleColor;
+					statusPrefixTE.style.color = assetStyleColor;
 					break;
 				case StatusCodes.WARNING:
-					statusIndicatorVisualElement.style.unityBackgroundImageTintColor = warningStyleColor;
-					statusTitleTextElement.style.color = warningStyleColor;
+					statusIndicatorVE.style.unityBackgroundImageTintColor = warningStyleColor;
+					statusPrefixTE.style.color = warningStyleColor;
 					break;
 				case StatusCodes.SUCCESS:
-					statusIndicatorVisualElement.style.unityBackgroundImageTintColor = successStyleColor;
-					statusTitleTextElement.style.color = successStyleColor;
+					statusIndicatorVE.style.unityBackgroundImageTintColor = successStyleColor;
+					statusPrefixTE.style.color = successStyleColor;
 					break;
 				default:
 					Debug.LogWarning("T.ext: Unable to support this status code.");

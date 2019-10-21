@@ -1,50 +1,48 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
-    <ui:VisualElement name="Root">
+    <ui:VisualElement>
         <Style src="TextensionWizardEditor.uss" />
-        <ui:VisualElement name="Banner" style="flex-direction: row; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; padding-left: 0; padding-right: 5px; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; -unity-background-scale-mode: stretch-to-fill; border-left-width: 0; border-bottom-color: rgb(40, 40, 40); border-bottom-width: 2px;">
-            <ui:VisualElement name="Logo" style="width: 40px; height: 40px; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-left-color: rgb(244, 193, 60);" />
+        <ui:VisualElement name="Banner" style="flex-direction: row; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; padding-left: 0; padding-right: 5px; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; -unity-background-scale-mode: stretch-to-fill; border-left-width: 0; border-bottom-color: rgb(40, 40, 40); border-bottom-width: 2px; display: flex;">
+            <ui:VisualElement name="Logo*" style="width: 40px; height: 40px; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-left-color: rgb(244, 193, 60);" />
             <ui:VisualElement name="Banner Text" style="left: 3px;">
-                <ui:Label text="Textensions" name="Textensions" class="H1 h1" style="margin-left: 0; margin-right: 0; margin-top: -2px; margin-bottom: 0;" />
-                <ui:Label text="Created by Adrian Miasik" name="Textensions Tagline" class="p" style="top: -2px;" />
+                <ui:Label text="Textensions" name="Banner Title" class="H1 h1" style="margin-left: 0; margin-right: 0; margin-top: -2px; margin-bottom: 0;" />
+                <ui:Label text="Created by Adrian Miasik" name="Banner Credits" class="p" style="top: -2px;" />
             </ui:VisualElement>
-            <ui:VisualElement name="Status Indicator" style="background-image: resource('StatusIndicator10x10'); height: 5px; width: 5px; position: absolute; right: 0; bottom: 0; top: 0; margin-right: 5px; margin-top: 5px;" />
+            <ui:VisualElement name="Status Indicator*" style="background-image: resource('StatusIndicator10x10'); height: 5px; width: 5px; position: absolute; right: 0; bottom: 0; top: 0; margin-right: 5px; margin-top: 5px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="Status Row" style="border-left-color: rgb(47, 47, 47); border-right-color: rgb(47, 47, 47); border-top-color: rgb(47, 47, 47); border-bottom-color: rgb(47, 47, 47); margin-top: 1px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 2px; display: flex; flex-direction: row; flex-grow: 0; align-items: center;">
-            <ui:Label text="STATUS" name="Status Text" class="h2" style="margin-top: 1px; margin-left: 2px; color: rgba(255, 255, 255, 0.95); font-size: 12px; flex-shrink: 1; flex-grow: 0;" />
-            <ui:Label text="Test Message here" name="Display Message Text" class="p" style="flex-wrap: wrap; flex-shrink: 1; flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+        <ui:VisualElement name="Status Row*" style="border-left-color: rgb(47, 47, 47); border-right-color: rgb(47, 47, 47); border-top-color: rgb(47, 47, 47); border-bottom-color: rgb(47, 47, 47); margin-top: 1px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 2px; display: flex; flex-direction: row; flex-grow: 0; align-items: center;">
+            <ui:Label text="STATUS" name="Status Prefix*" class="h2" style="margin-top: 1px; margin-left: 2px; color: rgba(255, 255, 255, 0.95); font-size: 12px; flex-shrink: 1; flex-grow: 0;" />
+            <ui:Label text="Test Message here" name="Status Text*" class="p" style="flex-wrap: wrap; flex-shrink: 1; flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
         </ui:VisualElement>
-        <ui:VisualElement name="Wizard" style="border-bottom-color: rgb(243, 193, 60); flex-shrink: 1; flex-grow: 1;">
-            <ui:VisualElement name="Columns" style="flex-direction: row; flex-grow: 1;">
-                <ui:VisualElement name="Left Column" class="column" style="flex-grow: 1; flex-shrink: 1;" />
-                <ui:VisualElement name="Body" style="margin-bottom: 0; border-bottom-width: 0; border-top-width: 0; flex-grow: 0; flex-shrink: 1; padding-top: 0; padding-bottom: 0; flex-basis: 300px;">
-                    <ui:VisualElement name="Instructions Row" style="border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; align-items: center; flex-direction: row; justify-content: center; flex-grow: 0; flex-shrink: 1;">
-                        <ui:Label text="Step 1:" name="Instruction Title" class="H2 h2" style="font-size: 12px; -unity-font-style: normal; color: rgb(243, 193, 60); flex-shrink: 1;" />
-                        <ui:Label text="Display Message Here" name="Instruction Text" class="p" />
+        <ui:VisualElement name="Wizard*" style="border-bottom-color: rgb(243, 193, 60); flex-shrink: 1; flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement class="column" style="flex-direction: row; flex-shrink: 1;" />
+            <ui:VisualElement name="Wizard Center" style="margin-bottom: 0; border-bottom-width: 0; border-top-width: 0; flex-grow: 1; flex-shrink: 1; padding-top: 0; padding-bottom: 0; flex-basis: 300px; color: rgba(0, 0, 0, 0.29);">
+                <ui:VisualElement name="Instructions Row*" style="border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; align-items: center; flex-direction: row; justify-content: center; flex-grow: 0; flex-shrink: 1;">
+                    <ui:Label text="Step 1:" name="Instruction Title*" class="H2 h2" style="font-size: 12px; -unity-font-style: normal; color: rgb(243, 193, 60); flex-shrink: 1;" />
+                    <ui:Label text="Display Message Here" name="Instruction Text*" class="p" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Wizard Content*" style="border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; background-color: rgba(0, 0, 0, 0.31); align-items: stretch; flex-direction: column; justify-content: space-around; flex-shrink: 0; flex-grow: 1;">
+                    <ui:Button text="Connect" name="Step 0*" style="border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-top-width: 0; -unity-font-style: bold; padding-top: 0; display: flex; flex-basis: 30px; padding-left: 0; padding-right: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-bottom-width: 0;" />
+                    <ui:VisualElement name="Step 1*" style="padding-left: 3px; padding-right: 3px; flex-grow: 1; justify-content: center; flex-basis: 30px;">
+                        <uie:ObjectField label="Text:" name="Step 1 Object Field*" style="-unity-font-style: normal; -unity-font: resource('Chivo-Bold'); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left-width: 0; border-right-width: 0; flex-shrink: 1; flex-wrap: wrap;" />
                     </ui:VisualElement>
-                    <ui:VisualElement name="Content" style="border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; background-color: rgba(0, 0, 0, 0.49); align-items: stretch; flex-direction: column; justify-content: space-around; flex-shrink: 0; flex-grow: 1;">
-                        <ui:Button text="Connect" name="Step-0" style="border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-top-width: 0; -unity-font-style: bold; padding-top: 0; display: flex; flex-basis: 30px; padding-left: 0; padding-right: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-bottom-width: 0;" />
-                        <ui:VisualElement name="Content Steps" style="padding-left: 3px; padding-right: 3px; flex-grow: 1; justify-content: center; flex-basis: 30px;">
-                            <uie:ObjectField label="Text:" name="Step-1" style="-unity-font-style: normal; -unity-font: resource('Chivo-Bold'); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left-width: 0; border-right-width: 0; flex-shrink: 1; flex-wrap: wrap;" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="Step-2" style="flex-grow: 1; flex-direction: row; flex-shrink: 0; flex-basis: 30px;">
-                            <ui:Button text="Yes" name="Yes" style="-unity-font-style: bold; color: rgb(255, 255, 255); border-left-color: rgb(68, 214, 97); border-right-color: rgb(68, 214, 97); border-top-color: rgb(68, 214, 97); border-bottom-color: rgb(68, 214, 97); border-right-width: 0; border-left-width: 0; flex-shrink: 1; flex-grow: 1; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 1px; margin-top: 0; margin-bottom: 0;" />
-                            <ui:Button text="No" name="No" style="color: rgb(255, 255, 255); border-left-color: rgb(202, 59, 56); border-right-color: rgb(202, 59, 56); border-top-color: rgb(202, 59, 56); border-bottom-color: rgb(202, 59, 56); -unity-font-style: bold; flex-shrink: 1; flex-grow: 1; margin-left: 1px; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
-                        </ui:VisualElement>
+                    <ui:VisualElement name="Step 2*" style="flex-grow: 1; flex-direction: row; flex-shrink: 0; flex-basis: 30px;">
+                        <ui:Button text="Yes" name="Step 2 Yes*" style="-unity-font-style: bold; color: rgb(255, 255, 255); border-left-color: rgb(68, 214, 97); border-right-color: rgb(68, 214, 97); border-top-color: rgb(68, 214, 97); border-bottom-color: rgb(68, 214, 97); border-right-width: 0; border-left-width: 0; flex-shrink: 1; flex-grow: 1; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 1px; margin-top: 0; margin-bottom: 0;" />
+                        <ui:Button text="No" name="Step 2 No*" style="color: rgb(255, 255, 255); border-left-color: rgb(202, 59, 56); border-right-color: rgb(202, 59, 56); border-top-color: rgb(202, 59, 56); border-bottom-color: rgb(202, 59, 56); -unity-font-style: bold; flex-shrink: 1; flex-grow: 1; margin-left: 1px; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="Right Column" class="column" style="flex-grow: 1; flex-shrink: 1;" />
             </ui:VisualElement>
+            <ui:VisualElement class="column" />
         </ui:VisualElement>
-        <ui:VisualElement name="History" style="margin-left: 0; margin-right: 0; margin-bottom: 2px; margin-top: 5px; padding-left: 0; flex-direction: row; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; flex-grow: 1; justify-content: center;">
-            <ui:VisualElement name="Left Column" style="flex-grow: 1; flex-shrink: 0;" />
-            <ui:VisualElement name="History Center" style="border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; -unity-text-align: middle-left; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-color: rgba(243, 193, 60, 0.39); border-right-color: rgba(243, 193, 60, 0.39); border-top-color: rgba(243, 193, 60, 0.39); border-bottom-color: rgba(243, 193, 60, 0.39); flex-grow: 1; flex-basis: 300px; margin-left: 5px; margin-right: 5px;">
-                <ui:Label text="Textension.cs" name="History Title" class="h2" style="-unity-text-align: upper-left; padding-bottom: 5px; padding-left: 5px; padding-top: 5px; background-color: rgba(0, 0, 0, 0.24); padding-right: 5px; color: rgb(243, 193, 60); border-bottom-width: 1px; border-bottom-color: rgba(243, 193, 60, 0.39); flex-shrink: 1;" />
-                <ui:VisualElement name="History Content" style="-unity-text-align: middle-left; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1; margin-left: 0; margin-right: 0; align-items: stretch; flex-shrink: 0;">
-                    <uie:ObjectField label="Text:" name="TextMeshProTextRef" class="field" />
-                    <ui:Toggle label="Hide On Initialization:" name="HideOnInitializationRef" class="field" />
+        <ui:VisualElement name="Direct*" style="margin-left: 0; margin-right: 0; margin-bottom: 2px; margin-top: 5px; padding-left: 0; flex-direction: row; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; flex-grow: 1; justify-content: center;">
+            <ui:VisualElement class="column" />
+            <ui:VisualElement name="Direct Center" style="border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; -unity-text-align: middle-left; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-color: rgba(243, 193, 60, 0.39); border-right-color: rgba(243, 193, 60, 0.39); border-top-color: rgba(243, 193, 60, 0.39); border-bottom-color: rgba(243, 193, 60, 0.39); flex-grow: 1; flex-basis: 300px; margin-left: 5px; margin-right: 5px;">
+                <ui:Label text="Textension.cs" name="Direct Title*" class="h2" style="-unity-text-align: upper-left; padding-bottom: 5px; padding-left: 5px; padding-top: 5px; background-color: rgba(0, 0, 0, 0.24); padding-right: 5px; color: rgb(243, 193, 60); border-bottom-width: 1px; border-bottom-color: rgba(243, 193, 60, 0.39); flex-shrink: 1;" />
+                <ui:VisualElement name="Direct Content" style="-unity-text-align: middle-left; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1; margin-left: 0; margin-right: 0; align-items: stretch; flex-shrink: 0;">
+                    <uie:ObjectField label="Text:" name="Direct Text*" class="field" />
+                    <ui:Toggle label="Hide On Initialization:" name="Direct Hide On Init*" class="field" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="Right Column" style="flex-grow: 1; flex-shrink: 0;" />
+            <ui:VisualElement class="column" style="flex-grow: 1; flex-shrink: 0;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
