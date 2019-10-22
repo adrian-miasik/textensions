@@ -4,14 +4,13 @@ namespace Textensions.Core
 	{
 		public enum WizardStates
 		{
-			NOT_DETERMINED,
 			SPLASH_SCREEN,
 			TEXTENSION_CONNECT,
 			HIDE_ON_INITIALIZATION,
 			COMPLETED
 		}
 
-		public WizardStates state = WizardStates.NOT_DETERMINED;
+		public WizardStates state = WizardStates.SPLASH_SCREEN;
 
 		public bool IsWizardComplete()
 		{

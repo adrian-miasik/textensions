@@ -9,6 +9,7 @@ using UnityEngine.UIElements;
 
 namespace Textensions.Editor
 {
+	// TODO: Create a proper error catcher
 	public class ConsoleRecorder
 	{
 		private VisualElement parent;
@@ -101,28 +102,54 @@ namespace Textensions.Editor
 		/// </summary>
 		private readonly string[] propertiesToExclude = {"m_Script"};
 
-		// Cache
-		private VisualElement statusIndicatorVE;
-		private Texture2D logo;
+		/// <summary>
+		/// Textensions Logo (Pre-determined size, image gets loaded into this)
+		/// </summary>
 		private VisualElement logoVE;
-		private VisualElement statusRowVE;
+
+		/// <summary>
+		/// Status Indicator that lights a certain color at the top right. This color matches the statusPrefixTE color
+		/// </summary>
+		private VisualElement statusIndicatorVE;
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		private VisualElement wizardContentVE;
+
+		/// <summary>
+		/// Status Row Parent
+		/// </summary>
+		private VisualElement statusRowVE;
+
+		/// <summary>
+		/// Status Row Prefix (E.g. 'SUCCESS' from TextensionWizardEditor.StatusCodes)
+		/// </summary>
 		private TextElement statusPrefixTE;
+
+		/// <summary>
+		/// Status Row Text (E.g. 'Missing Text Reference')
+		/// </summary>
 		private TextElement statusTextTE;
+
 		private VisualElement instructionsRowVE;
 		private TextElement instructionTitleTE;
 		private TextElement instructionTextTE;
+
 		private Button step0;
+
 		private VisualElement step1;
 		private ObjectField step1ObjectField;
+
 		private VisualElement step2;
 		private Button step2ButtonYes;
 		private Button step2ButtonNo;
+
 		private VisualElement direct;
+		private TextElement directTitleTE;
 		private ObjectField directTextOF;
 		private Toggle directHideOnInitT;
 		private VisualElement wizardVE;
-		private TextElement directTitleTE;
 
 		private const string LOGO_PATH =
 			"Packages/com.adrianmiasik.textensions/Resources/TextensionLogo40x40.png";
@@ -258,7 +285,7 @@ namespace Textensions.Editor
 				});
 
 				// Load page
-				DeterminePath();
+				Paint();
 
 				// Load the default inspector
 //				resultElement.Add(new IMGUIContainer(OnInspectorGUI));
@@ -282,195 +309,240 @@ namespace Textensions.Editor
 			return CheckElements();
 		}
 
-		// TODO: Refactor and modularize the redundant code
-		private void DeterminePath()
+		private static void ShowDisplay(VisualElement _element)
 		{
-			// Remove status
-			statusRowVE.style.display = DisplayStyle.None;
+			_element.style.display = DisplayStyle.Flex;
+		}
 
-			// Remove all steps
-			step0.style.display = DisplayStyle.None;
-			step1ObjectField.parent.style.display = DisplayStyle.None;
-			step2.style.display = DisplayStyle.None;
+		private static void HideDisplay(VisualElement _element)
+		{
+			_element.style.display = DisplayStyle.None;
+		}
 
-			// Remove the history
-			direct.style.display = DisplayStyle.None;
+		private void ToggleDisplay(VisualElement _element)
+		{
+			_element.style.display = _element.style.display == DisplayStyle.None ? DisplayStyle.Flex : DisplayStyle.None;
+		}
+
+		private void ChangeDisplay(VisualElement _element, DisplayStyle _style)
+		{
+			_element.style.display = _style;
+		}
+
+		private void ChangeWizardInstruction(string _prefix = "", string _message = "")
+		{
+			instructionTitleTE.text = _prefix;
+			instructionTextTE.text = _message;
+		}
+
+		private static void InitializeObjectField(ObjectField _objectField)
+		{
+			_objectField.objectType = typeof(TMP_Text);
+		}
+
+		/// <summary>
+		/// Add functionality to the connect button that changes the wizard state to TEXTENSION_CONNECT and redraw.
+		/// </summary>
+		private void HandleStep0()
+		{
+			step0.RegisterCallback<MouseUpEvent>(_e =>
+			{
+				// We will transition to the other state
+				textensionWizard.state = TextensionWizard.WizardStates.TEXTENSION_CONNECT;
+				Paint();
+			});
+		}
+
+		private void HandleStep1()
+		{
+			step1ObjectField.RegisterCallback<ChangeEvent<Object>>((_field) =>
+			{
+				textensionWizard.text = _field.newValue as TMP_Text;
+
+				// If you are adding a valid reference.
+				if (_field.newValue != null && _field.previousValue == null)
+				{
+					textensionWizard.state = TextensionWizard.WizardStates.HIDE_ON_INITIALIZATION;
+					Paint();
+				}
+				// else if you de-referenced it.
+				else if (_field.previousValue != null && _field.newValue == null)
+				{
+					console.RecordLog(StatusCodes.WARNING, "Missing Text Reference");
+					textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
+					Paint();
+				}
+			});
+		}
+
+		private void HandleStep2()
+		{
+			step2ButtonYes.RegisterCallback<MouseUpEvent>(_e =>
+				{
+					textensionWizard.hideOnInitialization = true;
+					textensionWizard.state = TextensionWizard.WizardStates.COMPLETED;
+					Paint();
+				});
+
+				step2ButtonNo.RegisterCallback<MouseUpEvent>(_e =>
+				{
+					textensionWizard.hideOnInitialization = false;
+					textensionWizard.state = TextensionWizard.WizardStates.COMPLETED;
+					Paint();
+				});
+		}
+
+		private void HandleDirectReferences()
+		{
+			directTextOF.RegisterCallback<ChangeEvent<Object>>((_field) =>
+			{
+				// If you de-referenced it a valid value.
+				if (_field.previousValue != null && _field.newValue == null)
+				{
+					DisplayStatusMessage(StatusCodes.WARNING, "Missing Text Reference");
+				}
+			});
+
+			// Whatever the direct bool is, apply it on the textensionWizard.hideOnInitialization
+			directHideOnInitT.RegisterCallback<ChangeEvent<bool>>((_field) =>
+				{
+					textensionWizard.hideOnInitialization = _field.newValue;
+				});
+
+			// Enable the direct fields
+			directHideOnInitT.SetEnabled(true);
+			directTextOF.SetEnabled(true);
+		}
+
+		/// <summary>
+		/// Disables the direct references interactivity.
+		/// </summary>
+		private void DisableDirectInteractivity()
+		{
+			directTextOF.SetEnabled(false);
+			directHideOnInitT.SetEnabled(false);
+		}
+
+		/// <summary>
+		/// Marks this element as the "actively' working element.
+		/// </summary>
+		/// <param name="_element"></param>
+		private void MarkActiveField(VisualElement _element)
+		{
+			_element.AddToClassList("active-field");
+		}
+
+		/// <summary>
+		/// Cleans (or "Un-marks") this element as the "active" working element.
+		/// </summary>
+		/// <param name="_element"></param>
+		private void CleanActiveField(VisualElement _element)
+		{
+			_element.RemoveFromClassList("active-field");
+		}
+
+		/// TODO: Refactor this so I'm not changing the (virtual?) DOM unnecessarily, which I am.
+		/// <summary>
+		/// Draw the frame based on the textension wizard state
+		/// </summary>
+		private void Paint()
+		{
+			// Hide the status row
+			HideDisplay(statusRowVE);
+
+			// Hide the connect button, text object field, and the hide on init bool
+			HideDisplay(step0);
+			HideDisplay(step1);
+			HideDisplay(step2);
+
+			// Set interactivity
+			DisableDirectInteractivity();
+
+			// Remove styles by default
+			CleanActiveField(directTextOF);
+			CleanActiveField(directHideOnInitT);
+
+			// Initialize the direct object field to always be of type TMP_Text
+			InitializeObjectField(directTextOF);
+
+			if (textensionWizard.state == TextensionWizard.WizardStates.SPLASH_SCREEN)
+			{
+				textensionWizard.text = null;
+				textensionWizard.hideOnInitialization = false;
+			}
+
+			// Binding
+			directTextOF.value = textensionWizard.text;
+			directHideOnInitT.value = textensionWizard.hideOnInitialization;
+
+			HandleDirectReferences();
 
 			// Check state of wizard
 			switch (textensionWizard.state)
 			{
-				case TextensionWizard.WizardStates.NOT_DETERMINED:
-					textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
-					DeterminePath();
-
-//					console.RecordLog(ConsoleRecorder.MessageType.NULL, "Not determined");
-//
-//					// Is our required references done?
-//					if (!textensionWizard.IsWizardComplete())
-//					{
-//						// If not...start the wizard
-//						textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
-//					}
-
-					break;
-
 				case TextensionWizard.WizardStates.SPLASH_SCREEN:
 
-					statusRowVE.style.display = DisplayStyle.None;
-					instructionTitleTE.text = "Setup Wizard";
-					instructionTextTE.text = "";
+					// Change the instruction text
+					ChangeWizardInstruction("Setup Wizard");
 
-					textensionWizard.text = null;
-					step0.style.display = DisplayStyle.Flex;
+					// Display the connect button
+					ShowDisplay(step0);
 
-					direct.style.display = DisplayStyle.None;
+					// Hook up the connect button functionality.
+					HandleStep0();
 
-					// When the user presses the connect button...
-					step0.RegisterCallback<MouseUpEvent>(_e =>
-					{
-						// We will transition to the other state
-						textensionWizard.state = TextensionWizard.WizardStates.TEXTENSION_CONNECT;
-						DeterminePath();
-					});
-
-					direct.style.display = DisplayStyle.Flex;
 					directTextOF.SetEnabled(false);
-					directTextOF.objectType = typeof(TMP_Text);
 					directHideOnInitT.SetEnabled(false);
-//					hideOnInitializationRef.Q<VisualElement>().style.justifyContent = Justify.FlexEnd;
-
-					directTextOF.value = textensionWizard.text;
-					directTextOF.RemoveFromClassList("active-field");
-					directHideOnInitT.RemoveFromClassList("active-field");
-
-					directHideOnInitT.style.display = DisplayStyle.Flex;
-					directHideOnInitT.value = textensionWizard.hideOnInitialization;
 
 					break;
 
 				case TextensionWizard.WizardStates.TEXTENSION_CONNECT:
 
-					step1ObjectField.parent.style.display = DisplayStyle.Flex;
-					step1ObjectField.Q<Label>().style.minWidth = 0;
-					step1ObjectField.objectType = typeof(TMP_Text);
+					// Change the instruction text
+					ChangeWizardInstruction("Step 1 of 2:", "Please connect your text");
 
-					instructionTitleTE.text = "Step 1 of 2:";
-					instructionTextTE.text = "Please connect your text";
+					// Display the text object field
+					ShowDisplay(step1);
 
-					// History
-					direct.style.display = DisplayStyle.Flex;
+					// Change the object field type and the direct object field to a TMP_Text
+					InitializeObjectField(step1ObjectField);
+
+					// Handle the object field
+					HandleStep1();
+
+					// Make the textensions text reference the active field.
+					MarkActiveField(directTextOF);
+
 					directTextOF.SetEnabled(false);
-					directTextOF.objectType = typeof(TMP_Text);
-
-					directHideOnInitT.style.display = DisplayStyle.Flex;
 					directHideOnInitT.SetEnabled(false);
 
-					directTextOF.AddToClassList("active-field");
-					directHideOnInitT.RemoveFromClassList("active-field");
-
-					step1ObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>((_field) =>
-					{
-						step1ObjectField.value = _field.newValue;
-						textensionWizard.text = _field.newValue as TMP_Text;
-						directTextOF.value = _field.newValue;
-
-						// If your you are adding a valid reference
-						if (_field.newValue != null && _field.previousValue == null)
-						{
-							textensionWizard.state = TextensionWizard.WizardStates.HIDE_ON_INITIALIZATION;
-							DeterminePath();
-						}
-						// Else if you have something and you de-referenced it.
-						else if (_field.previousValue != null && _field.newValue == null)
-						{
-							console.RecordLog(StatusCodes.WARNING, "Missing Text Reference");
-							textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
-							DeterminePath();
-						}
-					});
 					break;
 
 				case TextensionWizard.WizardStates.HIDE_ON_INITIALIZATION:
 
-					instructionTitleTE.text = "Step 2 of 2:";
-					instructionTextTE.text = "Hide text on initialization?";
+					// Change the instruction text
+					ChangeWizardInstruction("Step 2 of 2:", "Hide text on initialization?");
 
-					// Step Buttons
-					step2ButtonYes.parent.style.display = DisplayStyle.Flex;
-					step2ButtonYes.style.display = DisplayStyle.Flex;
-					step2ButtonNo.style.display = DisplayStyle.Flex;
+					// Display the yes and no buttons
+					ShowDisplay(step2);
 
-					// History
-					direct.style.display = DisplayStyle.Flex;
-					directTextOF.SetEnabled(true);
+					// Handle the yes and no buttons
+					HandleStep2();
 
-					directTextOF.RegisterCallback<ChangeEvent<UnityEngine.Object>>(_field =>
-					{
-						directTextOF.value = _field.newValue;
-						textensionWizard.text = _field.newValue as TMP_Text;
+					// Make the textensions text reference the bool
+					MarkActiveField(directHideOnInitT);
 
-						// If your you are adding a valid reference
-						if (_field.newValue != null && _field.previousValue == null)
-						{
-							textensionWizard.state = TextensionWizard.WizardStates.HIDE_ON_INITIALIZATION;
-							DeterminePath();
-						}
-						// Else if you have something and you de-referenced it.
-						else if (_field.previousValue != null && _field.newValue == null)
-						{
-							console.RecordLog(StatusCodes.WARNING, "Missing Text Reference");
-						}
-					});
-
-					directHideOnInitT.style.display = DisplayStyle.Flex;
 					directHideOnInitT.SetEnabled(false);
-
-					directTextOF.RemoveFromClassList("active-field");
-					directHideOnInitT.AddToClassList("active-field");
-
-					step2ButtonYes.RegisterCallback<MouseUpEvent>(_e =>
-					{
-						// We will transition to the other state
-						textensionWizard.hideOnInitialization = true;
-						directHideOnInitT.value = true;
-						textensionWizard.state = TextensionWizard.WizardStates.COMPLETED;
-						DeterminePath();
-					});
-
-					step2ButtonNo.RegisterCallback<MouseUpEvent>(_e =>
-					{
-						// We will transition to the other state
-						textensionWizard.hideOnInitialization = false;
-						directHideOnInitT.value = false;
-						textensionWizard.state = TextensionWizard.WizardStates.COMPLETED;
-						DeterminePath();
-					});
 
 					break;
 
+				// TODO: Revise this
 				case TextensionWizard.WizardStates.COMPLETED:
 
-					instructionsRowVE.style.display = DisplayStyle.None;
+					HideDisplay(wizardVE);
 
-					wizardContentVE.style.display = DisplayStyle.None;
-					direct.style.display = DisplayStyle.Flex;
-					directTextOF.SetEnabled(true);
-					directHideOnInitT.SetEnabled(true);
-//					hideOnInitializationRef.Q<VisualElement>().style.justifyContent = Justify.FlexEnd;
-					wizardVE.style.display = DisplayStyle.None;
-
-					directTextOF.value = textensionWizard.text;
-					directTextOF.RemoveFromClassList("active-field");
-					directHideOnInitT.RemoveFromClassList("active-field");
-//					resultElement.Add(new IMGUIContainer(OnInspectorGUI));
-
-					directHideOnInitT.style.display = DisplayStyle.Flex;
-					directHideOnInitT.value = textensionWizard.hideOnInitialization;
-//					hideOnInitializationRef.Q<VisualElement>("unity-checkmark").parent.style.justifyContent =
-//						Justify.FlexEnd;
-
-					console.RecordLog(StatusCodes.NULL, "test");
 					// TODO: Expand the console recorder class - pull data from console instead
+					console.RecordLog(StatusCodes.NULL, "test");
 					if (console.GetLogCount() > 0)
 					{
 						DisplayStatusMessage(StatusCodes.SUCCESS, "Ready to use!");
