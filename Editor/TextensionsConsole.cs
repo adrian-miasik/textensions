@@ -46,7 +46,7 @@ namespace Textensions.Editor
 		/// <summary>
 		/// Records a log into our console
 		/// </summary>
-		/// <param name="_type">The type of message you would like to log. <example>Warning</example></param>
+		/// <param name="_type">The type of message you would like to log. <example>WARNING</example></param>
 		/// <param name="_message">The message associated with that type. <example>"Missing text reference!"</example></param>
 		public void Record(Types _type, string _message)
 		{
