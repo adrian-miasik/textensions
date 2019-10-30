@@ -1,82 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using Textensions.Core;
 using TMPro;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static Textensions.Editor.TextensionStyling;
 
 namespace Textensions.Editor
 {
-	// TODO: Create a proper error catcher
-	public class ConsoleRecorder
-	{
-		private VisualElement parent;
-		private TextElement titleTE;
-		private StyleColor titleColor;
-		private TextElement textTE;
-
-		private Queue<KeyValuePair<TextensionWizardEditor.StatusCodes, string>> console;
-
-		public ConsoleRecorder(VisualElement _statusRow, TextElement _statusTitle, StyleColor _titleColor,
-			TextElement _statusText)
-		{
-			// Hook up references
-			parent = _statusRow;
-			titleTE = _statusTitle;
-			titleColor = _titleColor;
-			textTE = _statusText;
-
-			// Create a console
-			console = new Queue<KeyValuePair<TextensionWizardEditor.StatusCodes, string>>();
-		}
-
-		public void RecordLog(KeyValuePair<TextensionWizardEditor.StatusCodes, string> _log)
-		{
-			console.Enqueue(_log);
-		}
-
-		public void RecordLog(TextensionWizardEditor.StatusCodes _type, string _message)
-		{
-			console.Enqueue(new KeyValuePair<TextensionWizardEditor.StatusCodes, string>(_type, _message));
-		}
-
-		public void PrintRecords()
-		{
-			foreach (KeyValuePair<TextensionWizardEditor.StatusCodes, string> log in console)
-			{
-				Debug.Log(log.Key + ": " + log.Value);
-			}
-		}
-
-		public VisualElement GenerateRecordVisuals()
-		{
-			VisualElement result = new VisualElement();
-
-			foreach (KeyValuePair<TextensionWizardEditor.StatusCodes, string> log in console)
-			{
-				result.Add(titleTE);
-			}
-
-			return result;
-		}
-
-		public KeyValuePair<TextensionWizardEditor.StatusCodes, string> GetFirstLog()
-		{
-			return console.Peek();
-		}
-
-		/// <summary>
-		/// Returns the number of errors, warnings, or successes we've received
-		/// </summary>
-		/// <returns></returns>
-		public int GetLogCount()
-		{
-			return console.Count;
-		}
-	}
-
 	// This script is for the textension wizard component
 	[CustomEditor(typeof(TextensionWizard))]
 	public class TextensionWizardEditor : UnityEditor.Editor
@@ -111,11 +43,6 @@ namespace Textensions.Editor
 		/// Status Indicator that lights a certain color at the top right. This color matches the statusPrefixTE color
 		/// </summary>
 		private VisualElement statusIndicatorVE;
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		private VisualElement wizardContentVE;
 
 		/// <summary>
 		/// Status Row Parent
@@ -166,7 +93,8 @@ namespace Textensions.Editor
 		private StyleColor warningStyleColor = new StyleColor(warningColor);
 		private StyleColor successStyleColor = new StyleColor(successColor);
 
-		public enum StatusCodes
+		// TODO: Remove this from the editor and into the usages report
+		private enum StatusCodes
 		{
 			NULL,
 			ASSERT,
@@ -174,67 +102,11 @@ namespace Textensions.Editor
 			SUCCESS
 		}
 
-		private ConsoleRecorder console;
-
-		/// <summary>
-		/// Queries and caches all our elements needed on creation
-		/// </summary>
-		private void QueryElements()
-		{
-			#region Root
-			#region Banner/
-			logoVE = resultElement.Q("Logo*");
-			statusIndicatorVE = resultElement.Q("Status Indicator*");
-			#endregion
-			statusRowVE = resultElement.Q("Status Row*");
-			#region Status Row/
-			statusPrefixTE = resultElement.Q<TextElement>("Status Prefix*");
-			statusTextTE = resultElement.Q<TextElement>("Status Text*");
-			#endregion
-			wizardVE = resultElement.Q("Wizard*");
-			#region Wizard/Wizard Center
-			instructionsRowVE = resultElement.Q("Instructions Row*");
-			#region Wizard/Wizard Center/Instructions Row
-			instructionTitleTE = resultElement.Q<TextElement>("Instruction Title*");
-			instructionTextTE = resultElement.Q<TextElement>("Instruction Text*");
-			#endregion
-			wizardContentVE = resultElement.Q("Wizard Content*");
-			#region Wizard/Wizard Center/Wizard Content
-			step0 = resultElement.Q<Button>("Step 0*");
-			step1 = resultElement.Q("Step 1*");
-			#region Wizard/Wizard Center/Wizard Content/Step 1/
-			step1ObjectField = resultElement.Q<ObjectField>("Step 1 Object Field*");
-			#endregion
-			step2 = resultElement.Q("Step 2*");
-			#region Wizard/Wizard Center/Wizard Content/Step 2/
-			step2ButtonYes = resultElement.Q<Button>("Step 2 Yes*");
-			step2ButtonNo = resultElement.Q<Button>("Step 2 No*");
-			#endregion
-			#endregion
-			#endregion
-			direct = resultElement.Q("Direct*");
-			#region Direct/
-			directTitleTE = resultElement.Q<TextElement>("Direct Title*");
-			#region Direct/Direct Center/Direct Content/
-			directTextOF = resultElement.Q<ObjectField>("Direct Text*");
-			directHideOnInitT = resultElement.Q<Toggle>("Direct Hide On Init*");
-			#endregion
-			#endregion
-			#endregion
-		}
-
-		private bool CheckElements()
-		{
-			bool isSuccessful = true;
-
-			// TODO: Implement console system
-
-			return isSuccessful;
-		}
+		private TextensionsConsole console;
 
 		public void OnEnable()
 		{
-			// Cache the script
+			// Cache the script reference
 			textensionWizard = (TextensionWizard) target;
 
 			// Cache the uxml structure reference so we can pull out the visual elements when needed as necessary
@@ -262,22 +134,23 @@ namespace Textensions.Editor
 
 		public override VisualElement CreateInspectorGUI()
 		{
+			// Create a console
+			console = new TextensionsConsole();
+
 			// Clear the result element before we add stuff to render to it
 			resultElement.Clear();
 
 			// Read and draw the uxml structure visual elements to the result element
 			uxmlReference.CloneTree(resultElement);
 
-			// Create a console
-			console = new ConsoleRecorder(statusRowVE, statusPrefixTE, defaultStyleColor,
-				statusTextTE);
-
 			// Setup all our references, and null check our queries...
 			if (Setup())
 			{
 				// Load Logo
-				LoadImage(logoVE, LOGO_PATH, 40, 40);
+				LoadImageIntoElement(logoVE, LOGO_PATH, 40, 40);
 
+				// TODO: Place inside context menu for release
+				// When the user presses the Textensions logo we will reset the wizard
 				logoVE.RegisterCallback<MouseUpEvent>(_e =>
 				{
 					textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
@@ -290,8 +163,6 @@ namespace Textensions.Editor
 				// Load the default inspector
 //				resultElement.Add(new IMGUIContainer(OnInspectorGUI));
 			}
-
-			console.PrintRecords();
 
 			return resultElement;
 		}
@@ -309,25 +180,90 @@ namespace Textensions.Editor
 			return CheckElements();
 		}
 
-		private static void ShowDisplay(VisualElement _element)
+		/// <summary>
+		/// Queries and caches all our elements needed on creation
+		/// </summary>
+		private void QueryElements()
 		{
-			_element.style.display = DisplayStyle.Flex;
+			#region Root
+			#region Banner/
+			logoVE = resultElement.Q("Logo*");
+			statusIndicatorVE = resultElement.Q("Status Indicator*");
+			#endregion
+			// TODO: Creates copies
+			statusRowVE = resultElement.Q("Status Row*");
+			#region Status Row/
+			// TODO: Creates copies
+			statusPrefixTE = resultElement.Q<TextElement>("Status Prefix*");
+			// TODO: Creates copies
+			statusTextTE = resultElement.Q<TextElement>("Status Text*");
+			#endregion
+			wizardVE = resultElement.Q("Wizard*");
+			#region Wizard/Wizard Center
+			instructionsRowVE = resultElement.Q("Instructions Row*");
+			#region Wizard/Wizard Center/Instructions Row
+			instructionTitleTE = resultElement.Q<TextElement>("Instruction Title*");
+			instructionTextTE = resultElement.Q<TextElement>("Instruction Text*");
+			#endregion
+			#region Wizard/Wizard Center/Wizard Content
+			step0 = resultElement.Q<Button>("Step 0*");
+			step1 = resultElement.Q("Step 1*");
+			#region Wizard/Wizard Center/Wizard Content/Step 1/
+			step1ObjectField = resultElement.Q<ObjectField>("Step 1 Object Field*");
+			#endregion
+			step2 = resultElement.Q("Step 2*");
+			#region Wizard/Wizard Center/Wizard Content/Step 2/
+			step2ButtonYes = resultElement.Q<Button>("Step 2 Yes*");
+			step2ButtonNo = resultElement.Q<Button>("Step 2 No*");
+			#endregion
+			#endregion
+			#endregion
+			direct = resultElement.Q("Direct*");
+			#region Direct/
+			directTitleTE = resultElement.Q<TextElement>("Direct Title*");
+			#region Direct/Direct Center/Direct Content/
+			directTextOF = resultElement.Q<ObjectField>("Direct Text*");
+			directHideOnInitT = resultElement.Q<Toggle>("Direct Hide On Init*");
+			#endregion
+			#endregion
+			#endregion
 		}
 
-		private static void HideDisplay(VisualElement _element)
+		private bool CheckElements()
 		{
-			_element.style.display = DisplayStyle.None;
+			if (logoVE == null)
+			{
+				console.Record(TextensionsConsole.Types.WARNING, "Unable to locate logo element." +
+				                                                 " This is used to display the Textensions logo.");
+			}
+
+			if (statusIndicatorVE == null)
+			{
+				console.Record(TextensionsConsole.Types.ASSERT, "Unable to locate the status indicator. " +
+				                                                "This is used to show the user the highest priority log on this component.");
+			}
+
+			if (wizardVE == null)
+			{
+				console.Record(TextensionsConsole.Types.ASSERT, "Unable to locate the wizard container element. This is used to hide the " +
+				                                                "entire wizard window when the user completes the setup process.");
+			}
+
+			// TODO: The rest of the visual elements.
+
+			// If we are missing any necessary elements to build this wizard...
+			if (console.GetTypeCount(TextensionsConsole.Types.ASSERT) > 0)
+			{
+				Debug.LogAssertion("Unable to draw the Textension Wizard component. Please see the asset logs in the Textensions console.");
+				return false;
+			}
+
+			return true;
 		}
 
-		private void ToggleDisplay(VisualElement _element)
-		{
-			_element.style.display = _element.style.display == DisplayStyle.None ? DisplayStyle.Flex : DisplayStyle.None;
-		}
-
-		private void ChangeDisplay(VisualElement _element, DisplayStyle _style)
-		{
-			_element.style.display = _style;
-		}
+		// TODO: A validate function or flow controller
+		// (Only move to the next step if the requirements for a previous step have been filled. Not: if this field has updated go to
+		// this specific state)
 
 		private void ChangeWizardInstruction(string _prefix = "", string _message = "")
 		{
@@ -368,7 +304,7 @@ namespace Textensions.Editor
 				// else if you de-referenced it.
 				else if (_field.previousValue != null && _field.newValue == null)
 				{
-					console.RecordLog(StatusCodes.WARNING, "Missing Text Reference");
+					console.Record(TextensionsConsole.Types.WARNING, "Missing Text Reference");
 					textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
 					Paint();
 				}
@@ -399,7 +335,8 @@ namespace Textensions.Editor
 				// If you de-referenced it a valid value.
 				if (_field.previousValue != null && _field.newValue == null)
 				{
-					DisplayStatusMessage(StatusCodes.WARNING, "Missing Text Reference");
+					console.Record(TextensionsConsole.Types.WARNING, "Missing Text Reference.");
+					textensionWizard.text = null;
 				}
 			});
 
@@ -412,33 +349,6 @@ namespace Textensions.Editor
 			// Enable the direct fields
 			directHideOnInitT.SetEnabled(true);
 			directTextOF.SetEnabled(true);
-		}
-
-		/// <summary>
-		/// Disables the direct references interactivity.
-		/// </summary>
-		private void DisableDirectInteractivity()
-		{
-			directTextOF.SetEnabled(false);
-			directHideOnInitT.SetEnabled(false);
-		}
-
-		/// <summary>
-		/// Marks this element as the "actively' working element.
-		/// </summary>
-		/// <param name="_element"></param>
-		private void MarkActiveField(VisualElement _element)
-		{
-			_element.AddToClassList("active-field");
-		}
-
-		/// <summary>
-		/// Cleans (or "Un-marks") this element as the "active" working element.
-		/// </summary>
-		/// <param name="_element"></param>
-		private void CleanActiveField(VisualElement _element)
-		{
-			_element.RemoveFromClassList("active-field");
 		}
 
 		/// TODO: Refactor this so I'm not changing the (virtual?) DOM unnecessarily, which I am.
@@ -541,34 +451,46 @@ namespace Textensions.Editor
 
 					HideDisplay(wizardVE);
 
-					// TODO: Expand the console recorder class - pull data from console instead
-					console.RecordLog(StatusCodes.NULL, "test");
-					if (console.GetLogCount() > 0)
+					// If we have no assets and no warnings, we can say we are ready to use.
+					if (console.GetTypeCount(TextensionsConsole.Types.ASSERT) <= 0 && console.GetTypeCount(TextensionsConsole.Types.WARNING) <= 0)
 					{
-						DisplayStatusMessage(StatusCodes.SUCCESS, "Ready to use!");
-
-						var hideStatusMessage = resultElement.schedule.Execute(() =>
-						{
-							statusRowVE.style.display = DisplayStyle.None;
-						});
-
-						hideStatusMessage.ExecuteLater(2000);
+						console.Record(TextensionsConsole.Types.SUCCESS, "Ready to use!");
 					}
+
+					console.PrintAllLogs();
+
+//					// TODO: Expand the console recorder class - pull data from console instead
+//					console.RecordLog(StatusCodes.NULL, "test");
+//					if (console.GetLogCount() > 0)
+//					{
+//						DisplayStatusMessage(StatusCodes.SUCCESS, "Ready to use!");
+//
+//						var hideStatusMessage = resultElement.schedule.Execute(() =>
+//						{
+//							statusRowVE.style.display = DisplayStyle.None;
+//						});
+//
+//						hideStatusMessage.ExecuteLater(2000);
+//					}
 
 					break;
 			}
 		}
 
-		private void DisplayStatusMessage(KeyValuePair<StatusCodes, string> log)
+		// TODO: Pull data from the textensions console and create visual element copies in here
+
+		// TODO: Remove
+		private void DisplayStatusMessage(KeyValuePair<StatusCodes, string> _log)
 		{
-			Debug.Log(log.Key);
-			Debug.Log(log.Value);
+			Debug.Log(_log.Key);
+			Debug.Log(_log.Value);
 
 			statusRowVE.style.display = DisplayStyle.Flex;
 			DisplayStatus(StatusCodes.ASSERT);
-			statusTextTE.text = log.Value;
+			statusTextTE.text = _log.Value;
 		}
 
+		// TODO: Remove
 		private void DisplayStatusMessage(StatusCodes _statusCode,  string _message)
 		{
 			statusRowVE.style.display = DisplayStyle.Flex;
@@ -609,30 +531,30 @@ namespace Textensions.Editor
 		}
 
 		/// <summary>
-		/// Provides a background image for a specific VisualElement
+		/// Disables the direct references interactivity.
 		/// </summary>
-		/// <param name="target">The visual element that will get a background image</param>
-		/// <param name="imagePath">The directory of the image asset</param>
-		/// <param name="imageWidth">The image width in pixels</param>
-		/// <param name="imageHeight">The image height in pixels</param>
-		private void LoadImage(VisualElement target, string imagePath, int imageWidth, int imageHeight)
+		private void DisableDirectInteractivity()
 		{
-			// If our image asset exists...
-			if (File.Exists(imagePath))
-			{
-				// Create a 2D Texture
-				Texture2D logoTexture = new Texture2D(imageWidth, imageHeight);
+			directTextOF.SetEnabled(false);
+			directHideOnInitT.SetEnabled(false);
+		}
 
-				// Load image into 2D Texture (Convert .png to a texture2D)
-				logoTexture.LoadImage(File.ReadAllBytes(LOGO_PATH));
+		/// <summary>
+		/// Marks this element as the "actively' working element.
+		/// </summary>
+		/// <param name="_element"></param>
+		private static void MarkActiveField(VisualElement _element)
+		{
+			_element.AddToClassList("active-field");
+		}
 
-				// Load 2D texture into the background image style
-				target.style.backgroundImage = logoTexture;
-			}
-			else
-			{
-				Debug.LogAssertion("Unable to find asset in: " + imagePath);
-			}
+		/// <summary>
+		/// Cleans (or "Un-marks") this element as the "active" working element.
+		/// </summary>
+		/// <param name="_element"></param>
+		private static void CleanActiveField(VisualElement _element)
+		{
+			_element.RemoveFromClassList("active-field");
 		}
 	}
 }
