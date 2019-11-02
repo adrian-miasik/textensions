@@ -9,10 +9,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="Status Indicator*" style="background-image: resource('StatusIndicator10x10'); height: 5px; width: 5px; position: absolute; right: 0; bottom: 0; top: 0; margin-right: 5px; margin-top: 5px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="Status Row*" style="border-left-color: rgb(47, 47, 47); border-right-color: rgb(47, 47, 47); border-top-color: rgb(47, 47, 47); border-bottom-color: rgb(47, 47, 47); margin-top: 1px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 2px; display: flex; flex-direction: row; flex-grow: 0; align-items: center;">
-            <ui:Label text="STATUS" name="Status Prefix*" class="h2" style="margin-top: 1px; margin-left: 2px; color: rgba(255, 255, 255, 0.95); font-size: 12px; flex-shrink: 1; flex-grow: 0;" />
-            <ui:Label text="Test Message here" name="Status Text*" class="p" style="flex-wrap: wrap; flex-shrink: 1; flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
-        </ui:VisualElement>
+        <ui:VisualElement name="ConsoleLogContainer*" />
         <ui:VisualElement name="Wizard*" style="border-bottom-color: rgb(243, 193, 60); flex-shrink: 1; flex-grow: 1; flex-direction: row;">
             <ui:VisualElement class="column" style="flex-direction: row; flex-shrink: 1;" />
             <ui:VisualElement name="Wizard Center" style="margin-bottom: 0; border-bottom-width: 0; border-top-width: 0; flex-grow: 1; flex-shrink: 1; padding-top: 0; padding-bottom: 0; flex-basis: 300px; color: rgba(0, 0, 0, 0.29);">
