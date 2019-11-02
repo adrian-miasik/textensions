@@ -54,3 +54,7 @@
     flex-grow: 1;
     flex-shrink: 1;
 }
+
+.chivo-bold {
+    -unity-font: resource('Chivo-Bold');
+}

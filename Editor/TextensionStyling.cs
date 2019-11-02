@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 namespace Textensions.Editor
 {
 	/// <summary>
-	/// A static class of helper functions related to global USS properties
+	/// A static class of helper functions related to global USS properties for Textensions
 	/// </summary>
 	public static class TextensionStyling
 	{
@@ -54,6 +54,24 @@ namespace Textensions.Editor
 		internal static void ChangeDisplay(VisualElement _element, DisplayStyle _style)
 		{
 			_element.style.display = _style;
+		}
+
+		/// <summary>
+		/// Gives this element `font : chivo-bold`.
+		/// </summary>
+		/// <param name="_element"></param>
+		public static void MarkBold(VisualElement _element)
+		{
+			_element.AddToClassList("chivo-bold");
+		}
+
+		/// <summary>
+		/// Removes the <see cref="MarkBold"/> effect on the element.
+		/// </summary>
+		/// <param name="_element"></param>
+		public static void CleanBold(VisualElement _element)
+		{
+			_element.RemoveFromClassList("active-field");
 		}
 	}
 }
