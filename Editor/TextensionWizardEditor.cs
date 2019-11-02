@@ -44,21 +44,6 @@ namespace Textensions.Editor
 		/// </summary>
 		private VisualElement statusIndicatorVE;
 
-		/// <summary>
-		/// Status Row Parent
-		/// </summary>
-		private VisualElement statusRowVE;
-
-		/// <summary>
-		/// Status Row Prefix (E.g. 'SUCCESS' from TextensionWizardEditor.StatusCodes)
-		/// </summary>
-		private TextElement statusPrefixTE;
-
-		/// <summary>
-		/// Status Row Text (E.g. 'Missing Text Reference')
-		/// </summary>
-		private TextElement statusTextTE;
-
 		private VisualElement instructionsRowVE;
 		private TextElement instructionTitleTE;
 		private TextElement instructionTextTE;
@@ -78,29 +63,10 @@ namespace Textensions.Editor
 		private Toggle directHideOnInitT;
 		private VisualElement wizardVE;
 
+		private VisualElement consoleLogContainer;
+
 		private const string LOGO_PATH =
 			"Packages/com.adrianmiasik.textensions/Resources/TextensionLogo40x40.png";
-
-		// Colors
-		private static Color32 defaultColor = new Color32(255, 255, 255, 255);
-		private static Color32 assetColor = new Color32(255, 28, 41, 255);
-		private static Color32 warningColor = new Color32(255, 192, 41, 255);
-		private static Color32 successColor = new Color32(44, 255, 99, 255);
-
-		// Styles
-		private StyleColor defaultStyleColor = new StyleColor(defaultColor);
-		private StyleColor assetStyleColor = new StyleColor(assetColor);
-		private StyleColor warningStyleColor = new StyleColor(warningColor);
-		private StyleColor successStyleColor = new StyleColor(successColor);
-
-		// TODO: Remove this from the editor and into the usages report
-		private enum StatusCodes
-		{
-			NULL,
-			ASSERT,
-			WARNING,
-			SUCCESS
-		}
 
 		private TextensionsConsole console;
 
@@ -108,6 +74,9 @@ namespace Textensions.Editor
 		{
 			// Cache the script reference
 			textensionWizard = (TextensionWizard) target;
+
+			// Send reference of us to the wizard so it can get context menu logic
+			textensionWizard.editor = this;
 
 			// Cache the uxml structure reference so we can pull out the visual elements when needed as necessary
 			uxmlReference = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
@@ -149,14 +118,6 @@ namespace Textensions.Editor
 				// Load Logo
 				LoadImageIntoElement(logoVE, LOGO_PATH, 40, 40);
 
-				// TODO: Place inside context menu for release
-				// When the user presses the Textensions logo we will reset the wizard
-				logoVE.RegisterCallback<MouseUpEvent>(_e =>
-				{
-					textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
-					CreateInspectorGUI();
-				});
-
 				// Load page
 				Paint();
 
@@ -190,14 +151,7 @@ namespace Textensions.Editor
 			logoVE = resultElement.Q("Logo*");
 			statusIndicatorVE = resultElement.Q("Status Indicator*");
 			#endregion
-			// TODO: Creates copies
-			statusRowVE = resultElement.Q("Status Row*");
-			#region Status Row/
-			// TODO: Creates copies
-			statusPrefixTE = resultElement.Q<TextElement>("Status Prefix*");
-			// TODO: Creates copies
-			statusTextTE = resultElement.Q<TextElement>("Status Text*");
-			#endregion
+			consoleLogContainer = resultElement.Q("ConsoleLogContainer*");
 			wizardVE = resultElement.Q("Wizard*");
 			#region Wizard/Wizard Center
 			instructionsRowVE = resultElement.Q("Instructions Row*");
@@ -357,9 +311,6 @@ namespace Textensions.Editor
 		/// </summary>
 		private void Paint()
 		{
-			// Hide the status row
-			HideDisplay(statusRowVE);
-
 			// Hide the connect button, text object field, and the hide on init bool
 			HideDisplay(step0);
 			HideDisplay(step1);
@@ -459,6 +410,8 @@ namespace Textensions.Editor
 
 					console.PrintAllLogs();
 
+					console.InjectLogs(consoleLogContainer);
+
 //					// TODO: Expand the console recorder class - pull data from console instead
 //					console.RecordLog(StatusCodes.NULL, "test");
 //					if (console.GetLogCount() > 0)
@@ -473,59 +426,6 @@ namespace Textensions.Editor
 //						hideStatusMessage.ExecuteLater(2000);
 //					}
 
-					break;
-			}
-		}
-
-		// TODO: Pull data from the textensions console and create visual element copies in here
-
-		// TODO: Remove
-		private void DisplayStatusMessage(KeyValuePair<StatusCodes, string> _log)
-		{
-			Debug.Log(_log.Key);
-			Debug.Log(_log.Value);
-
-			statusRowVE.style.display = DisplayStyle.Flex;
-			DisplayStatus(StatusCodes.ASSERT);
-			statusTextTE.text = _log.Value;
-		}
-
-		// TODO: Remove
-		private void DisplayStatusMessage(StatusCodes _statusCode,  string _message)
-		{
-			statusRowVE.style.display = DisplayStyle.Flex;
-			DisplayStatus(_statusCode);
-			statusTextTE.text = _message;
-		}
-
-		/// <summary>
-		/// Displays a color for the status indicator and status title. Also renames the status title to the status code.
-		/// </summary>
-		/// <param name="_statusCode">A status code<see cref="StatusCodes"/></param>
-		private void DisplayStatus(StatusCodes _statusCode)
-		{
-			statusPrefixTE.text = _statusCode + ": ";
-
-			switch (_statusCode)
-			{
-				case StatusCodes.NULL:
-					statusIndicatorVE.style.unityBackgroundImageTintColor = defaultStyleColor;
-					statusPrefixTE.style.color = defaultStyleColor;
-					break;
-				case StatusCodes.ASSERT:
-					statusIndicatorVE.style.unityBackgroundImageTintColor = assetStyleColor;
-					statusPrefixTE.style.color = assetStyleColor;
-					break;
-				case StatusCodes.WARNING:
-					statusIndicatorVE.style.unityBackgroundImageTintColor = warningStyleColor;
-					statusPrefixTE.style.color = warningStyleColor;
-					break;
-				case StatusCodes.SUCCESS:
-					statusIndicatorVE.style.unityBackgroundImageTintColor = successStyleColor;
-					statusPrefixTE.style.color = successStyleColor;
-					break;
-				default:
-					Debug.LogWarning("T.ext: Unable to support this status code.");
 					break;
 			}
 		}

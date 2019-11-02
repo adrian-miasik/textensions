@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Textensions.Editor
 {
@@ -11,7 +12,7 @@ namespace Textensions.Editor
 		/// </summary>
 		public enum Types
 		{
-			DEFAULT,
+			MESSAGE,
 			WARNING,
 			SUCCESS,
 			ASSERT
@@ -22,8 +23,8 @@ namespace Textensions.Editor
 		/// </summary>
 		private struct Log
 		{
-			private Types status;
-			private string message;
+			private readonly Types status;
+			private readonly string message;
 
 			public Log(Types _status, string _message)
 			{
@@ -35,13 +36,39 @@ namespace Textensions.Editor
 			{
 				Debug.Log(status + ": " + message);
 			}
+
+			public Types GetStatus()
+			{
+				return status;
+			}
+
+			public string GetMessage()
+			{
+				return message;
+			}
 		}
 
 		/// <summary>
 		/// A dictionary that contains a reference to all the types of logs.
 		/// </summary>
 		/// <returns></returns>
-		private Dictionary<Types, List<Log>> console = new Dictionary<Types, List<Log>>();
+		private readonly Dictionary<Types, List<Log>> console = new Dictionary<Types, List<Log>>();
+
+		// Colors
+		private static readonly Color32 DefaultColor = new Color32(40, 40, 40, 255);
+		private static readonly Color32 AssetColor = new Color32(255, 28, 41, 255);
+		private static readonly Color32 WarningColor = new Color32(255, 192, 41, 255);
+		private static readonly Color32 SuccessColor = new Color32(44, 255, 99, 255);
+
+		// Styles
+		private readonly StyleColor defaultStyleColor = new StyleColor(DefaultColor);
+		private readonly StyleColor assetStyleColor = new StyleColor(AssetColor);
+		private readonly StyleColor warningStyleColor = new StyleColor(WarningColor);
+		private readonly StyleColor successStyleColor = new StyleColor(SuccessColor);
+
+		// Cache
+		private TextElement lastUsedStatusPrefix;
+		private Types lastUsedType;
 
 		/// <summary>
 		/// Records a log into our console
@@ -63,11 +90,8 @@ namespace Textensions.Editor
 			// We can't find out message type, it's the first of it's entry. Let's create a list of logs for it.
 			else
 			{
-				// Create new list of logs.
-				List<Log> _logs = new List<Log>();
-
-				// Add the new log to our list.
-				_logs.Add(_log);
+				// Create a list of logs starting with this log
+				List<Log> _logs = new List<Log> { _log };
 
 				// Add that list to the console.
 				console.Add(_type, _logs);
@@ -96,6 +120,26 @@ namespace Textensions.Editor
 		}
 
 		/// <summary>
+		/// Generates and injects all our console logs into a certain visual element
+		/// </summary>
+		public void InjectLogs(VisualElement _parent)
+		{
+			// Iterate through the Types enum...
+			foreach (Types _type in Enum.GetValues(typeof(Types)))
+			{
+				// Check the console to see if it contains our type...
+				if (console.TryGetValue(_type, out List<Log> _recordedLogs))
+				{
+					// Let's iterate through all the logs of this type...
+					foreach (Log _log in _recordedLogs)
+					{
+						_parent.Add(GenerateComponentLog(_log));
+					}
+				}
+			}
+		}
+
+		/// <summary>
 		/// Gets the number of logs of this type that have been logged to the console thus far.
 		/// </summary>
 		/// <summary>
@@ -106,6 +150,85 @@ namespace Textensions.Editor
 		public int GetTypeCount(Types _type)
 		{
 			return console.TryGetValue(_type, out List<Log> _recordedLogs) ? _recordedLogs.Count : 0;
+		}
+
+		/// <summary>
+		/// Generates and returns an in-line component log
+		/// </summary>
+		/// <param name="_log"></param>
+		/// <returns></returns>
+		private VisualElement GenerateComponentLog(Log _log)
+		{
+			// Create and stylize the status row
+			VisualElement _statusRow = new VisualElement {name = "Status Row*"};
+			_statusRow.style.flexGrow = 0;
+			_statusRow.style.flexDirection = FlexDirection.Row;
+			_statusRow.style.alignItems = Align.Center;
+			_statusRow.style.marginTop = 1;
+			_statusRow.style.borderBottomWidth = 2f;					// Border
+			_statusRow.style.borderBottomColor = defaultStyleColor;		// Border
+
+			// Create and stylize the status prefix
+			TextElement _statusPrefix = new TextElement {name = "Status Prefix*"};
+			_statusPrefix.style.flexShrink = 1;
+			_statusPrefix.style.flexGrow = 0;
+			_statusPrefix.style.marginLeft = 2;
+			_statusPrefix.style.marginTop = 1;
+			_statusPrefix.style.fontSize = 12;
+
+			// Create and stylize the status text
+			TextElement _statusText = new TextElement {name = "Status Prefix*"};
+			_statusText.style.flexShrink = 1;
+			_statusText.style.flexGrow = 0;
+			_statusText.style.flexWrap = Wrap.Wrap;
+
+			_statusPrefix.text = _log.GetStatus().ToString();
+			_statusText.text = _log.GetMessage();
+
+			// Cache log
+			lastUsedStatusPrefix = _statusPrefix;
+			lastUsedType = _log.GetStatus();
+
+			StyleCachedLog();
+
+			// Sort hierarchy
+			_statusRow.Add(_statusPrefix);
+			_statusRow.Add(_statusText);
+
+			return _statusRow;
+		}
+
+		/// <summary>
+		/// Stylizes the last cached log depending on the log data.
+		/// </summary>
+		private void StyleCachedLog()
+		{
+			// Make the title bold
+			TextensionStyling.MarkBold(lastUsedStatusPrefix);
+
+			// Show type and append a colon for formatting
+			lastUsedStatusPrefix.text = lastUsedType.ToString();
+			lastUsedStatusPrefix.text += ": ";
+
+			// Change title color based on log type
+			switch (lastUsedType)
+			{
+				case Types.MESSAGE:
+					lastUsedStatusPrefix.style.color = defaultStyleColor;
+					break;
+				case Types.WARNING:
+					lastUsedStatusPrefix.style.color = warningStyleColor;
+					break;
+				case Types.SUCCESS:
+					lastUsedStatusPrefix.style.color = successStyleColor;
+					break;
+				case Types.ASSERT:
+					lastUsedStatusPrefix.style.color = assetStyleColor;
+					break;
+				default:
+					Debug.LogWarning("T.ext: Unable to style this type.");
+					break;
+			}
 		}
 	}
 }
