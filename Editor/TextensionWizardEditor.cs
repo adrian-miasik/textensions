@@ -258,7 +258,6 @@ namespace Textensions.Editor
 				// else if you de-referenced it.
 				else if (_field.previousValue != null && _field.newValue == null)
 				{
-					console.Record(TextensionsConsole.Types.WARNING, "Missing Text Reference");
 					textensionWizard.state = TextensionWizard.WizardStates.SPLASH_SCREEN;
 					Paint();
 				}
@@ -270,14 +269,29 @@ namespace Textensions.Editor
 			step2ButtonYes.RegisterCallback<MouseUpEvent>(_e =>
 				{
 					textensionWizard.hideOnInitialization = true;
-					textensionWizard.state = TextensionWizard.WizardStates.COMPLETED;
+					if (textensionWizard.IsReady())
+					{
+						textensionWizard.CompleteWizard();
+					}
+					else
+					{
+						textensionWizard.state = TextensionWizard.WizardStates.TEXTENSION_CONNECT;
+					}
 					Paint();
 				});
 
 				step2ButtonNo.RegisterCallback<MouseUpEvent>(_e =>
 				{
 					textensionWizard.hideOnInitialization = false;
-					textensionWizard.state = TextensionWizard.WizardStates.COMPLETED;
+
+					if (textensionWizard.IsReady())
+					{
+						textensionWizard.CompleteWizard();
+					}
+					else
+					{
+						textensionWizard.state = TextensionWizard.WizardStates.TEXTENSION_CONNECT;
+					}
 					Paint();
 				});
 		}
@@ -286,11 +300,11 @@ namespace Textensions.Editor
 		{
 			directTextOF.RegisterCallback<ChangeEvent<Object>>((_field) =>
 			{
-				// If you de-referenced it a valid value.
+				// If you de-referenced a valid value.
 				if (_field.previousValue != null && _field.newValue == null)
 				{
 					console.Record(TextensionsConsole.Types.WARNING, "Missing Text Reference.");
-					textensionWizard.text = null;
+					textensionWizard.state = TextensionWizard.WizardStates.TEXTENSION_CONNECT;
 				}
 			});
 
@@ -311,6 +325,8 @@ namespace Textensions.Editor
 		/// </summary>
 		private void Paint()
 		{
+			Debug.LogWarning("Paint");
+
 			// Hide the connect button, text object field, and the hide on init bool
 			HideDisplay(step0);
 			HideDisplay(step1);
@@ -332,9 +348,11 @@ namespace Textensions.Editor
 				textensionWizard.hideOnInitialization = false;
 			}
 
-			// Binding
+			// Copy data
 			directTextOF.value = textensionWizard.text;
 			directHideOnInitT.value = textensionWizard.hideOnInitialization;
+
+			statusIndicatorVE.style.unityBackgroundImageTintColor = console.messageStyleColor;
 
 			HandleDirectReferences();
 
@@ -402,15 +420,19 @@ namespace Textensions.Editor
 
 					HideDisplay(wizardVE);
 
-					// If we have no assets and no warnings, we can say we are ready to use.
-					if (console.GetTypeCount(TextensionsConsole.Types.ASSERT) <= 0 && console.GetTypeCount(TextensionsConsole.Types.WARNING) <= 0)
+					// If our textensions component has everything it needs...
+					if (textensionWizard.IsReady())
 					{
-						console.Record(TextensionsConsole.Types.SUCCESS, "Ready to use!");
+						textensionWizard.hasWizardCompleted = true;
+
+						// If we have no assets and no warnings, we can say we are ready to use.
+						if (console.GetTypeCount(TextensionsConsole.Types.ASSERT) <= 0 && console.GetTypeCount(TextensionsConsole.Types.WARNING) <= 0)
+						{
+							console.Record(TextensionsConsole.Types.SUCCESS, "Ready to use!");
+						}
+
+						statusIndicatorVE.style.unityBackgroundImageTintColor = console.successStyleColor;
 					}
-
-					console.PrintAllLogs();
-
-					console.InjectLogs(consoleLogContainer);
 
 //					// TODO: Expand the console recorder class - pull data from console instead
 //					console.RecordLog(StatusCodes.NULL, "test");
@@ -428,6 +450,14 @@ namespace Textensions.Editor
 
 					break;
 			}
+
+			// Print to unity console
+			console.PrintAllLogs();
+
+			// Add elements to flag
+			console.InjectLogs(consoleLogContainer);
+
+			Debug.LogWarning("injecting logs: " + console.GetLogCount());
 		}
 
 		/// <summary>

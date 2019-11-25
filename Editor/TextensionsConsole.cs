@@ -21,7 +21,7 @@ namespace Textensions.Editor
 		/// <summary>
 		/// The log structure. Each log requires a type and a message.
 		/// </summary>
-		private struct Log
+		public struct Log
 		{
 			private readonly Types status;
 			private readonly string message;
@@ -55,16 +55,18 @@ namespace Textensions.Editor
 		private readonly Dictionary<Types, List<Log>> console = new Dictionary<Types, List<Log>>();
 
 		// Colors
-		private static readonly Color32 DefaultColor = new Color32(40, 40, 40, 255);
+		private static readonly Color32 BackgroundColor = new Color32(40, 40, 40, 255);
+		private static readonly Color32 MessageColor = new Color32(248, 248, 248, 255);
 		private static readonly Color32 AssetColor = new Color32(255, 28, 41, 255);
 		private static readonly Color32 WarningColor = new Color32(255, 192, 41, 255);
 		private static readonly Color32 SuccessColor = new Color32(44, 255, 99, 255);
 
 		// Styles
-		private readonly StyleColor defaultStyleColor = new StyleColor(DefaultColor);
-		private readonly StyleColor assetStyleColor = new StyleColor(AssetColor);
-		private readonly StyleColor warningStyleColor = new StyleColor(WarningColor);
-		private readonly StyleColor successStyleColor = new StyleColor(SuccessColor);
+		public readonly StyleColor backgroundStyleColor = new StyleColor(BackgroundColor);
+		public readonly StyleColor messageStyleColor = new StyleColor(MessageColor);
+		public readonly StyleColor assetStyleColor = new StyleColor(AssetColor);
+		public readonly StyleColor warningStyleColor = new StyleColor(WarningColor);
+		public readonly StyleColor successStyleColor = new StyleColor(SuccessColor);
 
 		// Cache
 		private TextElement lastUsedStatusPrefix;
@@ -153,11 +155,32 @@ namespace Textensions.Editor
 		}
 
 		/// <summary>
+		/// Returns the total number of logs
+		/// </summary>
+		/// <returns></returns>
+		public int GetLogCount()
+		{
+			int count = 0;
+
+			// Iterate through the Types enum...
+			foreach (Types _type in Enum.GetValues(typeof(Types)))
+			{
+				// Check the console to see if it contains our type...
+				if (console.TryGetValue(_type, out List<Log> _recordedLogs))
+				{
+					count += _recordedLogs.Count;
+				}
+			}
+
+			return count;
+		}
+
+		/// <summary>
 		/// Generates and returns an in-line component log
 		/// </summary>
 		/// <param name="_log"></param>
 		/// <returns></returns>
-		private VisualElement GenerateComponentLog(Log _log)
+		public VisualElement GenerateComponentLog(Log _log)
 		{
 			// Create and stylize the status row
 			VisualElement _statusRow = new VisualElement {name = "Status Row*"};
@@ -166,7 +189,7 @@ namespace Textensions.Editor
 			_statusRow.style.alignItems = Align.Center;
 			_statusRow.style.marginTop = 1;
 			_statusRow.style.borderBottomWidth = 2f;					// Border
-			_statusRow.style.borderBottomColor = defaultStyleColor;		// Border
+			_statusRow.style.borderBottomColor = backgroundStyleColor;	// Border
 
 			// Create and stylize the status prefix
 			TextElement _statusPrefix = new TextElement {name = "Status Prefix*"};
@@ -214,7 +237,7 @@ namespace Textensions.Editor
 			switch (lastUsedType)
 			{
 				case Types.MESSAGE:
-					lastUsedStatusPrefix.style.color = defaultStyleColor;
+					lastUsedStatusPrefix.style.color = messageStyleColor;
 					break;
 				case Types.WARNING:
 					lastUsedStatusPrefix.style.color = warningStyleColor;

@@ -15,6 +15,8 @@ namespace Textensions.Core
 
 		public WizardStates state = WizardStates.SPLASH_SCREEN;
 
+		public bool hasWizardCompleted;
+
 		public bool IsReady()
 		{
 			if (text == null)
@@ -38,9 +40,16 @@ namespace Textensions.Core
 		{
 			if (editor != null)
 			{
+				hasWizardCompleted = false;
 				state = WizardStates.SPLASH_SCREEN;
 				editor.CreateInspectorGUI();
 			}
+		}
+
+		public void CompleteWizard()
+		{
+			hasWizardCompleted = true;
+			state = WizardStates.COMPLETED;
 		}
 	}
 }
