@@ -325,7 +325,7 @@ namespace Textensions.Editor
 		/// </summary>
 		private void Paint()
 		{
-			Debug.LogWarning("Paint");
+//			Debug.LogWarning("Paint");
 
 			// Hide the connect button, text object field, and the hide on init bool
 			HideDisplay(step0);
@@ -457,7 +457,7 @@ namespace Textensions.Editor
 			// Add elements to flag
 			console.InjectLogs(consoleLogContainer);
 
-			Debug.LogWarning("injecting logs: " + console.GetLogCount());
+//			Debug.LogWarning("injecting logs: " + console.GetLogCount());
 		}
 
 		/// <summary>
