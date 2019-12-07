@@ -1,5 +1,5 @@
 using Textensions.Editor;
-using UnityEditor;
+using Textensions.Utilities;
 using UnityEngine;
 
 namespace Textensions.Core
@@ -46,64 +46,28 @@ namespace Textensions.Core
 				editor.CreateInspectorGUI();
 			}
 		}
-
+		
 		/// <summary>
-		/// Resets the wizard state and forces a redraw on the editor reference.
+		/// Converts this wizard into a basic textension component.
 		/// </summary>
 		[ContextMenu("Convert to Textension")]
 		public void ConvertToTextension()
 		{
-			if (editor != null)
-			{				
-				int stepCount = MoveComponentToTop(this);
-				UnityEditorInternal.ComponentUtility.CopyComponent(this);
-
-				int stepsToMoveUp = ((GetComponents<Component>().Length - 1) - stepCount) - 1; // Ignore first element, then account for index
-				
-				// Create a new textension and cache it
-				Textension createdTextension = gameObject.AddComponent<Textension>();
-
-				for (int i = 0; i < stepsToMoveUp; i++)
-				{
-					UnityEditorInternal.ComponentUtility.MoveComponentUp(createdTextension);
-				}
-
-				UnityEditorInternal.ComponentUtility.PasteComponentValues(createdTextension);
-				
-				// Destroy self
-				DestroyImmediate(this); // This spits out an instance id error
-			}
-		}
-
-		private int MoveComponentToTop(Textension textension)
-		{
-			Component[] allComponents = GetComponents<Component>();
+			if (editor == null) return;
 			
-			// You can't move anything above the transform component.
-			// We need to get the 1st component under that.
-			int topMostInstanceID = allComponents[1].GetInstanceID();
-			
-			int movingComponentInstanceID = textension.GetInstanceID();
+			// Create Textension
+			Textension createdTextension = gameObject.AddComponent<Textension>();
 
-			int timesMovedUpwards = 0;
+			// Sample our components, then move our new textension to our wizard location
+			ComponentUtilities.SampleComponents(gameObject);
+			ComponentUtilities.MoveComponentToIndex(createdTextension, ComponentUtilities.GetComponentIndex(this));
 
-			for (int i = 0; i < allComponents.Length; i++)
-			{
-				if (topMostInstanceID != movingComponentInstanceID)
-				{
-					timesMovedUpwards++;
-					UnityEditorInternal.ComponentUtility.MoveComponentUp(textension);
-
-					// Fetch a refreshed order of the components.
-					topMostInstanceID = GetComponents<Component>()[1].GetInstanceID();
-				}
-				else
-				{
-					return timesMovedUpwards;
-				}
-			}
-
-			return timesMovedUpwards;
+			// Carry over component data
+			UnityEditorInternal.ComponentUtility.CopyComponent(this);
+			UnityEditorInternal.ComponentUtility.PasteComponentValues(createdTextension);
+				
+			// Remove our wizard component
+			DestroyImmediate(this);
 		}
 		
 		public void CompleteWizard()
