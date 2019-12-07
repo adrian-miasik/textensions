@@ -7,17 +7,17 @@ namespace Textensions.Core
 	public class TextensionEffects : MonoBehaviour
 	{
 		/// <summary>
-		/// The text we want to apply effects to
+		/// The text we want to apply effects to.
 		/// </summary>
 		public Textension textension;
 
 		/// <summary>
-		/// The effects we want to apply to this textension
+		/// The effects we want to apply to this textension.
 		/// </summary>
 		public List<Effect> fxs;
 
 		/// <summary>
-		/// These are the effects that we will be updating in EffectTick() every frame
+		/// These are the effects that we will be updating in EffectTick() every frame.
 		/// </summary>
 		public Dictionary<int, List<Effect>> appliedEffects = new Dictionary<int, List<Effect>>();
 
@@ -91,6 +91,7 @@ namespace Textensions.Core
 			AddEffects(fxs);
 		}
 
+		// TODO: Refactor this. (There is redundant logic here)
 		/// <summary>
 		/// Determine what character indices this effect will apply to.
 		/// </summary>
