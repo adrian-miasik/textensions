@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Textensions.Utilities
 {
-	public static class ComponentUtilities
+	public static class ComponentOrder
 	{
 		private static Component[] cachedComponents;
 
