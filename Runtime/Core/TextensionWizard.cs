@@ -54,20 +54,23 @@ namespace Textensions.Core
 		public void ConvertToTextension()
 		{
 			if (editor == null) return;
-			
+
+            GameObject myObject = gameObject;
+            
 			// Create Textension
-			Textension createdTextension = gameObject.AddComponent<Textension>();
+			Textension createdTextension = myObject.AddComponent<Textension>();
 
 			// Sample our components, then move our new textension to our wizard location
-			ComponentUtilities.SampleComponents(gameObject);
-			ComponentUtilities.MoveComponentToIndex(createdTextension, ComponentUtilities.GetComponentIndex(this));
+			ComponentOrder.SampleComponents(myObject);
+			ComponentOrder.MoveComponentToIndex(createdTextension, ComponentOrder.GetComponentIndex(this));
 
+			// TODO: This is broken...
 			// Carry over component data
-			UnityEditorInternal.ComponentUtility.CopyComponent(this);
-			UnityEditorInternal.ComponentUtility.PasteComponentValues(createdTextension);
+			ComponentClipboard.CopyComponent(this);
+			ComponentClipboard.PasteComponent(createdTextension);
 				
 			// Remove our wizard component
-			DestroyImmediate(this);
+			// DestroyImmediate(this);
 		}
 		
 		public void CompleteWizard()
