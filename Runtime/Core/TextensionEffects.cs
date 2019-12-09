@@ -204,44 +204,44 @@ namespace Textensions.Core
 		/// However if the provided effect does exist within the dictionary we will access that key and add the effect to the list within that key value.
 		/// </summary>
 		private void AddEffects(List<Effect> _effectsToApply)
-		{
-			// Iterate through each effect...
-			for (int i = 0; i < _effectsToApply.Count; i++)
-			{
-				// Get the indices that this effect is going to be applied to. (We don't want to apply this effect to every character)
-				List<int> indicesToEffect = DetermineWhatCharactersToAffect(_effectsToApply[i]);
+        {
+            // Iterate through each effect...
+            foreach (Effect t in _effectsToApply)
+            {
+                // Get the indices that this effect is going to be applied to. (We don't want to apply this effect to every character)
+                List<int> indicesToEffect = DetermineWhatCharactersToAffect(t);
 
-				// Iterate through all the character indices this effect will affect...
-				for (int j = 0; j < indicesToEffect.Count; j++)
-					// If this key index exists...
-					if (appliedEffects.TryGetValue(indicesToEffect[j], out List<Effect> effectsList))
-					{
+                // Iterate through all the character indices this effect will affect...
+                for (int j = 0; j < indicesToEffect.Count; j++)
+                    // If this key index exists...
+                    if (appliedEffects.TryGetValue(indicesToEffect[j], out List<Effect> effectsList))
+                    {
 #if DEBUG_TEXT
                         Debug.Log("Key value " + indicesToEffect[j] + " already exists.");
 #endif
-						// This key already exists, lets add this effect to the effects list at this index.
-						effectsList.Add(_effectsToApply[i]);
-					}
-					// This key index does not exist...
-					else
-					{
+                        // This key already exists, lets add this effect to the effects list at this index.
+                        effectsList.Add(t);
+                    }
+                    // This key index does not exist...
+                    else
+                    {
 #if DEBUG_TEXT
                         Debug.Log(effectsToApply[i].title + " is not being applied to " + indicesToEffect[j] + " therefore we will create a new list for it at index " + indicesToEffect[j]);
 #endif
-						// Create a new effects list
-						List<Effect> stackingEffect = new List<Effect>();
+                        // Create a new effects list
+                        List<Effect> stackingEffect = new List<Effect>();
 
-						// Add this effect to the list
-						stackingEffect.Add(_effectsToApply[i]);
+                        // Add this effect to the list
+                        stackingEffect.Add(t);
 
-						// Create an entry in our dictionary with our list (if the key exists then other effects will be added to this list)
-						appliedEffects.Add(indicesToEffect[j], stackingEffect);
-					}
-			}
+                        // Create an entry in our dictionary with our list (if the key exists then other effects will be added to this list)
+                        appliedEffects.Add(indicesToEffect[j], stackingEffect);
+                    }
+            }
 #if DEBUG_TEXT
             LogAppliedEffects();
 #endif
-		}
+        }
 
 #if DEBUG_TEXT
         /// <summary>
