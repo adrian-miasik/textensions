@@ -7,7 +7,7 @@ namespace Textensions.Examples.Scripts
 	/// <summary>
 	/// An example script that demonstrates how to use invoke Reveal functions.
 	/// </summary>
-	[Obsolete("This class is not fully supported")]
+	[Obsolete("This class is not being supported anymore.")]
 	public class TextRevealUsageExample : MonoBehaviour
 	{
 		private const string MESSAGE = "This is a test sentence that was passed in by TextRevealUsageExample.cs";
