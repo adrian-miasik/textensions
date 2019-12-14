@@ -286,9 +286,7 @@ namespace Textensions.Core
                 return;
 
             // Clean the update flags
-            _character.hasPositionUpdated = false;
-            _character.hasRotationUpdated = false;
-            _character.hasScaleUpdated = false;
+            _character.CleanFlags();
 
             // TODO: Move these 2 lines outside of this function since they aren't specific to this character (It can probably just done once in initialization)
             // Get the characters material vertices from the texts mesh

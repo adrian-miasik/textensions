@@ -44,6 +44,13 @@ namespace Textensions.Core
             isRevealed = false;
         }
 
+        public void CleanFlags()
+        {
+            hasPositionUpdated = false;
+            hasRotationUpdated = false;
+            hasScaleUpdated = false;
+        }
+
         /// <summary>
         /// Adds a vector3 to our cached position.
         /// </summary>
