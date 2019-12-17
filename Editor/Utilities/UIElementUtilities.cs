@@ -36,6 +36,17 @@ namespace Textensions.Editor.Utilities
                 Debug.LogAssertion("T.ext: Unable to find asset in: " + _imagePath);
             }
         }
+        public static VisualElement CreateRootElement()
+        {
+            VisualElement result = new VisualElement();
+            result.AddToClassList("root");
+            return result;
+        }
+        
+        public static void StyleElement(VisualElement _element, string _styleSheetPath)
+        {
+            _element.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(_styleSheetPath));
+        }
         
         internal static void ShowDisplay(VisualElement _element)
         {
