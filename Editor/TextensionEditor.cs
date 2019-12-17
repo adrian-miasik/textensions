@@ -1,4 +1,5 @@
 using Textensions.Core;
+using Textensions.Editor.Utilities;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -8,7 +9,6 @@ using static Textensions.Editor.Utilities.TextensionStyling;
 
 namespace Textensions.Editor.Components
 {
-    // TODO: Look into creating this the base class for Textension components
     // TODO: Add the ability to remove the header from Textension components
     [CustomEditor(typeof(Textension))]
     public class TextensionEditor: UnityEditor.Editor
@@ -19,7 +19,7 @@ namespace Textensions.Editor.Components
         /// The result element that we want to render and is used to tell the inspector what to render.
         /// <see cref="Editor.CreateInspectorGUI"/>
         /// </summary>
-        private VisualElement resultElement;
+        protected VisualElement resultElement;
 
         /// <summary>
         /// The visual tree uxml structure this script is targeting
@@ -39,35 +39,43 @@ namespace Textensions.Editor.Components
         /// <summary>
         /// Status Indicator that lights a certain color at the top right. This color matches the statusPrefixTE color
         /// </summary>
-        private VisualElement statusIndicatorVE;
+        protected VisualElement statusIndicatorVE;
 
         private const string LOGO_PATH =
             "Packages/com.adrianmiasik.textensions/Resources/TextensionLogo40x40.png";
 
-        private ObjectField directTextOF;
-        private Toggle directHideOnInitT;
+        protected ObjectField directTextOF;
+        protected Toggle directHideOnInitT;
 
-        private VisualElement consoleLogContainer;
+        protected VisualElement consoleLogContainer;
+
+        protected TextensionsConsole console;
         
-        private TextensionsConsole console;
-        
-        public void OnEnable()
+        public virtual void OnEnable()
         {
             // Cache the script reference
             textension = (Textension) target;
-
-            // Cache the uxml structure reference so we can pull out the visual elements when needed as necessary
-            uxmlReference = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
-                ("Packages/com.adrianmiasik.textensions/Editor/Components/TextensionEditor.uxml");
-
-            // Create a new visual element object that we will use to draw every inspector rebuild
-            resultElement = new VisualElement();
-
-            // Link the style sheet to the result element so each element within the result element is styled properly
-            resultElement.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>
-                ("Packages/com.adrianmiasik.textensions/Editor/Components/TextensionEditor.uss"));
             
-            resultElement.AddToClassList("root");
+            InitializeUIElements(
+                "Packages/com.adrianmiasik.textensions/Editor/Components/TextensionEditor.uxml",
+                "Packages/com.adrianmiasik.textensions/Editor/Components/TextensionEditor.uss");
+        }
+
+        /// <summary>
+        /// Caches our uxml visual tree asset and created a root visual element.
+        /// </summary>
+        /// <param name="_uxmlPath"></param>
+        /// <param name="_styleSheetPath"></param>
+        protected void InitializeUIElements(string _uxmlPath, string _styleSheetPath)
+        {
+            // Cache the uxml structure reference so we can pull out the visual elements when needed as necessary
+            uxmlReference = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(_uxmlPath);
+
+            // Create a new styled VisualElement that we will use to draw every inspector rebuild
+            resultElement = CreateRootElement();
+            
+            // Style root element
+            StyleElement(resultElement, _styleSheetPath);
         }
 
         public override void OnInspectorGUI()
@@ -89,7 +97,7 @@ namespace Textensions.Editor.Components
 
             // Read and draw the uxml structure visual elements to the result element
             uxmlReference.CloneTree(resultElement);
-
+            
             // Setup all our references, and null check our queries...
             if (Setup())
             {
@@ -111,15 +119,27 @@ namespace Textensions.Editor.Components
         {
             // Get references
             QueryElements();
-
+            
             // Verify element validity
-            return CheckElements();
+            CheckElements();
+
+            // If we are missing any necessary elements to build this wizard...
+            if (console.GetTypeCount(TextensionsConsole.Types.ASSERT) > 0)
+            {
+                console.PrintAllLogs();
+                console.InjectLogs(consoleLogContainer);
+                
+                Debug.LogAssertion("Unable to draw the Textension Wizard component. Please see the asset logs in the Textensions console.");
+                return false;
+            }
+            
+            return true;
         }
 
         /// <summary>
         /// Queries and caches all our elements needed on creation
         /// </summary>
-        private void QueryElements()
+        protected virtual void QueryElements()
         {
             #region Root
             #region Banner/
@@ -135,23 +155,28 @@ namespace Textensions.Editor.Components
             #endregion
             #endregion
         }
-        
-        private bool CheckElements()
+
+        /// <summary>
+        /// Verifies the integrity of our references.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual void CheckElements()
         {
             // TODO: The rest of the visual elements.
 
-            // If we are missing any necessary elements to build this wizard...
-            if (console.GetTypeCount(TextensionsConsole.Types.ASSERT) > 0)
+            if (logoVE == null)
             {
-                Debug.LogAssertion(
-                    "Unable to draw the Textension Wizard component. Please see the asset logs in the Textensions console.");
-                return false;
+                console.Record(TextensionsConsole.Types.WARNING, "Unable to locate logo element." +
+                                                                 " This is used to display the Textensions logo.");
             }
 
-            return true;
+            if (statusIndicatorVE == null)
+            {
+                console.Record(TextensionsConsole.Types.ASSERT, "Unable to locate the status indicator. " +
+                                                                "This is used to show the user the highest priority log on this component.");
+            }
         }
-
-
+        
         // TODO: A validate function or flow controller
         // (Only move to the next step if the requirements for a previous step have been filled. Not: if this field has updated go to
         // this specific state)
@@ -160,7 +185,7 @@ namespace Textensions.Editor.Components
         /// <summary>
         /// Draw the frame based on the textension wizard state
         /// </summary>
-        private void Paint()
+        protected virtual void Paint()
         {
             // Initialize the direct object field to always be of type TMP_Text
             InitializeObjectField(directTextOF);

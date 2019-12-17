@@ -9,42 +9,15 @@ using static Textensions.Editor.Utilities.TextensionStyling;
 
 namespace Textensions.Editor.Components
 {
-    // TODO: Inherit from TextensionEditor.cs
     // This script is for the textension wizard component
     [CustomEditor(typeof(TextensionWizard))]
-    public class TextensionWizardEditor : UnityEditor.Editor
+    public class TextensionWizardEditor : TextensionEditor
     {
         /// <summary>
         /// The class that has the state data
         /// </summary>
         private TextensionWizard textensionWizard;
-
-        /// <summary>
-        /// The result element that we want to render and is used to tell the inspector what to render.
-        /// <see cref="CreateInspectorGUI"/>
-        /// </summary>
-        private VisualElement resultElement;
-
-        /// <summary>
-        /// The visual tree uxml structure this script is targeting
-        /// </summary>
-        private VisualTreeAsset uxmlReference;
-
-        /// <summary>
-        /// The properties we don't want the default inspector to draw
-        /// </summary>
-        private readonly string[] propertiesToExclude = {"m_Script"};
-
-        /// <summary>
-        /// Textensions Logo (Pre-determined size, image gets loaded into this)
-        /// </summary>
-        private VisualElement logoVE;
-
-        /// <summary>
-        /// Status Indicator that lights a certain color at the top right. This color matches the statusPrefixTE color
-        /// </summary>
-        private VisualElement statusIndicatorVE;
-
+        
         private TextElement instructionTitleTE;
         private TextElement instructionTextTE;
 
@@ -58,96 +31,26 @@ namespace Textensions.Editor.Components
         private VisualElement step2;
         private Button step2ButtonYes;
         private Button step2ButtonNo;
-
-        private ObjectField directTextOF;
-        private Toggle directHideOnInitT;
         
-        private VisualElement consoleLogContainer;
-
-        private const string LOGO_PATH =
-            "Packages/com.adrianmiasik.textensions/Resources/TextensionLogo40x40.png";
-
-        private TextensionsConsole console;
-
-        public void OnEnable()
+        public override void OnEnable()
         {
-            // Cache the script reference
+            // Cache the wizard reference
             textensionWizard = (TextensionWizard) target;
-
-            // Send reference of us to the wizard so it can get context menu logic
             textensionWizard.Editor = this;
 
-            // Cache the uxml structure reference so we can pull out the visual elements when needed as necessary
-            uxmlReference = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
-                ("Packages/com.adrianmiasik.textensions/Editor/Components/TextensionWizardEditor.uxml");
-
-            // Create a new visual element object that we will use to draw every inspector rebuild
-            resultElement = new VisualElement();
-
-            // Link the style sheet to the result element so each element within the result element is styled properly
-            resultElement.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>
-                ("Packages/com.adrianmiasik.textensions/Editor/Components/TextensionWizardEditor.uss"));
-
-            resultElement.AddToClassList("root");
+            InitializeUIElements(
+                "Packages/com.adrianmiasik.textensions/Editor/Components/TextensionWizardEditor.uxml",
+                "Packages/com.adrianmiasik.textensions/Editor/Components/TextensionWizardEditor.uss");
         }
-
-        public override void OnInspectorGUI()
+        
+        protected override void QueryElements()
         {
-            // Update our object, don't draw all the properties, and apply the new properties only
-            // TL;DR: We don't render all inspector variables
-            serializedObject.Update();
-            DrawPropertiesExcluding(serializedObject, propertiesToExclude);
-            serializedObject.ApplyModifiedProperties();
-        }
-
-        public override VisualElement CreateInspectorGUI()
-        {
-            // Create a console
-            console = new TextensionsConsole();
-
-            // Clear the result element before we add stuff to render to it
-            resultElement.Clear();
-
-            // Read and draw the uxml structure visual elements to the result element
-            uxmlReference.CloneTree(resultElement);
-
-            // Setup all our references, and null check our queries...
-            if (Setup())
-            {
-                // Load Logo
-                LoadImageIntoElement(logoVE, LOGO_PATH, 40, 40);
-
-                // Load page
-                Paint();
-            }
-
-            return resultElement;
-        }
-
-        /// <summary>
-        /// Query our elements and checks the validity of our queried data.
-        /// </summary>
-        /// <returns>Returns true if the setup was successful. Otherwise this will return false</returns>
-        private bool Setup()
-        {
-            // Get references
-            QueryElements();
-
-            // Verify element validity
-            return CheckElements();
-        }
-
-        /// <summary>
-        /// Queries and caches all our elements needed on creation
-        /// </summary>
-        private void QueryElements()
-        {
+            // Query base elements first
+            base.QueryElements();
+            
             #region Root
             #region Banner/
-            logoVE = resultElement.Q("Logo*");
-            statusIndicatorVE = resultElement.Q("Status Indicator*");
             #endregion
-            consoleLogContainer = resultElement.Q("ConsoleLogContainer*");
             wizardVE = resultElement.Q("Wizard*");
             #region Wizard/Wizard Center
             #region Wizard/Wizard Center/Instructions Row
@@ -167,45 +70,19 @@ namespace Textensions.Editor.Components
             #endregion
             #endregion
             #endregion
-            #region Direct/
-            #region Direct/Direct Center/Direct Content/
-            directTextOF = resultElement.Q<ObjectField>("Direct Text*");
-            directHideOnInitT = resultElement.Q<Toggle>("Direct Hide On Init*");
-            #endregion
-            #endregion
             #endregion
         }
 
-        private bool CheckElements()
+        protected override void CheckElements()
         {
-            if (logoVE == null)
-            {
-                console.Record(TextensionsConsole.Types.WARNING, "Unable to locate logo element." +
-                                                                 " This is used to display the Textensions logo.");
-            }
-
-            if (statusIndicatorVE == null)
-            {
-                console.Record(TextensionsConsole.Types.ASSERT, "Unable to locate the status indicator. " +
-                                                                "This is used to show the user the highest priority log on this component.");
-            }
+            base.CheckElements();
 
             if (wizardVE == null)
             {
-                console.Record(TextensionsConsole.Types.ASSERT, "Unable to locate the wizard container element. This is used to hide the " +
-                                                                "entire wizard window when the user completes the setup process.");
+                console.Record(TextensionsConsole.Types.ASSERT,
+                    "Unable to locate the wizard container element. This is used to hide the " +
+                    "entire wizard window when the user completes the setup process.");
             }
-
-            // TODO: The rest of the visual elements.
-
-            // If we are missing any necessary elements to build this wizard...
-            if (console.GetTypeCount(TextensionsConsole.Types.ASSERT) > 0)
-            {
-                Debug.LogAssertion("Unable to draw the Textension Wizard component. Please see the asset logs in the Textensions console.");
-                return false;
-            }
-
-            return true;
         }
         
         private void ChangeWizardInstruction(string _prefix = "", string _message = "")
@@ -307,7 +184,7 @@ namespace Textensions.Editor.Components
         /// <summary>
         /// Draw the frame based on the textension wizard state
         /// </summary>
-        private void Paint()
+        protected override void Paint()
         {
             // Hide the connect button, text object field, and the hide on init bool
             HideDisplay(step0);
@@ -418,6 +295,8 @@ namespace Textensions.Editor.Components
                     }
 
                     break;
+                default:
+                    return;
             }
 
             // Print to unity console
