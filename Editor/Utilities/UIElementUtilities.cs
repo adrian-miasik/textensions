@@ -1,5 +1,5 @@
 using System.IO;
-using UnityEditor.UIElements;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -23,19 +23,20 @@ namespace Textensions.Editor.Utilities
             if (File.Exists(_imagePath))
             {
                 // Create a 2D Texture
-                Texture2D _logoTexture = new Texture2D(_imageWidth, _imageHeight);
+                Texture2D logoTexture = new Texture2D(_imageWidth, _imageHeight);
 
                 // Load image into 2D Texture (Convert .png to a texture2D)
-                _logoTexture.LoadImage(File.ReadAllBytes(_imagePath));
+                logoTexture.LoadImage(File.ReadAllBytes(_imagePath));
 
                 // Load 2D texture into the background image style
-                _target.style.backgroundImage = _logoTexture;
+                _target.style.backgroundImage = logoTexture;
             }
             else
             {
                 Debug.LogAssertion("T.ext: Unable to find asset in: " + _imagePath);
             }
         }
+
         public static VisualElement CreateRootElement()
         {
             VisualElement result = new VisualElement();
