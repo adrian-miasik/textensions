@@ -366,9 +366,11 @@ namespace Textensions.Core
 		/// </summary>
 		private void CleanUnusedEffects()
 		{
-			// If we have keys to clean...
-			if (keysToClean.Count > 0)
+            if (!AreThereKeysToClean())
 			{
+                return;
+            }
+            
 				// Since we are no longer iterating through the appliedEffects collection, we can now remove the effects
 				// Iterate through all the keys to remove from appliedEffects...
 				foreach (int i in keysToClean)
@@ -385,6 +387,10 @@ namespace Textensions.Core
 				// We have just cleaned the keys, we can now clear this memory up for the next tick.
 				keysToClean.Clear();
 			}
+
+        private bool AreThereKeysToClean()
+        {
+            return keysToClean.Count > 0;
 		}
 	}
 }
