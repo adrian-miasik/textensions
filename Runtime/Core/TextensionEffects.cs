@@ -213,7 +213,7 @@ namespace Textensions.Core
 		/// <summary>
 		/// However if the provided effect does exist within the dictionary we will access that key and add the effect to the list within that key value.
 		/// </summary>
-		private void AddEffects(List<Effect> _effectsToApply)
+		private void AddEffects(IEnumerable<Effect> _effectsToApply)
         {
             // Iterate through each effect...
             foreach (Effect t in _effectsToApply)
