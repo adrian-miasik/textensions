@@ -46,12 +46,32 @@ namespace Textensions.Reveals.Base
 
         private void OnEnable()
         {
-            textension.OnHideInitialize += Reveal;
-            textension.RevealsTick += Tick;
+            Subscribe();
         }
 
         private void OnDisable()
         {
+            Unsubscribe();
+        }
+
+        private void Subscribe()
+        {
+            if (textension == null)
+            {
+                return;
+            }
+            
+            textension.OnHideInitialize += Reveal;
+            textension.RevealsTick += Tick;
+        }
+
+        private void Unsubscribe()
+        {
+            if (textension == null)
+            {
+                return;
+            }
+            
             textension.OnHideInitialize -= Reveal;
             textension.RevealsTick -= Tick;
             isRevealing = false;
