@@ -22,7 +22,7 @@ namespace Textensions.Editor
         /// <summary>
         /// The log structure. Each log requires a type and a message.
         /// </summary>
-        public struct Log
+        private struct Log
         {
             private readonly Types status;
             private readonly string message;
@@ -136,7 +136,7 @@ namespace Textensions.Editor
                     // Let's iterate through all the logs of this type...
                     foreach (Log _log in _recordedLogs)
                     {
-                        _parent.Add(GenerateComponentLog(_log));
+                        _parent.Add(GenerateLogComponent(_log));
                     }
                 }
             }
@@ -181,7 +181,7 @@ namespace Textensions.Editor
         /// </summary>
         /// <param name="_log"></param>
         /// <returns></returns>
-        private VisualElement GenerateComponentLog(Log _log)
+        private VisualElement GenerateLogComponent(Log _log)
         {
             // Create and stylize the status row
             VisualElement _statusRow = new VisualElement {name = "Status Row*"};
@@ -189,7 +189,7 @@ namespace Textensions.Editor
             _statusRow.style.flexDirection = FlexDirection.Row;
             _statusRow.style.alignItems = Align.Center;
             _statusRow.style.marginTop = 1;
-            _statusRow.style.borderBottomWidth = 2f;					// Border
+            _statusRow.style.borderBottomWidth = 2f;			        // Border
             _statusRow.style.borderBottomColor = backgroundStyleColor;	// Border
 
             // Create and stylize the status prefix
@@ -221,7 +221,7 @@ namespace Textensions.Editor
 
             return _statusRow;
         }
-
+        
         /// <summary>
         /// Stylizes the last cached log depending on the log data.
         /// </summary>
