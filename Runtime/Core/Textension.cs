@@ -58,7 +58,7 @@ namespace Textensions.Core
         /// Recalculates the TMP_Text and creates multiple character classes to match the source text.
         /// This should not be called more than once per frame.
         /// </summary>
-        public void Initialize()
+        private void Initialize()
         {
             /* Force the mesh update so we don't have to wait a frame to get the data.
             Since we need to get information from the mesh we will have to update the mesh a bit earlier than normal.
@@ -127,8 +127,11 @@ namespace Textensions.Core
 
         private void Update()
         {
-            if (hasInitialized)
+            if (!hasInitialized)
             {
+                return;
+            }
+            
                 // Step 0: Initialize the text so the data is ready for manipulation.
                 text.ForceMeshUpdate();
 
@@ -145,7 +148,6 @@ namespace Textensions.Core
                 // Step 4: Then finally take all that information and apply it to the TMP_Text only once this frame
                 Render();
             }
-        }
 
         /// <summary>
         /// Update each character that has been dirtied. (If an effect didn't modify a character, we will not update
