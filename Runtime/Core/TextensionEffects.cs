@@ -59,6 +59,11 @@ namespace Textensions.Core
 		/// </summary>
 		private void Subscribe()
 		{
+            if (textension == null)
+            {
+                return;
+            }
+
 			// Subscribe to the effect action events
 			textension.EffectsInitialize += Initialize;
 			textension.EffectsTick += EffectsTick;
@@ -69,6 +74,11 @@ namespace Textensions.Core
 		/// </summary>
 		private void Unsubscribe()
 		{
+            if (textension == null)
+            {
+                return;
+            }
+            
 			// Unsubscribe to the effect action events
 			textension.EffectsInitialize -= Initialize;
 			textension.EffectsTick -= EffectsTick;
