@@ -21,7 +21,7 @@ namespace Textensions.Reveals.Base
         [Tooltip("The text we want to reveal.")]
         public Textension textension;
         
-        private float totalRevealTime; // TODO: Utilize this somewhere
+        private float totalRevealTime;
         private bool vertexUpdate;
 
         /// <summary>
