@@ -13,7 +13,6 @@ namespace Textensions.Core
         private Quaternion rotationCached;
         private Vector3 scaleCached;
         
-        // TODO: Utilize this
         public bool effectCompleted;
 
         [HideInInspector] public bool hasPositionUpdated;

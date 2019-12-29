@@ -314,13 +314,6 @@ namespace Textensions.Core
 			// For each key...(each character index to apply an effect to)
 			foreach (int key in appliedEffects.Keys)
 			{
-//                if (key > textension.GetTextLength() - 1)
-//                {
-//                    Debug.Log("Our effects need to be re-initialized since the text has changed.");
-//                    // TODO: Throw out all character data past the characters length
-//                    return;
-//                }
-
 				Character character = textension.GetCharacter(key);
 
 				// If our current character is not revealed, or not visible...
