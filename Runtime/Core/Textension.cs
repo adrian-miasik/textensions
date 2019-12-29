@@ -58,7 +58,7 @@ namespace Textensions.Core
         /// Recalculates the TMP_Text and creates multiple character classes to match the source text.
         /// This should not be called more than once per frame.
         /// </summary>
-        private void Initialize()
+        public void Initialize()
         {
             /* Force the mesh update so we don't have to wait a frame to get the data.
             Since we need to get information from the mesh we will have to update the mesh a bit earlier than normal.
@@ -127,7 +127,7 @@ namespace Textensions.Core
 
         private void Update()
         {
-            if (!hasInitialized)
+            if (hasInitialized)
             {
                 return;
             }
