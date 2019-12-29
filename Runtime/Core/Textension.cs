@@ -132,22 +132,22 @@ namespace Textensions.Core
                 return;
             }
             
-                // Step 0: Initialize the text so the data is ready for manipulation.
-                text.ForceMeshUpdate();
+            // Step 0: Initialize the text so the data is ready for manipulation.
+            text.ForceMeshUpdate();
 
             // Step 1: Tick each text reveal to determine if they should reveal a/multiple text character(s)
             // (A tick does not equal a character reveal)
-                RevealsTick?.Invoke();
+            RevealsTick?.Invoke();
 
-                // Step 2: Calculate the effect for each character (If the character has any effects applied to it)
-                EffectsTick?.Invoke();
+            // Step 2: Calculate the effect for each character (If the character has any effects applied to it)
+            EffectsTick?.Invoke();
 
             // Step 3: Apply our effect modifications to the character class
-                UpdateCharacters();
+            UpdateCharacters();
 
-                // Step 4: Then finally take all that information and apply it to the TMP_Text only once this frame
-                Render();
-            }
+            // Step 4: Then finally take all that information and apply it to the TMP_Text only once this frame
+            Render();
+        }
 
         /// <summary>
         /// Update each character that has been dirtied. (If an effect didn't modify a character, we will not update
