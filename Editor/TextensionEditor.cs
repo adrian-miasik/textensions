@@ -141,19 +141,11 @@ namespace Textensions.Editor.Components
         /// </summary>
         protected virtual void QueryElements()
         {
-            #region Root
-            #region Banner/
             logoVE = resultElement.Q("Logo*");
             statusIndicatorVE = resultElement.Q("Status Indicator*");
-            #endregion
             consoleLogContainer = resultElement.Q("ConsoleLogContainer*");
-            #region Direct/
-            #region Direct/Direct Center/Direct Content/
             directTextOF = resultElement.Q<ObjectField>("Direct Text*");
             directHideOnInitT = resultElement.Q<Toggle>("Direct Hide On Init*");
-            #endregion
-            #endregion
-            #endregion
         }
 
         /// <summary>
