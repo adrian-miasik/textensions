@@ -162,18 +162,42 @@ namespace Textensions.Editor.Components
         /// <returns></returns>
         protected virtual void CheckElements()
         {
-            // TODO: The rest of the visual elements.
-
             if (logoVE == null)
             {
-                console.Record(TextensionsConsole.Types.WARNING, "Unable to locate logo element." +
-                                                                 " This is used to display the Textensions logo.");
+                console.Record(TextensionsConsole.Types.WARNING, 
+                    "Unable to locate logo element. This is used to display the Textensions logo.");
             }
 
             if (statusIndicatorVE == null)
             {
-                console.Record(TextensionsConsole.Types.ASSERT, "Unable to locate the status indicator. " +
-                                                                "This is used to show the user the highest priority log on this component.");
+                console.Record(TextensionsConsole.Types.ASSERT, 
+                    "Unable to locate the status indicator. This is used to show the user the highest " +
+                    "priority log on this component.");
+            }
+
+            if (consoleLogContainer == null)
+            {
+                console.Record(TextensionsConsole.Types.ASSERT, 
+                    "Unable to locate the console container. This reference is used to inject our " +
+                    "console logs into the Unity Editor. If this reference doesn't exist, our logs will " +
+                    "appear in the console only.");
+            }
+
+            if (directTextOF == null)
+            {
+                console.Record(TextensionsConsole.Types.ASSERT, 
+                    "Unable to locate the object field 'Direct Text*'. This is used to keep track of " +
+                    "the current Textension reference. If this reference doesn't exist, our component will " +
+                    "not work at all.");
+            }
+
+            if (directHideOnInitT == null)
+            {
+                console.Record(TextensionsConsole.Types.WARNING, 
+                    "Unable to locate the checkbox toggle 'Direct Hide On Init*'. This is used to " +
+                    "determine if our text should be hidden/seen on start (Needed for text reveals). If this " +
+                    "reference doesn't exist, our component should mostly remain functional but our text reveal " +
+                    "functionality will possibly break.");
             }
         }
         
