@@ -8,8 +8,8 @@ using UnityEngine.Profiling;
 namespace Textensions.Core
 {
     /// <summary>
-    /// A textension is an abstraction layer on top of the TMP 'TMP_Text' class including all it's relevant components. This will be used for later to keep track
-    /// of effects and each character state.
+    /// A textension is an abstraction layer on top of the TMP 'TMP_Text' class including all it's relevant components.
+    /// This will be used for later to keep track of effects and each character state.
     /// </summary>
     public class Textension : MonoBehaviour
     {
@@ -55,7 +55,8 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Recalculates the TMP_Text and creates multiple character classes to match the source text. This should not be called more than once per frame.
+        /// Recalculates the TMP_Text and creates multiple character classes to match the source text.
+        /// This should not be called more than once per frame.
         /// </summary>
         public void Initialize()
         {
@@ -131,13 +132,14 @@ namespace Textensions.Core
                 // Step 0: Initialize the text so the data is ready for manipulation.
                 text.ForceMeshUpdate();
 
-                // Step 1: Tick each text reveal to determine if they should reveal a/multiple text character(s) (A tick does not equal a character reveal)
+            // Step 1: Tick each text reveal to determine if they should reveal a/multiple text character(s)
+            // (A tick does not equal a character reveal)
                 RevealsTick?.Invoke();
 
                 // Step 2: Calculate the effect for each character (If the character has any effects applied to it)
                 EffectsTick?.Invoke();
 
-                // Step 3: Apply our effect modifications to the character class
+            // Step 3: Apply our effect modifications to the character class
                 UpdateCharacters();
 
                 // Step 4: Then finally take all that information and apply it to the TMP_Text only once this frame
@@ -146,11 +148,13 @@ namespace Textensions.Core
         }
 
         /// <summary>
-        /// Update each character that has been dirtied. (If an effect didn't modify a character, we will not update that characters mesh)
+        /// Update each character that has been dirtied. (If an effect didn't modify a character, we will not update
+        /// that characters mesh)
         /// </summary>
         /// <summary>
-        /// Note: I'm leaving this function within the base Textension class since we might have to modify characters that not specific to effects.
-        /// If this isn't the case in the near future, we should put this inside the TextensionEffects.cs class instead.
+        /// Note: I'm leaving this function within the base Textension class since we might have to modify characters
+        /// that not specific to effects. If this isn't the case in the near future, we should put this inside the
+        /// TextensionEffects.cs class instead.
         /// </summary>
         private void UpdateCharacters()
         {

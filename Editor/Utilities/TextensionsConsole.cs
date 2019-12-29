@@ -177,7 +177,7 @@ namespace Textensions.Editor
         }
 
         /// <summary>
-        /// Generates and returns an in-line component log
+        /// Generates and returns a specific visual element based on the provided log.
         /// </summary>
         /// <param name="_log"></param>
         /// <returns></returns>

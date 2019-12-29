@@ -12,7 +12,7 @@ namespace Textensions.Core
         private Vector3 positionCached;
         private Quaternion rotationCached;
         private Vector3 scaleCached;
-
+        
         // TODO: Utilize this
         public bool effectCompleted;
 
