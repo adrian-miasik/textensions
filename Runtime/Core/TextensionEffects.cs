@@ -57,14 +57,14 @@ namespace Textensions.Core
 		/// <summary>
 		/// Subscribe to the textension action events so that this effect script can get invoked. (EffectsInitialize & EffectsTick)
 		/// </summary>
-		private void Subscribe()
-		{
+        private void Subscribe()
+        {
             if (textension == null)
             {
                 return;
             }
 
-			// Subscribe to the effect action events
+            // Subscribe to the effect action events
 			textension.EffectsInitialize += Initialize;
 			textension.EffectsTick += EffectsTick;
 		}
@@ -195,14 +195,18 @@ namespace Textensions.Core
 		private void RemoveEffect(int _characterIndex, Effect _effectToRemove)
 		{
 			// If we have found the character index...
-			if (appliedEffects.TryGetValue(_characterIndex, out List<Effect> effectsList))
-				// Remove the specific effect from this character
-				effectsList.Remove(_effectToRemove);
-			else
-				Debug.LogWarning("Could not find " + _characterIndex + " in the applied effects list." +
-				                 "It looks like you are trying to access a character that has no effects on it." +
-				                 "Are you sure this character index has been created on the appliedEffect list?");
-		}
+            if (appliedEffects.TryGetValue(_characterIndex, out List<Effect> effectsList))
+            {
+                // Remove the specific effect from this character
+                effectsList.Remove(_effectToRemove);
+            }
+            else
+            {
+                Debug.LogWarning("Could not find " + _characterIndex + " in the applied effects list." +
+                                 "It looks like you are trying to access a character that has no effects on it." +
+                                 "Are you sure this character index has been created on the appliedEffect list?");
+            }
+        }
 
 		/// <summary>
 		/// Adds the provided effects to our textension.
@@ -314,7 +318,7 @@ namespace Textensions.Core
 			// For each key...(each character index to apply an effect to)
 			foreach (int key in appliedEffects.Keys)
 			{
-				Character character = textension.GetCharacter(key);
+                Character character = textension.GetCharacter(key);
 
 				// If our current character is not revealed, or not visible...
 				if (!character.isRevealed || !character.Info().isVisible)
@@ -337,24 +341,33 @@ namespace Textensions.Core
 					if (character.timeSinceReveal >= fx.m_uniform[fx.m_uniform.length - 1].time)
 					{
 						// If this effect animation curve has either a ping pong effect or a loop effect at the end...
-						if (fx.m_uniform.postWrapMode == WrapMode.PingPong || fx.m_uniform.postWrapMode == WrapMode.Loop)
-							// This effect is still playing, let's go to the next effect instead
-							continue;
+                        if (fx.m_uniform.postWrapMode == WrapMode.PingPong ||
+                            fx.m_uniform.postWrapMode == WrapMode.Loop)
+                        {
+                            // This effect is still playing, let's go to the next effect instead
+                            continue;
+                        }
 
-						// Remove the completed effect from this character
+                        // Remove the completed effect from this character
 						RemoveEffect(key, fx);
 
 						// This character has no more effects, therefore we will mark it as effectCompleted.
 						character.effectCompleted = true;
 
 						// If the specific character index has a value...
-						if (appliedEffects.TryGetValue(key, out List<Effect> effectsList))
-							// If the specific character has no more effects...
-							if (effectsList.Count <= 0)
-								// Mark this key as ready to be removed. (The reason we are doing it this way
-								// is we can't remove it while we are still iterating through it.)
-								keysToClean.Add(key);
-					}
+                        if (appliedEffects.TryGetValue(key, out List<Effect> effectsList))
+                        {
+
+
+                            // If the specific character has no more effects...
+                            if (effectsList.Count <= 0)
+                            {
+                                // Mark this key as ready to be removed. (The reason we are doing it this way
+                                // is we can't remove it while we are still iterating through it.)
+                                keysToClean.Add(key);
+                            }
+                        }
+                    }
 				}
 			}
 
@@ -367,30 +380,30 @@ namespace Textensions.Core
 		private void CleanUnusedEffects()
 		{
             if (!AreThereKeysToClean())
-			{
+            {
                 return;
             }
             
-				// Since we are no longer iterating through the appliedEffects collection, we can now remove the effects
-				// Iterate through all the keys to remove from appliedEffects...
-				foreach (int i in keysToClean)
-				{
-					// Remove the cleaned key
-					appliedEffects.Remove(i);
+            // Since we are no longer iterating through the appliedEffects collection, we can now remove the effects
+            // Iterate through all the keys to remove from appliedEffects...
+            foreach (int i in keysToClean)
+            {
+                // Remove the cleaned key
+                appliedEffects.Remove(i);
 
 #if DEBUG_TEXT
                     Debug.Log("Character index [" + i + "] has no more effects on it, therefore the dictionary key is being revoked.");
                     Debug.Log(textension.GetCharacter(i).Info().character);
 #endif
-				}
+            }
 
-				// We have just cleaned the keys, we can now clear this memory up for the next tick.
-				keysToClean.Clear();
-			}
+            // We have just cleaned the keys, we can now clear this memory up for the next tick.
+            keysToClean.Clear();
+        }
 
         private bool AreThereKeysToClean()
         {
             return keysToClean.Count > 0;
-		}
+        }
 	}
 }
