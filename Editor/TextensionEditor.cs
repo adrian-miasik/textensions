@@ -43,12 +43,11 @@ namespace Textensions.Editor.Components
 
         private const string LOGO_PATH =
             "Packages/com.adrianmiasik.textensions/Resources/TextensionLogo40x40.png";
-
+        
+        private VisualElement consoleLogContainer;
+        
         protected ObjectField directTextOF;
         protected Toggle directHideOnInitT;
-
-        protected VisualElement consoleLogContainer;
-
         protected TextensionsConsole console;
         
         public virtual void OnEnable()
