@@ -298,13 +298,7 @@ namespace Textensions.Editor.Components
                 default:
                     return;
             }
-
-            // Print to unity console
-            // console.PrintAllLogs();
-
-            // Add elements to flag
-            console.InjectLogs(consoleLogContainer);
-
+            
             // TODO: Schedule all the logs so they disappear
             // var hideStatusMessage = resultElement.schedule.Execute(() => 
             // 	{
