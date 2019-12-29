@@ -217,7 +217,7 @@ namespace Textensions.Editor.Components
 
         private void HandleDirectReferences()
         {
-            directTextOF.RegisterCallback<ChangeEvent<Object>>((_field) =>
+            directTextOF.RegisterCallback<ChangeEvent<Object>>(_field =>
             {
                 // If you de-referenced a valid value.
                 if (_field.previousValue != null && _field.newValue == null)
@@ -227,7 +227,7 @@ namespace Textensions.Editor.Components
             });
 
             // Whatever the direct bool is, apply it on the textensionWizard.hideOnInitialization
-            directHideOnInitT.RegisterCallback<ChangeEvent<bool>>((_field) =>
+            directHideOnInitT.RegisterCallback<ChangeEvent<bool>>(_field =>
             {
                 textension.hideOnInitialization = _field.newValue;
             });
