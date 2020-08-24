@@ -1,0 +1,40 @@
+.root {
+    margin: -3px -6px 0 -15px;
+}
+
+.h1 {
+    font-size: 26px;
+    -unity-font-style: bold;
+    margin-top: -2px;
+    color: rgb(244, 193, 60);
+}
+
+.h2 {
+    -unity-text-align: upper-center;
+    -unity-font: resource('Chivo-Bold');
+}
+
+.field {
+    -unity-font-style: normal;
+    -unity-font: resource('Chivo-Bold');
+    flex-grow: 1;
+    flex-shrink: 0;
+    align-items: center;
+    margin: 2px;
+}
+
+.p {
+    font-size: 10px;
+    flex-shrink: 1;
+    flex-grow: 0;
+    -unity-font-style: normal;
+}
+
+.column {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.chivo-bold {
+    -unity-font: resource('Chivo-Bold');
+}

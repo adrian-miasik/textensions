@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement>
+        <Style src="TextensionEditor.uss" />
+        <ui:VisualElement name="Banner" style="border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; padding-left: 0; padding-right: 5px; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; -unity-background-scale-mode: stretch-to-fill; border-left-width: 0; border-bottom-color: rgb(40, 40, 40); border-bottom-width: 2px; flex-direction: row;">
+            <ui:VisualElement name="Logo*" style="width: 40px; height: 40px; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-left-color: rgb(244, 193, 60);" />
+            <ui:VisualElement name="Banner Text" style="left: 3px;">
+                <ui:Label text="Textensions" name="Banner Title" class="H1 h1" style="margin-left: 0; margin-right: 0; margin-top: -2px; margin-bottom: 0;" />
+                <ui:Label text="Created by Adrian Miasik" name="Banner Credits" class="p" style="top: -2px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Status Indicator*" style="background-image: resource('StatusIndicator10x10'); height: 5px; width: 5px; position: absolute; right: 0; bottom: 0; top: 0; margin-right: 5px; margin-top: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ConsoleLogContainer*" />
+        <ui:VisualElement name="Direct*" style="margin-left: 0; margin-right: 0; margin-bottom: 2px; margin-top: 5px; padding-left: 0; flex-direction: row; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; flex-grow: 1; justify-content: center;">
+            <ui:VisualElement class="column" />
+            <ui:VisualElement name="Direct Center" style="border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; -unity-text-align: middle-left; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-color: rgba(243, 193, 60, 0.39); border-right-color: rgba(243, 193, 60, 0.39); border-top-color: rgba(243, 193, 60, 0.39); border-bottom-color: rgba(243, 193, 60, 0.39); flex-grow: 1; flex-basis: 300px; margin-left: 5px; margin-right: 5px;">
+                <ui:Label text="Textension.cs" name="Direct Title*" class="h2" style="-unity-text-align: upper-left; padding-bottom: 5px; padding-left: 5px; padding-top: 5px; background-color: rgba(0, 0, 0, 0.24); padding-right: 5px; color: rgb(243, 193, 60); border-bottom-width: 1px; border-bottom-color: rgba(243, 193, 60, 0.39); flex-shrink: 1;" />
+                <ui:VisualElement name="Direct Content" style="-unity-text-align: middle-left; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1; margin-left: 0; margin-right: 0; align-items: stretch; flex-shrink: 0;">
+                    <uie:ObjectField label="Text:" name="Direct Text*" class="field" />
+                    <ui:Toggle label="Hide On Initialization:" name="Direct Hide On Init*" class="field" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="column" style="flex-grow: 1; flex-shrink: 0;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

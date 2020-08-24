@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b23e34ea9431480da6a614efce3d39e9, type: 3}
+  m_Name: Bubble
+  m_EditorClassIdentifier: 
+  m_style: 0
+  m_title: Bubble
+  m_uniform:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0.023689393
+      outSlope: 0.023689393
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0
+      outWeight: 0.46095267
+    - serializedVersion: 3
+      time: 0.16055503
+      value: 1.4101684
+      inSlope: -0.17598483
+      outSlope: -0.27778238
+      tangentMode: 1
+      weightedMode: 3
+      inWeight: 1
+      outWeight: 0.22169173
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.0017618674
+      outSlope: 0.0017618674
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.91750425
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 1
+    m_RotationOrder: 4
