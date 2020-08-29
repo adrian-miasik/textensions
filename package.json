@@ -1,11 +1,15 @@
 {
   "name": "com.adrianmiasik.textensions",
-  "author": "Adrian Miasik",
+  "author": {
+    "name": "Adrian Miasik",
+    "email": "support@textensions.com",
+    "url": "https://www.adrianmiasik.com/"
+  },
   "displayName": "Textensions",
-  "version": "0.0.1",
+  "version": "0.0.2-preview",
   "unity": "2019.3",
   "bugs": "bugs@textensions.com",
-  "description": "Textensions is a tool used to quickly create and apply visual effects to any TextMeshPro text component. Allowing the developer to spend more time creating the visuals and less time creating their own animation solutions for text.",
+  "description": "Textensions is a tool used to quickly create and apply motion & visual effects to any TextMeshPro text component. Allowing devs to quickly make their text look nice without having to program their own animations.",
   "homepage": "textensions.com",
   "repository": {
     "type": "git",

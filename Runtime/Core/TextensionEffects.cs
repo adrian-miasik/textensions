@@ -240,7 +240,7 @@ namespace Textensions.Core
                     else
                     {
 #if DEBUG_TEXT
-                        Debug.Log(effectsToApply[i].title + " is not being applied to " + indicesToEffect[j] + " therefore we will create a new list for it at index " + indicesToEffect[j]);
+                        //Debug.Log(effectsToApply[i].title + " is not being applied to " + indicesToEffect[j] + " therefore we will create a new list for it at index " + indicesToEffect[j]);
 #endif
                         // Create a new effects list
                         List<Effect> stackingEffect = new List<Effect>();
@@ -277,7 +277,7 @@ namespace Textensions.Core
                     for (int j = 0; j < stackingEffect.Count; j++)
                     {
                         // Add the effect name to the end of this string
-                        allEffectsStr += stackingEffect[j].title;
+                        allEffectsStr += stackingEffect[j];
 
                         // If we have another effect after this one...
                         if (j != stackingEffect.Count - 1)

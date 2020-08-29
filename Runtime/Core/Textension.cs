@@ -127,7 +127,7 @@ namespace Textensions.Core
 
         private void Update()
         {
-            if (hasInitialized)
+            if (!hasInitialized)
             {
                 return;
             }
